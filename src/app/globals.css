@@ -1,26 +1,207 @@
 @import "tailwindcss";
 
+/*
+ * Sistema de diseño TINO — un libro de cuentas: papel y tinta.
+ * Fuente: referencias/TINO sistema de diseño.zip → "TINO Sistema de Diseño".
+ *
+ * Reglas del sistema:
+ *  - Sin sombras en ningún componente.
+ *  - La jerarquía se construye con cuatro líneas (división, raya, doble raya,
+ *    punteada) y el espacio. Las tarjetas son la excepción.
+ *  - Los acentos son solo texto e iconos: nunca fondo de un bloque.
+ *  - Todo importe monetario va en IBM Plex Mono (`font-mono`).
+ */
+
+/* ── Tokens · modo claro (papel) ─────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --fondo: #faf8f3;
+  --superficie: #ffffff;
+  --hundido: #f2eee5;
+  --texto: #1a1a17;
+  --secundario: #6b6760;
+  --terciario: #9a958b;
+  --linea: #e4dfd4;
+  --raya: #1a1a17;
+
+  /* Acentos: base para iconos, gráficas y cifras ≥ 24 px; «-texto» para tamaños pequeños. */
+  --marca: #a8762c;
+  --marca-texto: #8a5f1f;
+  --entrada: #2f7d5a;
+  --entrada-texto: #2f7d5a;
+  --salida: #b0452e;
+  --salida-texto: #b0452e;
+
+  color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/* ── Tokens · modo oscuro (tinta azulada) ────────────────────────────── */
+/* Por preferencia del sistema, salvo que se haya forzado el claro. */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    --fondo: #12141a;
+    --superficie: #181b22;
+    --hundido: #1f232c;
+    --texto: #e8e4dc;
+    --secundario: #8b8a84;
+    --terciario: #5e5f63;
+    --linea: #272b34;
+    --raya: #8b8a84;
+
+    --marca-texto: #bc8a3e;
+    --entrada-texto: #4e9e78;
+    --salida-texto: #d0664b;
+
+    color-scheme: dark;
   }
 }
 
+/* Cambio manual. Sin `:root` delante, también sirve para fijar el modo de un
+   bloque concreto (la página /estilos muestra ambos modos a la vez). */
+[data-theme="dark"] {
+  --fondo: #12141a;
+  --superficie: #181b22;
+  --hundido: #1f232c;
+  --texto: #e8e4dc;
+  --secundario: #8b8a84;
+  --terciario: #5e5f63;
+  --linea: #272b34;
+  --raya: #8b8a84;
+
+  --marca-texto: #bc8a3e;
+  --entrada-texto: #4e9e78;
+  --salida-texto: #d0664b;
+
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --fondo: #faf8f3;
+  --superficie: #ffffff;
+  --hundido: #f2eee5;
+  --texto: #1a1a17;
+  --secundario: #6b6760;
+  --terciario: #9a958b;
+  --linea: #e4dfd4;
+  --raya: #1a1a17;
+
+  --marca-texto: #8a5f1f;
+  --entrada-texto: #2f7d5a;
+  --salida-texto: #b0452e;
+
+  color-scheme: light;
+}
+
+/* ── Exposición a Tailwind ───────────────────────────────────────────── */
+@theme inline {
+  /* Se vacían las escalas por defecto: solo existe lo que el sistema define. */
+  --color-*: initial;
+  --shadow-*: initial;
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
+  --text-shadow-*: initial;
+  --radius-*: initial;
+  --text-*: initial;
+  --font-*: initial;
+
+  --color-fondo: var(--fondo);
+  --color-superficie: var(--superficie);
+  --color-hundido: var(--hundido);
+  --color-texto: var(--texto);
+  --color-secundario: var(--secundario);
+  --color-terciario: var(--terciario);
+  --color-linea: var(--linea);
+  --color-raya: var(--raya);
+  --color-marca: var(--marca);
+  --color-marca-texto: var(--marca-texto);
+  --color-entrada: var(--entrada);
+  --color-entrada-texto: var(--entrada-texto);
+  --color-salida: var(--salida);
+  --color-salida-texto: var(--salida-texto);
+
+  /* Los keywords que Tailwind necesita tras vaciar la paleta. */
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-inherit: inherit;
+
+  --font-sans: var(--font-interfaz), system-ui, sans-serif;
+  --font-mono: var(--font-cifras), ui-monospace, monospace;
+
+  /* Espaciado: base 4 → 4, 8, 12, 16, 24, 32, 48, 64 (1, 2, 3, 4, 6, 8, 12, 16). */
+  --spacing: 4px;
+
+  /* Radios, máximo 6. */
+  --radius-fila: 0px; /* filas, tablas y teclado */
+  --radius-muestra: 2px; /* muestras y barras */
+  --radius-campo: 4px; /* campos, botones y chips */
+  --radius-hoja: 6px; /* hojas y paneles */
+
+  /* Cifras (tamaño / interlineado · peso). Siempre con font-mono. */
+  --text-cifra-xl: 56px;
+  --text-cifra-xl--line-height: 60px;
+  --text-cifra-xl--font-weight: 500;
+  --text-cifra-xl--letter-spacing: -0.03em;
+  --text-cifra-l: 32px;
+  --text-cifra-l--line-height: 36px;
+  --text-cifra-l--font-weight: 500;
+  --text-cifra-l--letter-spacing: -0.02em;
+  --text-cifra-m: 20px;
+  --text-cifra-m--line-height: 28px;
+  --text-cifra-m--font-weight: 500;
+  --text-cifra-s: 15px;
+  --text-cifra-s--line-height: 22px;
+  --text-cifra-s--font-weight: 500;
+  --text-cifra-xs: 12px;
+  --text-cifra-xs--line-height: 16px;
+  --text-cifra-xs--font-weight: 400;
+  /* Solo el campo de monto (C4 del documento): 44/52. */
+  --text-cifra-campo: 44px;
+  --text-cifra-campo--line-height: 52px;
+  --text-cifra-campo--font-weight: 500;
+  --text-cifra-campo--letter-spacing: -0.02em;
+
+  /* Texto. */
+  --text-titulo-1: 28px;
+  --text-titulo-1--line-height: 34px;
+  --text-titulo-1--font-weight: 600;
+  --text-titulo-1--letter-spacing: -0.01em;
+  --text-titulo-2: 20px;
+  --text-titulo-2--line-height: 26px;
+  --text-titulo-2--font-weight: 600;
+  --text-cuerpo: 15px;
+  --text-cuerpo--line-height: 22px;
+  --text-cuerpo--font-weight: 400;
+  --text-etiqueta: 13px;
+  --text-etiqueta--line-height: 18px;
+  --text-etiqueta--font-weight: 500;
+  --text-rotulo: 11px;
+  --text-rotulo--line-height: 14px;
+  --text-rotulo--font-weight: 600;
+  --text-rotulo--letter-spacing: 0.08em;
+}
+
+/* ── Las cuatro líneas ───────────────────────────────────────────────── */
+/* División (entre filas) = `border-b border-linea`; raya (bajo encabezado de
+   sección) = `border-b border-raya`. Las otras dos no existen en Tailwind: */
+@utility doble-raya {
+  border-bottom: 3px double var(--raya);
+}
+
+@utility punteada {
+  border-bottom: 1px dashed var(--terciario);
+}
+
+/* ── Base ────────────────────────────────────────────────────────────── */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: var(--font-interfaz), system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 22px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* El foco es de marca y es un contorno, nunca una sombra. */
+:focus-visible {
+  outline: 2px solid var(--marca);
+  outline-offset: 2px;
 }
