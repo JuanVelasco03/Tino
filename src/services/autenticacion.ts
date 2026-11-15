@@ -78,8 +78,16 @@ export async function registrar(
   return { tipo: "revisa_correo", correo: validacion.correo };
 }
 
-/** `true` si el enlace verificó y la sesión quedó iniciada. */
+/**
+ * `true` si el enlace verificó y la sesión quedó iniciada.
+ *
+ * El token es de un solo uso: si el enlace se abre otra vez (doble clic,
+ * recarga, precarga del navegador) y ya hay sesión, no se vuelve a consumir
+ * y se da por bueno en lugar de mostrar un error falso.
+ */
 export async function confirmarEnlace(tokenHash: string, tipo: TipoEnlace): Promise<boolean> {
+  if (await repositorio.haySesion()) return true;
+
   const { error } = await repositorio.verificarEnlace(tokenHash, tipo);
   return error === null;
 }

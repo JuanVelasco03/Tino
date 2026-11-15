@@ -43,6 +43,13 @@ export async function verificarEnlace(
   return aResultado(error);
 }
 
+/** `true` si la petición porta una sesión válida (cookies de Supabase). */
+export async function haySesion(): Promise<boolean> {
+  const supabase = await crearClienteServidor();
+  const { data } = await supabase.auth.getClaims();
+  return Boolean(data?.claims);
+}
+
 export async function cerrarSesion(): Promise<ResultadoAuth> {
   const supabase = await crearClienteServidor();
   const { error } = await supabase.auth.signOut();

@@ -162,8 +162,9 @@ arquitectura de backend. Esa prioridad se protege así:
 
 - **Las decisiones de diseño las toma el autor.** Estructura de módulos,
   modelo de datos y nombres no se delegan.
-- **Las migraciones las escribe el autor.** El agente puede aplicarlas y
-  revisarlas, no diseñarlas.
+- **El modelo de datos lo decide el autor en el spec.** Tablas, columnas,
+  nombres y tipos se fijan ahí. El agente puede escribir y aplicar la
+  migración que lo implementa; el autor la revisa antes de aplicarla.
 - Sí se delega lo repetitivo: tipos, formularios, pruebas, configuración,
   componentes de interfaz a partir del sistema de diseño.
 - Ante una propuesta que contradiga una regla de la sección 3, gana la
