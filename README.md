@@ -34,3 +34,17 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Configuración de Supabase para el acceso (spec 01)
+
+Manual, en el panel de Supabase del proyecto:
+
+1. **Authentication → Providers → Email**: «Confirm email» activo.
+2. **Authentication → Email Templates → Confirm signup**: el enlace debe ser exactamente
+
+   ```
+   {{ .SiteURL }}/auth/confirmar?token_hash={{ .TokenHash }}&type=email
+   ```
+
+3. **Authentication → URL Configuration**: Site URL `http://localhost:3000` y
+   `http://localhost:3000` en Redirect URLs.

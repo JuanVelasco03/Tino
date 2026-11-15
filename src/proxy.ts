@@ -9,10 +9,26 @@ import { NextResponse, type NextRequest } from "next/server";
 import { crearClienteProxy } from "@/repositories/supabase/servidor";
 
 // Todo lo demás es privado. /estilos es la referencia viva del sistema de diseño: no toca datos.
-const RUTAS_PUBLICAS = ["/login", "/auth", "/estilos"];
+const RUTAS_PUBLICAS = ["/login", "/registro", "/auth", "/estilos"];
+
+// Con sesión iniciada no tienen sentido: se redirige a `/`.
+const RUTAS_DE_ACCESO = ["/login", "/registro"];
 
 function esPublica(ruta: string): boolean {
   return RUTAS_PUBLICAS.some((p) => ruta === p || ruta.startsWith(`${p}/`));
+}
+
+function esDeAcceso(ruta: string): boolean {
+  return RUTAS_DE_ACCESO.includes(ruta);
+}
+
+/** Redirige conservando las cookies de sesión que el refresco haya escrito. */
+function redirigir(destino: URL, cookies: ReturnType<typeof NextResponse.next>["cookies"]) {
+  const redireccion = NextResponse.redirect(destino);
+  for (const cookie of cookies.getAll()) {
+    redireccion.cookies.set(cookie);
+  }
+  return redireccion;
 }
 
 export async function proxy(request: NextRequest) {
@@ -22,13 +38,14 @@ export async function proxy(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const autenticado = Boolean(data?.claims);
 
-  if (!autenticado && !esPublica(request.nextUrl.pathname)) {
-    const redireccion = NextResponse.redirect(new URL("/login", request.url));
-    // Conserva las cookies de sesión que el refresco haya escrito.
-    for (const cookie of obtenerRespuesta().cookies.getAll()) {
-      redireccion.cookies.set(cookie);
-    }
-    return redireccion;
+  const ruta = request.nextUrl.pathname;
+
+  if (!autenticado && !esPublica(ruta)) {
+    return redirigir(new URL("/login", request.url), obtenerRespuesta().cookies);
+  }
+
+  if (autenticado && esDeAcceso(ruta)) {
+    return redirigir(new URL("/", request.url), obtenerRespuesta().cookies);
   }
 
   return obtenerRespuesta();

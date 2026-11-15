@@ -20,6 +20,7 @@
 - Cierre de sesión: botón mínimo «Salir» en `/`.
 - Proxy: `/registro` pasa a ser pública; usuario autenticado en `/login` o `/registro` se redirige a `/`.
 - Validación de credenciales en dominio, con pruebas unitarias.
+- Botón de cambio de tema (claro/oscuro) fijo en la esquina superior derecha de todas las pantallas, en el layout raíz. La elección se recuerda en el navegador.
 
 **Fuera de alcance (specs futuros):**
 
@@ -30,6 +31,7 @@
 - Layout de la aplicación autenticada; `/` sigue siendo un marcador con el botón «Salir».
 - Retorno a la ruta original tras entrar (`?siguiente=`).
 - Reenvío del correo de confirmación.
+- Guardar el tema en base de datos por usuario; modo «sistema» como tercera opción del botón.
 
 ## Modelo de datos
 
@@ -80,12 +82,14 @@ src/
       acciones.ts            # server actions: entrar, registrar, salir
     auth/confirmar/route.ts  # verifyOtp(token_hash, type) → redirige a /
     page.tsx                 # + botón «Salir»
+  components/boton-tema.tsx  # botón fijo de cambio de tema (cliente)
   components/acceso/         # columna, formulario, campo subrayado, separador «o con tu correo», botón Google
   domain/autenticacion/
     credenciales.ts
     credenciales.test.ts
   services/autenticacion.ts
   repositories/supabase/autenticacion.ts  # usa crearClienteServidor() de servidor.ts
+  app/layout.tsx             # + script de tema y <BotonTema />
   proxy.ts                   # modificado
 ```
 
@@ -104,6 +108,7 @@ Dirección: `app/(acceso)/acciones.ts → services/autenticacion.ts → domain/a
 9. `src/proxy.ts`: añade `/registro` a `RUTAS_PUBLICAS`; si hay sesión y la ruta es `/login` o `/registro`, redirige a `/` conservando cookies.
 10. `src/app/page.tsx`: añade formulario con botón «Salir» que invoca `salir`.
 11. Configuración de Supabase (manual, documentada en el README): «Confirm email» activo; plantilla «Confirm signup» con enlace `{{ .SiteURL }}/auth/confirmar?token_hash={{ .TokenHash }}&type=email`; Site URL y Redirect URLs con `http://localhost:3000`.
+12. Cambio de tema: `src/components/boton-tema.tsx` (cliente, `position: fixed`, arriba a la derecha, objetivo táctil 44 px, `aria-label="Cambiar tema"`; muestra sol en oscuro y luna en claro). Alterna `data-theme` en `<html>` y guarda `claro`/`oscuro` en `localStorage` con clave `tino-tema` (dentro de `try/catch`). En `src/app/layout.tsx`: script en línea en `<head>` que, antes de pintar, fija `data-theme` desde `localStorage` o, si no hay valor, desde `prefers-color-scheme`; `<html suppressHydrationWarning>`; `<BotonTema />` dentro de `<body>`.
 
 ## Criterios de aceptación
 
@@ -126,6 +131,10 @@ Dirección: `app/(acceso)/acciones.ts → services/autenticacion.ts → domain/a
 - [ ] «Salir» en `/` cierra sesión y lleva a `/login`; volver a `/` redirige a `/login`.
 - [ ] Ningún archivo en `src/components/` ni `src/app/` importa `@supabase/*` ni `repositories/` (salvo `proxy.ts`).
 - [ ] La prueba de aislamiento entre usuarios (REGLAS §4) sigue intacta.
+- [ ] El botón de tema aparece fijo arriba a la derecha en `/login`, `/registro`, `/` y `/estilos`, también al hacer scroll y en 390 px sin solaparse con el contenido.
+- [ ] Al pulsarlo, la pantalla cambia entre tokens claros y oscuros; al recargar se conserva la elección sin parpadeo.
+- [ ] Sin elección guardada, el tema inicial sigue la preferencia del sistema.
+- [ ] Con `localStorage` bloqueado el botón sigue alternando el tema de la sesión sin errores.
 
 ## Decisiones
 
@@ -138,6 +147,8 @@ Dirección: `app/(acceso)/acciones.ts → services/autenticacion.ts → domain/a
 - **Sí:** mensaje genérico de credenciales; distinguir solo «correo sin confirmar». **No:** decir si el correo existe (enumeración de usuarios).
 - **Sí:** destino tras entrar es `/`. **No:** `?siguiente=` ni ir al primer uso; ambos son otros specs.
 - **Sí:** «Salir» mínimo en `/` para probar el ciclo completo.
+- **Sí:** tema en `localStorage` más script en línea antes del primer pintado. **No:** cookie (obligaría a leerla en el layout y volvería dinámicas todas las rutas) ni base de datos (no hay perfil todavía).
+- **Sí:** botón alterna solo claro/oscuro; el valor inicial sale del sistema. **No:** tercera opción «sistema»; queda para un spec futuro.
 - **Sí:** el proxy redirige a `/` a usuarios autenticados en rutas de acceso.
 - **Sí:** server actions + `useActionState` para estado pendiente y errores. **No:** cliente de navegador para iniciar sesión; mantiene la regla de que los componentes no tocan Supabase.
 - **Sí:** estructura `app/(acceso) → services/autenticacion → domain/autenticacion + repositories/supabase/autenticacion`, aprobada por el autor.
