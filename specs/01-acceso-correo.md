@@ -1,6 +1,6 @@
 # SPEC 01 — Acceso con correo y contraseña
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** —
 > **Fecha:** 2026-11-14
 > **Objetivo:** Que un usuario pueda crear cuenta, confirmar su correo, entrar y salir de Tino con correo y contraseña, sobre la interfaz completa de acceso del diseño.
