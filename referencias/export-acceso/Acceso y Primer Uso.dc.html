@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F2EEE5;font-family:'Familjen Grotesk',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#8A5F1F}
+a:hover{color:#1A1A17}
+</style>
+</helmet>
+<div style="padding:64px;display:flex;flex-direction:column;gap:48px;color:#1A1A17">
+<div style="display:flex;flex-direction:column;gap:6px;padding-bottom:16px;border-bottom:1px solid #1A1A17"><span style="font-size:28px;font-weight:700;letter-spacing:0.16em">TINO</span><h1 style="margin:0;font-size:28px;font-weight:600">Acceso y primer uso</h1><span style="font-size:15px;color:#6B6760">Google o correo. Primer uso en 2 pasos: moneda y zona, luego cuentas con saldo de hoy.</span></div>
+<div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+<div style="display:flex;flex-direction:column;gap:12px"><span style="font-size:15px;font-weight:600">Escritorio · acceso · claro</span><dc-import name="Acceso" modo="claro" formato="escritorio" paso="login" hint-size="1440px,900px"></dc-import></div>
+<div style="display:flex;flex-direction:column;gap:12px"><span style="font-size:15px;font-weight:600">Escritorio · acceso · oscuro</span><dc-import name="Acceso" modo="oscuro" formato="escritorio" paso="login" hint-size="1440px,900px"></dc-import></div>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+<div style="display:flex;flex-direction:column;gap:12px"><span style="font-size:15px;font-weight:600">Escritorio · paso 2, cuentas · claro</span><dc-import name="Acceso" modo="claro" formato="escritorio" paso="cuentas" hint-size="1440px,1000px"></dc-import></div>
+<div style="display:flex;flex-direction:column;gap:12px"><span style="font-size:15px;font-weight:600">Escritorio · paso 2, cuentas · oscuro</span><dc-import name="Acceso" modo="oscuro" formato="escritorio" paso="cuentas" hint-size="1440px,1000px"></dc-import></div>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+<div style="display:flex;flex-direction:column;gap:12px"><span style="font-size:15px;font-weight:600">Móvil · acceso · claro</span><dc-import name="Acceso" modo="claro" formato="movil" paso="login" hint-size="390px,844px"></dc-import></div>
+<div style="display:flex;flex-direction:column;gap:12px"><span style="font-size:15px;font-weight:600">Móvil · acceso · oscuro</span><dc-import name="Acceso" modo="oscuro" formato="movil" paso="login" hint-size="390px,844px"></dc-import></div>
+<div style="display:flex;flex-direction:column;gap:12px"><span style="font-size:15px;font-weight:600">Móvil · paso 1 · claro</span><dc-import name="Acceso" modo="claro" formato="movil" paso="moneda" hint-size="390px,844px"></dc-import></div>
+<div style="display:flex;flex-direction:column;gap:12px"><span style="font-size:15px;font-weight:600">Móvil · paso 1 · oscuro</span><dc-import name="Acceso" modo="oscuro" formato="movil" paso="moneda" hint-size="390px,844px"></dc-import></div>
+<div style="display:flex;flex-direction:column;gap:12px"><span style="font-size:15px;font-weight:600">Móvil · paso 2 · claro</span><dc-import name="Acceso" modo="claro" formato="movil" paso="cuentas" hint-size="390px,844px"></dc-import></div>
+<div style="display:flex;flex-direction:column;gap:12px"><span style="font-size:15px;font-weight:600">Móvil · paso 2 · oscuro</span><dc-import name="Acceso" modo="oscuro" formato="movil" paso="cuentas" hint-size="390px,844px"></dc-import></div>
+</div>
+</div>
+</x-dc>
+</body>
+</html>

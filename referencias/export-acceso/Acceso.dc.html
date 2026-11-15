@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Familjen Grotesk',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#8A5F1F}
+a:hover{color:#1A1A17}
+input::placeholder{color:var(--t3,#9A958B);opacity:1}
+</style>
+</helmet>
+<div style="{{ vars }}">
+<div data-screen-label="{{ label }}" style="width:100%;min-height:100%;position:relative;background:var(--bg,#FAF8F3);color:var(--tx,#1A1A17);font-family:'Familjen Grotesk',sans-serif;border:1px solid var(--ln,#E4DFD4);box-sizing:border-box;display:flex;flex-direction:column">
+<sc-if value="{{ mov }}" hint-placeholder-val="{{ false }}"><div style="height:48px;flex:none;display:flex;align-items:flex-end;justify-content:space-between;padding:0 30px 6px;font-size:15px;font-weight:600"><span>9:41</span><span style="font-size:12px">5G</span></div></sc-if>
+
+<sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:{{ pad }}">
+<div style="width:100%;max-width:380px;display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:32px;font-weight:700;letter-spacing:0.16em">TINO</span><span style="font-size:17px;line-height:26px;color:var(--t2,#6B6760)">Tu libro de cuentas personal.</span></div>
+<div style="display:flex;flex-direction:column;gap:16px;padding-top:20px;border-top:1px solid var(--lf,#1A1A17)">
+<button style="height:52px;display:flex;align-items:center;justify-content:center;gap:12px;border:1px solid var(--ln,#E4DFD4);border-radius:4px;background:var(--sf,#FFFFFF);color:var(--tx,#1A1A17);font-family:'Familjen Grotesk',sans-serif;font-size:15px;font-weight:600;cursor:pointer"><span style="width:20px;height:20px;display:flex;align-items:center;justify-content:center;border:1px solid var(--tx,#1A1A17);border-radius:50%;font-size:12px;font-weight:700;box-sizing:border-box">G</span>Continuar con Google</button>
+<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center"><span style="height:1px;background:var(--ln,#E4DFD4)"></span><span style="font-size:13px;color:var(--t2,#6B6760)">o con tu correo</span><span style="height:1px;background:var(--ln,#E4DFD4)"></span></div>
+<label style="display:flex;flex-direction:column;gap:4px"><span style="font-size:13px;color:var(--t2,#6B6760)">Correo</span><input value="{{ email }}" onChange="{{ onEmail }}" type="email" placeholder="nombre@correo.com" style="height:44px;border:none;border-bottom:1px solid var(--lf,#1A1A17);outline:none;background:none;padding:0;font-family:'Familjen Grotesk',sans-serif;font-size:17px;color:var(--tx,#1A1A17)"></label>
+<label style="display:flex;flex-direction:column;gap:4px"><span style="display:flex;justify-content:space-between;font-size:13px;color:var(--t2,#6B6760)"><span>Contraseña</span><span style="color:var(--br,#8A5F1F);font-weight:600">¿La olvidaste?</span></span><input type="password" value="{{ pass }}" onChange="{{ onPass }}" placeholder="••••••••" style="height:44px;border:none;border-bottom:1px solid var(--ln,#E4DFD4);outline:none;background:none;padding:0;font-family:'Familjen Grotesk',sans-serif;font-size:17px;color:var(--tx,#1A1A17)"></label>
+<button onClick="{{ toMoneda }}" style="height:52px;margin-top:8px;border:none;border-radius:4px;background:var(--tx,#1A1A17);color:var(--bg,#FAF8F3);font-family:'Familjen Grotesk',sans-serif;font-size:15px;font-weight:600;cursor:pointer">Entrar</button>
+<span style="font-size:13px;color:var(--t2,#6B6760);text-align:center">¿Primera vez? <span style="color:var(--br,#8A5F1F);font-weight:600">Crear cuenta con correo</span></span>
+</div>
+<span style="font-size:12px;line-height:18px;color:var(--t2,#6B6760)">Sin conexión con tu banco: todo lo registras tú. Tus datos son solo tuyos.</span>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isOnb }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:{{ padOnb }}">
+<div style="width:100%;max-width:{{ colW }}px;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:20px;font-weight:700;letter-spacing:0.16em">TINO</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--t2,#6B6760)">Paso {{ stepN }} de 2</span></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px"><span style="height:3px;background:var(--tx,#1A1A17)"></span><span style="height:3px;background:{{ seg2 }}"></span></div>
+
+<sc-if value="{{ isMoneda }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:6px"><h1 style="margin:0;font-size:28px;line-height:34px;font-weight:600;letter-spacing:-0.01em">Hola, Daniela.</h1><p style="margin:0;font-size:15px;line-height:24px;color:var(--t2,#6B6760);text-wrap:pretty">Dos datos antes de empezar. Los tomamos de tu cuenta de Google; cámbialos si no son así.</p></div>
+<div>
+<div style="padding-bottom:8px;border-bottom:1px solid var(--lf,#1A1A17);font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase">Moneda base</div>
+<sc-for list="{{ monedas }}" as="m" hint-placeholder-count="3">
+<button onClick="{{ m.pick }}" style="width:100%;min-height:56px;display:grid;grid-template-columns:20px minmax(0,1fr) auto;gap:12px;align-items:center;padding:0;background:none;border:none;border-bottom:1px solid var(--ln,#E4DFD4);color:var(--tx,#1A1A17);text-align:left;font-family:'Familjen Grotesk',sans-serif;cursor:pointer"><span style="width:18px;height:18px;border-radius:50%;border:1px solid {{ m.ring }};display:flex;align-items:center;justify-content:center;box-sizing:border-box"><span style="width:8px;height:8px;border-radius:50%;background:{{ m.dot }}"></span></span><span style="display:flex;flex-direction:column"><span style="font-size:15px;font-weight:{{ m.weight }}">{{ m.label }}</span><span style="font-size:13px;color:var(--t2,#6B6760)">{{ m.sub }}</span></span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--t2,#6B6760)">{{ m.ej }}</span></button>
+</sc-for>
+</div>
+<div>
+<div style="padding-bottom:8px;border-bottom:1px solid var(--lf,#1A1A17);font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase">Zona horaria</div>
+<div style="min-height:56px;display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--ln,#E4DFD4)"><span style="display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">América/Bogotá</span><span style="font-size:13px;color:var(--t2,#6B6760)">UTC−5 · son las <span style="font-family:'IBM Plex Mono',monospace">9:41</span></span></span><span style="font-size:15px;font-weight:600;color:var(--br,#8A5F1F)">Cambiar</span></div>
+<p style="margin:10px 0 0;font-size:13px;line-height:20px;color:var(--t2,#6B6760)">Define qué cuenta como «hoy» al registrar y a qué hora llegan los avisos.</p>
+</div>
+<button onClick="{{ toCuentas }}" style="height:52px;border:none;border-radius:4px;background:var(--tx,#1A1A17);color:var(--bg,#FAF8F3);font-family:'Familjen Grotesk',sans-serif;font-size:15px;font-weight:600;cursor:pointer">Seguir</button>
+</sc-if>
+
+<sc-if value="{{ isCuentas }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:6px"><h1 style="margin:0;font-size:28px;line-height:34px;font-weight:600;letter-spacing:-0.01em">¿Dónde tienes tu plata hoy?</h1><p style="margin:0;font-size:15px;line-height:24px;color:var(--t2,#6B6760);text-wrap:pretty">Escribe el saldo actual de cada cuenta. Puedes agregar más después.</p></div>
+<div style="display:flex;flex-wrap:wrap;gap:8px">
+<sc-for list="{{ tipos }}" as="t" hint-placeholder-count="6">
+<button onClick="{{ t.add }}" style="height:{{ chipH }}px;display:flex;align-items:center;gap:6px;padding:0 12px;border:1px solid var(--ln,#E4DFD4);border-radius:4px;background:var(--sf,#FFFFFF);color:var(--tx,#1A1A17);font-family:'Familjen Grotesk',sans-serif;font-size:14px;cursor:pointer"><span style="display:flex;color:var(--t2,#6B6760)">{{ t.icon }}</span>{{ t.label }}</button>
+</sc-for>
+</div>
+<div>
+<div style="display:grid;grid-template-columns:20px minmax(0,1fr) 140px 32px;gap:12px;padding-bottom:8px;border-bottom:1px solid var(--lf,#1A1A17);font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--t2,#6B6760)"><span></span><span>Cuenta</span><span style="text-align:right">Saldo hoy</span><span></span></div>
+<sc-for list="{{ rows }}" as="r" hint-placeholder-count="4">
+<div style="display:grid;grid-template-columns:20px minmax(0,1fr) 140px 32px;gap:12px;align-items:center;min-height:60px;border-bottom:1px solid var(--ln,#E4DFD4)">
+<span style="display:flex;color:var(--t2,#6B6760)">{{ r.icon }}</span>
+<div style="min-width:0;display:flex;flex-direction:column"><input value="{{ r.name }}" onChange="{{ r.onName }}" placeholder="{{ r.ph }}" style="min-width:0;height:24px;border:none;outline:none;background:none;padding:0;font-family:'Familjen Grotesk',sans-serif;font-size:15px;font-weight:600;color:var(--tx,#1A1A17)"><span style="font-size:12px;color:var(--t2,#6B6760)">{{ r.tipo }}</span></div>
+<label style="display:flex;align-items:baseline;justify-content:flex-end;gap:2px;border-bottom:1px solid {{ r.line }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--out,#B0452E)">{{ r.sign }}</span><input value="{{ r.val }}" onChange="{{ r.onVal }}" inputmode="numeric" placeholder="0" style="width:110px;text-align:right;height:32px;border:none;outline:none;background:none;padding:0;font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:500;color:{{ r.valColor }}"></label>
+<button onClick="{{ r.del }}" aria-label="Quitar" style="width:32px;height:44px;display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--t2,#6B6760);cursor:pointer;padding:0">{{ ic.x }}</button>
+</div>
+</sc-for>
+<div style="display:grid;grid-template-columns:20px minmax(0,1fr) 140px 32px;gap:12px;align-items:baseline;padding:14px 0 10px;border-bottom:3px double var(--lf,#1A1A17)"><span></span><span style="font-size:15px;font-weight:600">Patrimonio inicial</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:500">{{ total }}</span><span></span></div>
+<p style="margin:10px 0 0;font-size:13px;line-height:20px;color:var(--t2,#6B6760)">Estos saldos son tu punto de partida. No cuentan como ingresos.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px"><button style="height:52px;border:none;border-radius:4px;background:var(--tx,#1A1A17);color:var(--bg,#FAF8F3);font-family:'Familjen Grotesk',sans-serif;font-size:15px;font-weight:600;cursor:pointer">Empezar con {{ nRows }}</button><button onClick="{{ back }}" style="height:44px;background:none;border:none;font-family:'Familjen Grotesk',sans-serif;font-size:15px;color:var(--t2,#6B6760);cursor:pointer">Volver</button></div>
+</sc-if>
+</div>
+</div>
+</sc-if>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;modo&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;claro&quot;,&quot;oscuro&quot;],&quot;default&quot;:&quot;claro&quot;,&quot;tsType&quot;:&quot;'claro'|'oscuro'&quot;},&quot;formato&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;escritorio&quot;,&quot;movil&quot;],&quot;default&quot;:&quot;escritorio&quot;,&quot;tsType&quot;:&quot;'escritorio'|'movil'&quot;},&quot;paso&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;login&quot;,&quot;moneda&quot;,&quot;cuentas&quot;],&quot;default&quot;:&quot;login&quot;,&quot;tsType&quot;:&quot;'login'|'moneda'|'cuentas'&quot;}}">
+const SVG = (d, s = 20) => React.createElement('svg', { width: s, height: s, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.5, strokeLinecap: 'round', strokeLinejoin: 'round', dangerouslySetInnerHTML: { __html: d } });
+const P = {
+  efectivo: '<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>',
+  banco: '<line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/>',
+  tarjeta: '<rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/>',
+  inversion: '<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
+  otorgado: '<path d="M7 17 17 7"/><path d="M7 7h10v10"/>', contraida: '<path d="M17 7 7 17"/><path d="M17 17H7V7"/>'
+};
+const ICONS = { x: SVG('<path d="M18 6 6 18"/><path d="m6 6 12 12"/>', 16) };
+const MODES = {
+  claro: { '--bg':'#FAF8F3','--sf':'#FFFFFF','--sk':'#F2EEE5','--tx':'#1A1A17','--t2':'#6B6760','--t3':'#9A958B','--ln':'#E4DFD4','--lf':'#1A1A17','--br':'#8A5F1F','--in':'#2F7D5A','--out':'#B0452E' },
+  oscuro: { '--bg':'#12141A','--sf':'#181B22','--sk':'#1F232C','--tx':'#E8E4DC','--t2':'#8B8A84','--t3':'#5E5F63','--ln':'#272B34','--lf':'#8B8A84','--br':'#BC8A3E','--in':'#4E9E78','--out':'#D0664B' }
+};
+const TIPOS = { efectivo:['Efectivo','Efectivo · activo',false,'Efectivo'], banco:['Banco','Banco · activo',false,'Nombre del banco'], tarjeta:['Tarjeta de crédito','Tarjeta · pasivo, lo que debes hoy',true,'Nombre de la tarjeta'], inversion:['Inversión','Inversión · activo',false,'Corredor o fondo'], otorgado:['Le presté a alguien','Préstamo otorgado · te debe',false,'¿A quién?'], contraida:['Debo a alguien','Deuda contraída · le debes',true,'¿A quién?'] };
+const fmt = n => String(Math.abs(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+const digits = s => String(s).replace(/\D/g, '');
+
+class Component extends DCLogic {
+  state = { paso: this.props.paso ?? 'login', email:'', pass:'', mon:'COP', seq:4,
+    rows: [{ id:1, t:'efectivo', name:'Efectivo', v:'45000' }, { id:2, t:'banco', name:'Bancolombia', v:'910051' }, { id:3, t:'banco', name:'Nequi', v:'20321' }, { id:4, t:'tarjeta', name:'', v:'' }] };
+  upd(id, patch) { this.setState(s => ({ rows: s.rows.map(r => r.id === id ? { ...r, ...patch } : r) })); }
+  renderVals() {
+    const s = this.state;
+    const esc = (this.props.formato ?? 'escritorio') === 'escritorio';
+    const total = s.rows.reduce((a, r) => a + (TIPOS[r.t][2] ? -1 : 1) * parseInt(r.v || '0', 10), 0);
+    const valid = s.rows.filter(r => r.v).length;
+    const v = MODES[this.props.modo ?? 'claro'] || MODES.claro;
+    return {
+      vars: { ...v, width: esc ? 1440 : 390, minHeight: esc ? (s.paso === 'login' ? 900 : 1000) : 844, display:'flex' },
+      label: s.paso === 'login' ? 'Acceso' : 'Primer uso', mov: !esc, ic: ICONS,
+      pad: esc ? '40px' : '24px 24px 48px', padOnb: esc ? '56px 40px' : '16px 16px 40px', colW: esc ? 560 : 358, chipH: esc ? 36 : 44,
+      isLogin: s.paso === 'login', isOnb: s.paso !== 'login', isMoneda: s.paso === 'moneda', isCuentas: s.paso === 'cuentas',
+      stepN: s.paso === 'cuentas' ? 2 : 1, seg2: s.paso === 'cuentas' ? 'var(--tx,#1A1A17)' : 'var(--ln,#E4DFD4)',
+      email: s.email, onEmail: e => this.setState({ email: e.target.value }), pass: s.pass, onPass: e => this.setState({ pass: e.target.value }),
+      toMoneda: () => this.setState({ paso:'moneda' }), toCuentas: () => this.setState({ paso:'cuentas' }), back: () => this.setState({ paso:'moneda' }),
+      monedas: [['COP','Peso colombiano · COP','Sin decimales, punto de miles','1.234.567'],['USD','Dólar estadounidense · USD','Dos decimales con coma','1.234,56'],['OTRA','Otra moneda','Elegir de la lista','']].map(([k, label, sub, ej]) => ({ label, sub, ej, ring: s.mon === k ? 'var(--tx,#1A1A17)' : 'var(--t3,#9A958B)', dot: s.mon === k ? 'var(--tx,#1A1A17)' : 'transparent', weight: s.mon === k ? 600 : 400, pick: () => this.setState({ mon:k }) })),
+      tipos: Object.keys(TIPOS).map(k => ({ label: TIPOS[k][0], icon: SVG(P[k], 16), add: () => this.setState(st => ({ rows: [...st.rows, { id: st.seq + 1, t:k, name:'', v:'' }], seq: st.seq + 1 })) })),
+      rows: s.rows.map(r => { const T = TIPOS[r.t]; return {
+        icon: SVG(P[r.t]), name: r.name, ph: T[3], tipo: T[1], sign: T[2] && r.v ? '−' : '',
+        val: r.v ? fmt(parseInt(r.v, 10)) : '', valColor: T[2] ? 'var(--out,#B0452E)' : 'var(--tx,#1A1A17)',
+        line: r.v ? 'var(--ln,#E4DFD4)' : 'var(--lf,#1A1A17)',
+        onName: e => this.upd(r.id, { name: e.target.value }), onVal: e => this.upd(r.id, { v: digits(e.target.value).slice(0, 11) }),
+        del: () => this.setState(st => ({ rows: st.rows.filter(x => x.id !== r.id) }))
+      }; }),
+      total: (total < 0 ? '−' : '') + fmt(total), nRows: valid === 1 ? '1 cuenta' : valid + ' cuentas'
+    };
+  }
+}
+</script>
+</body>
+</html>
