@@ -1,6 +1,6 @@
 # SPEC 02 — Perfil de usuario en base de datos
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01
 > **Fecha:** 2026-11-14
 > **Objetivo:** Que todo usuario nuevo tenga automáticamente una fila en `public.perfiles`, aislada por RLS y verificada por la prueba de aislamiento entre usuarios.
