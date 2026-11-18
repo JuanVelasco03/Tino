@@ -1,14 +1,18 @@
-# Tino
+# Tino web
+
+Cliente web de Tino. La API (reglas de negocio, datos, migraciones) vive en
+`../Tino-API`.
 
 `REGLAS.md` es **vinculante**. Léelo completo antes de cualquier cambio.
 Ante conflicto entre una propuesta y una regla, gana la regla.
+`REGLAS.md` es el mismo en ambos repositorios: si cambia, se cambia en los dos.
 
 @REGLAS.md
 @AGENTS.md
 
 ## Comandos
 
-- `npm run dev` — servidor de desarrollo
+- `npm run dev` — servidor de desarrollo (puerto 3000; necesita Tino API en `TINO_API_URL`)
 - `npm test` — Vitest (una pasada)
 - `npm run lint`
 
@@ -16,5 +20,6 @@ Ante conflicto entre una propuesta y una regla, gana la regla.
 
 - Next.js 16: `middleware` se llama `proxy` (`src/proxy.ts`). Lee `node_modules/next/dist/docs/` antes de tocar APIs de Next.
 - Dinero: `bigint` en unidades menores (COP = pesos, USD = centavos). Nunca `number` con decimales.
-- Solo `src/repositories/supabase/servidor.ts` construye clientes con el token del usuario. Nunca `service_role` en peticiones.
-- El modelo de datos lo decide el autor en el spec; el agente escribe y aplica la migración, y el autor la revisa antes de aplicarla (REGLAS §8).
+- La web no toca tablas. Datos: `src/repositories/api/` (único cliente de Tino API, reenvía el token de la sesión). Supabase solo para Auth.
+- Solo `src/repositories/supabase/servidor.ts` construye clientes de Supabase con la sesión del usuario. Nunca `service_role`.
+- Migraciones y modelo de datos: en `Tino-API` (REGLAS §8).

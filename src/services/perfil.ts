@@ -1,5 +1,6 @@
-import type { Perfil } from "@/domain/perfil/perfil";
-import { leerPerfilPropio } from "@/repositories/supabase/perfiles";
+import { leerPerfilPropio, type Perfil } from "@/repositories/api/perfil";
+
+export type { Perfil };
 
 export async function obtenerPerfil(): Promise<Perfil | null> {
   return leerPerfilPropio();

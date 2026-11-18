@@ -10,7 +10,8 @@ Especificación completa: `docs/Tino_Requerimientos.pdf`.
 
 ## 1. Qué es Tino
 
-Aplicación web de finanzas personales de uso real y diario, multiusuario.
+Aplicación de finanzas personales (web y, más adelante, celular) de uso
+real y diario, multiusuario.
 Registro manual, sin conexión bancaria. Moneda base COP, con posiciones
 en USD.
 
@@ -29,9 +30,20 @@ esté perfecto.
 
 ## 2. Stack
 
-- Next.js (App Router), TypeScript.
+Dos repositorios, una API y sus clientes:
+
+- **Tino API** (`Tino-API`): NestJS, TypeScript. Única dueña de las
+  reglas de negocio y del acceso a datos.
+- **Tino web** (`Tino-web`): Next.js (App Router), TypeScript. Cliente de
+  la API.
+- **App de celular**: cliente futuro de la misma API (§7).
 - Supabase: PostgreSQL, Auth (correo y Google), políticas a nivel de fila.
-- Esquema gestionado con migraciones versionadas en el repositorio.
+- Esquema gestionado con migraciones versionadas en
+  `Tino-API/supabase/migrations`.
+
+La API es sin estado: el cliente obtiene el token del proveedor y lo envía
+en `Authorization: Bearer`. La API lo verifica; no lo emite. Ningún
+cliente tiene acceso privilegiado: la web es un consumidor más.
 
 ---
 
@@ -60,7 +72,7 @@ posible, y en la capa de dominio cuando no. **Nunca solo en la interfaz.**
 | RN-16 | Toda entrada o salida de dinero de una cuenta real se registra, sin excepción. Que el usuario no quiera analizar algo no autoriza a omitirlo: un movimiento sin registrar desvía el saldo para siempre. |
 | RN-17 | Un movimiento asociado a una persona es préstamo por defecto. Puede convertirse en gasto propio al registrarlo o después, condonándolo. |
 | RN-18 | El cupo disponible es cupo total menos deuda vigente. No se almacena. |
-| RN-19 | El acceso a datos de usuario usa el cliente de Supabase en el servidor, portando el token del usuario, de modo que las políticas evalúen al usuario real. |
+| RN-19 | El acceso a datos de usuario lo hace la API con el cliente de Supabase portando el token del usuario, de modo que las políticas evalúen al usuario real. |
 | RN-20 | La aplicación no almacena contraseñas. Toda verificación de identidad se resuelve contra el token del proveedor. |
 
 ---
@@ -82,7 +94,10 @@ Reglas que se derivan:
   política de seguridad, desde su primera migración.
 - Ninguna tabla se expone sin políticas activas.
 - Existe una prueba automatizada que crea dos usuarios y verifica que
-  ninguno ve los datos del otro. **No se borra ni se desactiva.**
+  ninguno ve los datos del otro (`Tino-API/test/aislamiento.e2e-spec.ts`).
+  **No se borra ni se desactiva.**
+- La API se niega a arrancar si la credencial de servicio está en su
+  entorno. Solo la leen las pruebas.
 - Las variables de entorno con secretos nunca llevan prefijo público.
 - El MCP de Supabase se usa en modo solo lectura salvo al aplicar
   migraciones a propósito, y nunca apuntando a datos reales.
@@ -91,33 +106,50 @@ Reglas que se derivan:
 
 ## 5. Arquitectura
 
-Next.js no impone estructura, así que la imponemos nosotros. Esta es la
-parte que decide si el proyecto enseña algo.
+Esta es la parte que decide si el proyecto enseña algo.
+
+### Tino API
 
 ```
 src/
-  app/              Rutas, páginas, route handlers. Delgados.
-  domain/           Reglas de negocio puras. Sin HTTP, sin Supabase.
-  services/         Casos de uso. Orquestan dominio y repositorios.
+  <modulo>/         Módulo Nest por caso de uso: controller + service.
+  autenticacion/    Guard global que verifica el token (RF-03).
+  domain/           Reglas de negocio puras. Sin Nest, sin HTTP, sin Supabase.
   repositories/     Único lugar que conoce Supabase y el esquema.
+  config/           Variables de entorno.
+```
+
+Dirección de dependencias: `controller → service → domain`, con
+`repositories` detrás de `service`. El dominio no importa nada de las
+capas de arriba.
+
+### Tino web
+
+```
+src/
+  app/              Rutas, páginas, server actions. Delgados.
+  services/         Casos de uso de la interfaz.
+  repositories/
+    api/            Único cliente de Tino API.
+    supabase/       Solo Auth: sesión, inicio de sesión, registro.
+  domain/           Funciones puras de presentación (formato de dinero,
+                    naturaleza de cuenta para la interfaz).
   components/       Interfaz.
   lib/              Utilidades transversales.
 ```
 
-Dirección de dependencias: `app → services → domain`, con
-`repositories` detrás de `services`. El dominio no importa nada de las
-capas de arriba.
+### Reglas de capa
 
-Reglas de capa:
-
-- **Los componentes nunca llaman a Supabase directamente.** Es la
-  tentación central de este stack y el camino por el que las reglas de
-  negocio se dispersan por la interfaz.
-- Los route handlers y server actions validan la entrada, llaman a un
-  servicio y devuelven. Nada de lógica.
+- **La web nunca lee ni escribe tablas.** Todo dato pasa por la API. En
+  la web, Supabase solo sirve para autenticarse. Es la tentación central
+  de este stack y el camino por el que las reglas de negocio se
+  dispersan por la interfaz.
+- Los controllers, route handlers y server actions validan la entrada,
+  llaman a un servicio y devuelven. Nada de lógica.
 - El cálculo de saldos, la conversión de moneda, el devengo de intereses
-  y el signo por naturaleza de cuenta viven en `domain/`, son funciones
-  puras y tienen pruebas unitarias.
+  y el signo por naturaleza de cuenta viven en `domain/` de la API, son
+  funciones puras y tienen pruebas unitarias. Lo que la web replique para
+  presentar no reemplaza la validación de la API.
 - Las consultas analíticas (saldo corrido, jerarquía de categorías,
   series mensuales) se escriben como SQL o funciones de Postgres, no se
   resuelven trayendo filas a memoria.
@@ -144,7 +176,8 @@ Reglas de capa:
 rápida, cálculo de saldos.
 
 **Diseñado pero no construir todavía:** deudas y préstamos, recurrentes,
-avisos, inversiones, tarjeta de crédito con ciclo, informes.
+avisos, inversiones, tarjeta de crédito con ciclo, informes, app de
+celular (cliente de la API, en línea).
 
 **Fuera de esta versión, no diseñar:** presupuestos por categoría,
 compras a cuotas y diferidos, funcionamiento sin conexión, importación
