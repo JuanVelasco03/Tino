@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Familjen Grotesk',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#8A5F1F}
+a:hover{color:#1A1A17}
+</style>
+</helmet>
+<div style="{{ vars }}">
+
+<sc-if value="{{ esc }}" hint-placeholder-val="{{ true }}">
+<div data-screen-label="Cuentas escritorio" style="width:1440px;min-height:1024px;display:grid;grid-template-columns:232px minmax(0,1fr);background:var(--bg,#FAF8F3);color:var(--tx,#1A1A17);font-family:'Familjen Grotesk',sans-serif;border:1px solid var(--ln,#E4DFD4);box-sizing:border-box">
+<aside style="border-right:1px solid var(--ln,#E4DFD4);padding:28px 16px;display:flex;flex-direction:column;gap:28px">
+<div style="padding:0 8px;font-size:20px;font-weight:700;letter-spacing:0.16em">TINO</div>
+<button style="height:44px;display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:4px;background:var(--tx,#1A1A17);color:var(--bg,#FAF8F3);font-family:'Familjen Grotesk',sans-serif;font-size:15px;font-weight:600;cursor:pointer"><span style="display:flex">{{ ic.plus }}</span>Registrar</button>
+<nav style="display:flex;flex-direction:column;gap:2px">
+<sc-for list="{{ nav }}" as="n" hint-placeholder-count="8">
+<div style="height:40px;display:flex;align-items:center;gap:12px;padding:0 8px;border-radius:4px;background:{{ n.bg }};color:{{ n.color }};font-size:15px;font-weight:{{ n.weight }};cursor:pointer"><span style="display:flex">{{ n.icon }}</span><span style="flex:1">{{ n.label }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--br,#8A5F1F)">{{ n.badge }}</span></div>
+</sc-for>
+</nav>
+<div style="margin-top:auto;padding:0 8px;display:flex;flex-direction:column;gap:2px;font-size:13px;color:var(--t2,#6B6760)"><span>TRM de referencia</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--tx,#1A1A17)">4.120 COP</span><span>11 nov 2026</span></div>
+</aside>
+
+<main style="padding:36px 56px 64px;display:flex;flex-direction:column;gap:36px;min-width:0;max-width:1120px">
+<header style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px">
+<div style="display:flex;flex-direction:column;gap:6px">
+<h1 style="margin:0;font-size:28px;line-height:34px;font-weight:600;letter-spacing:-0.01em">Cuentas</h1>
+<span style="font-size:13px;color:var(--t2,#6B6760)">Saldos al 11 nov 2026 · USD a TRM <span style="font-family:'IBM Plex Mono',monospace">4.120</span></span>
+</div>
+<div style="display:flex;gap:12px">
+<button onClick="{{ toggleOrd }}" style="height:44px;display:flex;align-items:center;gap:8px;padding:0 16px;border:1px solid {{ ordBorder }};border-radius:4px;background:var(--sf,#FFFFFF);color:var(--tx,#1A1A17);font-family:'Familjen Grotesk',sans-serif;font-size:15px;font-weight:500;cursor:pointer"><span style="display:flex">{{ ordIcon }}</span>{{ ordLabel }}</button>
+<button style="height:44px;display:flex;align-items:center;gap:8px;padding:0 16px;border:none;border-radius:4px;background:var(--tx,#1A1A17);color:var(--bg,#FAF8F3);font-family:'Familjen Grotesk',sans-serif;font-size:15px;font-weight:600;cursor:pointer"><span style="display:flex">{{ ic.plus }}</span>Nueva cuenta</button>
+</div>
+</header>
+
+<sc-for list="{{ groups }}" as="g" hint-placeholder-count="2">
+<div style="background:{{ g.bg }};border:1px solid {{ g.border }};border-radius:6px;padding:0 24px 4px">
+<div style="display:grid;grid-template-columns:28px 24px minmax(0,1.1fr) minmax(0,1.6fr) 200px;gap:12px;align-items:baseline;padding:18px 0 10px;border-bottom:1px solid var(--lf,#1A1A17)">
+<span></span>
+<span style="grid-column:2 / 4;display:flex;align-items:baseline;gap:10px"><span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase">{{ g.title }}</span><span style="font-size:13px;color:var(--t2,#6B6760)">{{ g.sub }}</span></span>
+<span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--t2,#6B6760)">Detalle</span>
+<span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:500;color:{{ g.totColor }}">{{ g.total }}</span>
+</div>
+<sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="4">
+<div draggable="{{ ord }}" onDragStart="{{ r.ds }}" onDragOver="{{ r.dov }}" onDrop="{{ r.dp }}" onDragEnd="{{ dragEnd }}" style="display:grid;grid-template-columns:28px 24px minmax(0,1.1fr) minmax(0,1.6fr) 200px;gap:12px;align-items:center;min-height:64px;padding:10px 0;border-top:{{ r.top }};background:{{ r.hl }}">
+<span style="display:flex;justify-content:center;color:var(--t2,#6B6760);cursor:grab">{{ r.grip }}</span>
+<span style="display:flex;color:var(--t2,#6B6760)">{{ r.icon }}</span>
+<div style="min-width:0"><div style="font-size:15px;font-weight:600">{{ r.name }}</div><div style="font-size:13px;color:var(--t2,#6B6760)">{{ r.tipo }}</div></div>
+<div style="min-width:0;font-size:13px;color:var(--t2,#6B6760)">
+<span style="font-family:{{ r.detFont }}">{{ r.detail }}</span>
+<sc-if value="{{ r.isCard }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:6px;max-width:380px">
+<div style="height:4px;background:var(--ln,#E4DFD4);border-radius:2px;overflow:hidden"><div style="width:{{ r.usoW }}%;height:4px;background:var(--out,#B0452E)"></div></div>
+<div style="display:flex;justify-content:space-between;gap:12px;font-family:'IBM Plex Mono',monospace;font-size:12px"><span>Usado {{ r.uso }}</span><span>Disponible {{ r.disp }} de {{ r.cupo }}</span></div>
+<div style="font-size:13px">Corte <span style="color:var(--tx,#1A1A17)">15 nov</span> · en 4 días · pago límite <span style="color:var(--tx,#1A1A17)">30 nov</span></div>
+</div>
+</sc-if>
+</div>
+<sc-if value="{{ r.showAmt }}" hint-placeholder-val="{{ true }}">
+<div style="text-align:right"><div style="font-family:'IBM Plex Mono',monospace;font-size:20px;line-height:26px;font-weight:500;color:{{ r.amtColor }}">{{ r.amt }}</div><div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--t2,#6B6760)">{{ r.cap }}</div></div>
+</sc-if>
+<sc-if value="{{ ord }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;justify-content:flex-end;gap:4px"><button onClick="{{ r.up }}" aria-label="Subir" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid var(--ln,#E4DFD4);border-radius:4px;background:var(--sf,#FFFFFF);color:{{ r.upColor }};cursor:pointer">{{ ic.up }}</button><button onClick="{{ r.down }}" aria-label="Bajar" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid var(--ln,#E4DFD4);border-radius:4px;background:var(--sf,#FFFFFF);color:{{ r.downColor }};cursor:pointer">{{ ic.down }}</button></div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</sc-for>
+
+<div style="padding:0 24px">
+<sc-for list="{{ close }}" as="c" hint-placeholder-count="2">
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:12px;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--ln,#E4DFD4)"><span style="font-size:15px;color:var(--t2,#6B6760)">{{ c.l }}</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:500;color:{{ c.color }}">{{ c.v }}</span></div>
+</sc-for>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:12px;align-items:baseline;padding:14px 0 10px;border-bottom:3px double var(--lf,#1A1A17)"><span style="font-size:20px;font-weight:600">Patrimonio neto</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:32px;line-height:36px;font-weight:500;letter-spacing:-0.02em">{{ neto }}</span></div>
+</div>
+</main>
+</div>
+</sc-if>
+
+<sc-if value="{{ mov }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Cuentas móvil" style="width:390px;background:var(--bg,#FAF8F3);color:var(--tx,#1A1A17);font-family:'Familjen Grotesk',sans-serif;border:1px solid var(--ln,#E4DFD4);box-sizing:border-box;display:flex;flex-direction:column">
+<div style="height:48px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 30px 6px;font-size:15px;font-weight:600"><span>9:41</span><span style="font-size:12px">5G</span></div>
+<div style="padding:12px 16px 0;display:flex;flex-direction:column;gap:4px">
+<div style="display:flex;align-items:center;justify-content:space-between"><h1 style="margin:0;font-size:28px;line-height:34px;font-weight:600;letter-spacing:-0.01em">Cuentas</h1><button onClick="{{ toggleOrd }}" style="height:44px;padding:0 4px;background:none;border:none;font-family:'Familjen Grotesk',sans-serif;font-size:15px;font-weight:600;color:var(--br,#8A5F1F);cursor:pointer">{{ ordLabelM }}</button></div>
+<span style="font-size:13px;color:var(--t2,#6B6760)">Al 11 nov · USD a TRM <span style="font-family:'IBM Plex Mono',monospace">4.120</span></span>
+</div>
+
+<div style="padding:24px 16px 0;display:flex;flex-direction:column;gap:24px">
+<sc-for list="{{ groups }}" as="g" hint-placeholder-count="2">
+<div style="background:{{ g.bg }};border:1px solid {{ g.border }};border-radius:6px;padding:0 {{ g.padM }}">
+<div style="display:flex;justify-content:space-between;align-items:baseline;padding:14px 0 8px;border-bottom:1px solid var(--lf,#1A1A17)"><span style="display:flex;align-items:baseline;gap:8px"><span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase">{{ g.title }}</span><span style="font-size:13px;color:var(--t2,#6B6760)">{{ g.sub }}</span></span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:500;color:{{ g.totColor }}">{{ g.total }}</span></div>
+<sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="4">
+<div draggable="{{ ord }}" onDragStart="{{ r.ds }}" onDragOver="{{ r.dov }}" onDrop="{{ r.dp }}" onDragEnd="{{ dragEnd }}" style="display:grid;grid-template-columns:{{ colsM }};gap:12px;align-items:center;min-height:60px;padding:10px 0;border-top:{{ r.top }};background:{{ r.hl }}">
+<sc-if value="{{ ord }}" hint-placeholder-val="{{ false }}"><span style="display:flex;color:var(--t2,#6B6760)">{{ r.grip }}</span></sc-if>
+<span style="display:flex;color:var(--t2,#6B6760)">{{ r.icon }}</span>
+<div style="min-width:0"><div style="font-size:15px;font-weight:600">{{ r.name }}</div><div style="font-size:13px;line-height:18px;color:var(--t2,#6B6760)">{{ r.tipoM }}</div></div>
+<sc-if value="{{ r.showAmt }}" hint-placeholder-val="{{ true }}">
+<div style="text-align:right"><div style="font-family:'IBM Plex Mono',monospace;font-size:17px;line-height:22px;font-weight:500;color:{{ r.amtColor }}">{{ r.amt }}</div><div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--t2,#6B6760)">{{ r.cap }}</div></div>
+</sc-if>
+<sc-if value="{{ ord }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;gap:4px"><button onClick="{{ r.up }}" aria-label="Subir" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid var(--ln,#E4DFD4);border-radius:4px;background:var(--sf,#FFFFFF);color:{{ r.upColor }};cursor:pointer">{{ ic.up }}</button><button onClick="{{ r.down }}" aria-label="Bajar" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid var(--ln,#E4DFD4);border-radius:4px;background:var(--sf,#FFFFFF);color:{{ r.downColor }};cursor:pointer">{{ ic.down }}</button></div>
+</sc-if>
+<sc-if value="{{ r.cardM }}" hint-placeholder-val="{{ false }}">
+<div style="grid-column:2 / -1;display:flex;flex-direction:column;gap:6px;padding-bottom:2px">
+<div style="height:4px;background:var(--ln,#E4DFD4);border-radius:2px;overflow:hidden"><div style="width:{{ r.usoW }}%;height:4px;background:var(--out,#B0452E)"></div></div>
+<div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--t2,#6B6760)"><span>Usado {{ r.uso }}</span><span>Disponible {{ r.disp }}</span></div>
+<div style="font-size:13px;color:var(--t2,#6B6760)">Corte 15 nov · pago límite 30 nov</div>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+
+<div style="padding:24px 16px 32px">
+<sc-for list="{{ close }}" as="c" hint-placeholder-count="2">
+<div style="display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--ln,#E4DFD4)"><span style="font-size:15px;color:var(--t2,#6B6760)">{{ c.l }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:500;color:{{ c.color }}">{{ c.v }}</span></div>
+</sc-for>
+<div style="display:flex;justify-content:space-between;align-items:baseline;padding:14px 0 10px;border-bottom:3px double var(--lf,#1A1A17)"><span style="font-size:17px;font-weight:600">Patrimonio neto</span><span style="font-family:'IBM Plex Mono',monospace;font-size:28px;line-height:32px;font-weight:500;letter-spacing:-0.02em">{{ neto }}</span></div>
+</div>
+
+<div style="position:sticky;bottom:0;height:84px;box-sizing:border-box;padding-bottom:28px;display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--ln,#E4DFD4);background:var(--bg,#FAF8F3)">
+<sc-for list="{{ tabbar }}" as="t" hint-placeholder-count="5">
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:{{ t.color }};font-size:11px;font-weight:{{ t.weight }}"><span style="display:flex;align-items:center;justify-content:center;width:{{ t.box }}px;height:{{ t.box }}px;border-radius:4px;background:{{ t.bg }};color:{{ t.icColor }}">{{ t.icon }}</span><span>{{ t.label }}</span></div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1024},&quot;modo&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;claro&quot;,&quot;oscuro&quot;],&quot;default&quot;:&quot;claro&quot;,&quot;tsType&quot;:&quot;'claro'|'oscuro'&quot;},&quot;formato&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;escritorio&quot;,&quot;movil&quot;],&quot;default&quot;:&quot;escritorio&quot;,&quot;tsType&quot;:&quot;'escritorio'|'movil'&quot;},&quot;ordenando&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const SVG = (d, s = 20) => React.createElement('svg', { width: s, height: s, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.5, strokeLinecap: 'round', strokeLinejoin: 'round', dangerouslySetInnerHTML: { __html: d } });
+const P = {
+  resumen: '<line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/>',
+  movimientos: '<path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M8 6h13"/>',
+  cuentas: '<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>',
+  deudas: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+  avisos: '<path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/>',
+  recurrentes: '<path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/>',
+  metas: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  inversion: '<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
+  mas: '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',
+  efectivo: '<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>',
+  banco: '<line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/>',
+  tarjeta: '<rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/>',
+  otorgado: '<path d="M7 17 17 7"/><path d="M7 7h10v10"/>',
+  contraida: '<path d="M17 7 7 17"/><path d="M17 17H7V7"/>',
+  grip: '<circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/>',
+  up: '<path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>',
+  down: '<path d="M12 5v14"/><path d="m19 12-7 7-7-7"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>'
+};
+const ICONS = { plus: SVG(P.plus, 18), up: SVG(P.up, 18), down: SVG(P.down, 18), grip: SVG(P.grip, 18), check: SVG(P.check, 18), ordenar: SVG('<path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/>', 18) };
+const MODES = {
+  claro: { '--bg':'#FAF8F3','--sf':'#FFFFFF','--sk':'#F2EEE5','--tx':'#1A1A17','--t2':'#6B6760','--t3':'#9A958B','--ln':'#E4DFD4','--lf':'#1A1A17','--br':'#8A5F1F','--in':'#2F7D5A','--out':'#B0452E' },
+  oscuro: { '--bg':'#12141A','--sf':'#181B22','--sk':'#1F232C','--tx':'#E8E4DC','--t2':'#8B8A84','--t3':'#5E5F63','--ln':'#272B34','--lf':'#8B8A84','--br':'#BC8A3E','--in':'#4E9E78','--out':'#D0664B' }
+};
+const TRM = 4120;
+const ACC = {
+  bancolombia: { name:'Bancolombia', tipo:'Banco', icon:'banco', cop:910051, detail:'Ahorros ·· 4821' },
+  nubank: { name:'Nubank', tipo:'Banco', icon:'banco', cop:2500000, detail:'Cuenta ·· 0937' },
+  nequi: { name:'Nequi', tipo:'Banco', icon:'banco', cop:20321, detail:'Celular ·· 3108' },
+  efectivo: { name:'Efectivo', tipo:'Efectivo', icon:'efectivo', cop:45000, detail:'Billetera' },
+  etoro: { name:'eToro', tipo:'Inversión · USD', icon:'inversion', cop:775000 * TRM / 100, detail:'US$ 7.750,00 × 4.120', mono:true, cap:'US$ 7.750,00', tipoM:'Inversión · TRM 4.120' },
+  camila: { name:'Préstamo a Camila', tipo:'Préstamo otorgado', icon:'otorgado', cop:500000, detail:'Te debe desde el 14 ago · sin interés', cap:'por cobrar', tipoM:'Préstamo otorgado · te debe' },
+  tarjeta: { name:'Tarjeta de crédito', tipo:'Tarjeta de crédito', icon:'tarjeta', cop:1284300, cupo:4000000, detail:'', cap:'deuda' },
+  mama: { name:'Deuda con mamá', tipo:'Deuda contraída', icon:'contraida', cop:500000, detail:'Le debes desde el 3 mar · sin interés', cap:'deuda', tipoM:'Deuda contraída · desde 3 mar' }
+};
+const fmt = n => String(Math.abs(Math.round(n))).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+class Component extends DCLogic {
+  state = { order: { activo: ['bancolombia','nubank','nequi','efectivo','etoro','camila'], pasivo: ['tarjeta','mama'] }, ord: this.props.ordenando ?? false, drag: null, over: null };
+  move(g, id, to) {
+    this.setState(s => {
+      const arr = s.order[g].filter(x => x !== id);
+      arr.splice(Math.max(0, Math.min(to, arr.length)), 0, id);
+      return { order: { ...s.order, [g]: arr } };
+    });
+  }
+  renderVals() {
+    const s = this.state;
+    const esc = (this.props.formato ?? 'escritorio') === 'escritorio';
+    const tot = g => s.order[g].reduce((a, id) => a + ACC[id].cop, 0);
+    const act = tot('activo'), pas = tot('pasivo');
+    const mkRows = g => s.order[g].map((id, i, arr) => {
+      const a = ACC[id]; const isP = g === 'pasivo';
+      const usoP = a.cupo ? a.cop / a.cupo * 100 : 0;
+      return {
+        name: a.name, tipo: a.tipo, tipoM: a.tipoM || (a.cupo ? 'Tarjeta de crédito · cupo ' + fmt(a.cupo) : `${a.tipo} · ${a.detail}`),
+        icon: SVG(P[a.icon]), grip: s.ord ? ICONS.grip : null,
+        detail: a.detail, detFont: a.mono ? "'IBM Plex Mono',monospace" : 'inherit',
+        amt: (isP ? '−' : '') + fmt(a.cop), amtColor: isP ? 'var(--out,#B0452E)' : 'var(--tx,#1A1A17)', cap: a.cap || '',
+        isCard: !!a.cupo, cardM: !!a.cupo && !s.ord, usoW: usoP, uso: usoP.toFixed(0) + ' %', disp: fmt(a.cupo - a.cop), cupo: a.cupo ? fmt(a.cupo) : '',
+        showAmt: !s.ord, top: i ? '1px solid var(--ln,#E4DFD4)' : 'none',
+        hl: s.over === id && s.drag && s.drag !== id ? 'var(--sk,#F2EEE5)' : 'transparent',
+        upColor: i ? 'var(--tx,#1A1A17)' : 'var(--t3,#9A958B)', downColor: i < arr.length - 1 ? 'var(--tx,#1A1A17)' : 'var(--t3,#9A958B)',
+        up: () => this.move(g, id, i - 1), down: () => this.move(g, id, i + 1),
+        ds: e => { e.dataTransfer.effectAllowed = 'move'; this.setState({ drag: id }); },
+        dov: e => { if (s.drag && s.order[g].includes(s.drag)) { e.preventDefault(); if (s.over !== id) this.setState({ over: id }); } },
+        dp: e => { e.preventDefault(); if (s.drag && s.order[g].includes(s.drag)) this.move(g, s.drag, s.order[g].indexOf(id)); this.setState({ drag: null, over: null }); }
+      };
+    });
+    const groups = [
+      { title:'Activos', sub:'Lo que tienes', total: fmt(act), totColor:'var(--tx,#1A1A17)', bg:'var(--sf,#FFFFFF)', border:'var(--ln,#E4DFD4)', padM:'14px', rows: mkRows('activo') },
+      { title:'Pasivos', sub:'Lo que debes', total: '−' + fmt(pas), totColor:'var(--out,#B0452E)', bg:'transparent', border:'transparent', padM:'0', rows: mkRows('pasivo') }
+    ];
+    const tabbar = [['resumen','Resumen'],['movimientos','Movimientos'],['plus','Registrar'],['cuentas','Cuentas'],['mas','Más']].map(([k, label]) => ({ label, icon: SVG(P[k], k === 'plus' ? 22 : 20), box: k === 'plus' ? 40 : 24, bg: k === 'plus' ? 'var(--tx,#1A1A17)' : 'transparent', icColor: k === 'plus' ? 'var(--bg,#FAF8F3)' : 'inherit', color: k === 'cuentas' ? 'var(--tx,#1A1A17)' : 'var(--t2,#6B6760)', weight: k === 'cuentas' ? 600 : 400 }));
+    const navDef = [['resumen','Resumen'],['movimientos','Movimientos'],['cuentas','Cuentas'],['deudas','Deudas y préstamos'],['recurrentes','Recurrentes'],['inversion','Inversiones'],['metas','Metas'],['avisos','Avisos']];
+    const nav = navDef.map(([k, label]) => ({ label, icon: SVG(P[k]), badge: k === 'avisos' ? '3' : '', bg: k === 'cuentas' ? 'var(--sk,#F2EEE5)' : 'transparent', color: k === 'cuentas' ? 'var(--tx,#1A1A17)' : 'var(--t2,#6B6760)', weight: k === 'cuentas' ? 600 : 400 }));
+    return {
+      vars: MODES[this.props.modo ?? 'claro'] || MODES.claro, esc, mov: !esc,
+      ic: ICONS, nav, tabbar, groups, ord: s.ord,
+      colsM: s.ord ? '18px 20px minmax(0,1fr) auto' : '20px minmax(0,1fr) auto',
+      toggleOrd: () => this.setState({ ord: !s.ord }),
+      ordLabel: s.ord ? 'Listo' : 'Ordenar', ordLabelM: s.ord ? 'Listo' : 'Ordenar',
+      ordIcon: s.ord ? ICONS.check : ICONS.ordenar,
+      ordBorder: s.ord ? 'var(--tx,#1A1A17)' : 'var(--ln,#E4DFD4)',
+      dragEnd: () => this.setState({ drag: null, over: null }),
+      close: [{ l:'Activos', v: fmt(act), color:'var(--tx,#1A1A17)' }, { l:'Pasivos', v:'−' + fmt(pas), color:'var(--out,#B0452E)' }],
+      neto: fmt(act - pas)
+    };
+  }
+}
+</script>
+</body>
+</html>
