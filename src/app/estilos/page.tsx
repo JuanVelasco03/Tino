@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Boton } from "@/components/boton";
+import { BotonTema } from "@/components/boton-tema";
 import { CampoMonto } from "@/components/campo-monto";
 import { ChipCategoria } from "@/components/chip-categoria";
 import { EncabezadoSeccion } from "@/components/encabezado-seccion";
@@ -213,6 +214,7 @@ function Componentes() {
 export default function Estilos() {
   return (
     <main className="mx-auto w-full max-w-6xl px-4 pb-16 pt-12 md:px-8">
+      <BotonTema />
       <header className="flex flex-col gap-4 border-b border-raya pb-6">
         <div className="flex flex-wrap items-baseline justify-between gap-3">
           <h1 className="text-cifra-l font-bold tracking-[0.16em]">TINO</h1>

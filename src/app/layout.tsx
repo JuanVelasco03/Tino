@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Familjen_Grotesk, IBM_Plex_Mono } from "next/font/google";
-import { BotonTema, CLAVE_TEMA } from "@/components/boton-tema";
+import { CLAVE_TEMA } from "@/components/boton-tema";
 import "./globals.css";
 
 const SCRIPT_TEMA = `try{var t=localStorage.getItem("${CLAVE_TEMA}");if(t!=="light"&&t!=="dark"){t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.dataset.theme=t}catch(e){}`;
@@ -36,7 +36,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: SCRIPT_TEMA }} />
       </head>
       <body className="min-h-full flex flex-col">
-        <BotonTema />
         {children}
       </body>
     </html>
