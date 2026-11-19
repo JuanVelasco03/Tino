@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useTransition, type FormEvent } from "react";
-import Link from "next/link";
 import type { Cuenta, ResultadoCuenta } from "@/services/cuentas";
-import { CampoSubrayado } from "../acceso/campo-subrayado";
+import { CampoSubrayado } from "../campo-subrayado";
 import { Boton } from "../boton";
+import { EnlaceTexto } from "../enlace-texto";
 import { IconoCuenta, ROTULO_TIPO_CUENTA } from "../iconos";
+import { MensajeError } from "../mensaje-error";
 import { BloqueEliminar } from "./bloque-eliminar";
 
 type Props = {
@@ -19,9 +20,7 @@ type Props = {
 export function CabeceraArchivadas() {
   return (
     <header className="flex flex-col items-start gap-1 md:gap-1.5">
-      <Link href="/cuentas" className="flex h-11 items-center text-cuerpo font-semibold text-marca-texto">
-        ← Cuentas
-      </Link>
+      <EnlaceTexto href="/cuentas">← Cuentas</EnlaceTexto>
       <h1 className="text-titulo-1">Cuentas archivadas</h1>
     </header>
   );
@@ -52,8 +51,6 @@ type PropsFila = {
 };
 
 type Modo = "normal" | "renombrar" | "eliminar";
-
-const ERROR = "text-etiqueta font-normal text-salida-texto";
 
 function subtitulo(cuenta: Cuenta): string {
   const tipo = ROTULO_TIPO_CUENTA[cuenta.tipo];
@@ -116,7 +113,6 @@ function FilaArchivada({ cuenta, restaurar, eliminar }: PropsFila) {
   }
 
   const abierta = modo === "renombrar";
-  const idError = `nombre-${cuenta.id}-error`;
 
   return (
     <li
@@ -157,7 +153,7 @@ function FilaArchivada({ cuenta, restaurar, eliminar }: PropsFila) {
           <p className="text-etiqueta font-normal text-secundario">
             Ya tienes una cuenta con ese nombre. Elige otro para restaurarla.
           </p>
-          <div className="flex max-w-sm flex-col gap-1">
+          <div className="max-w-sm">
             <CampoSubrayado
               etiqueta="Nombre"
               name="nombre"
@@ -167,14 +163,8 @@ function FilaArchivada({ cuenta, restaurar, eliminar }: PropsFila) {
                 setNombre(e.target.value);
                 setErrorNombre(null);
               }}
-              aria-invalid={errorNombre ? true : undefined}
-              aria-describedby={errorNombre ? idError : undefined}
+              error={errorNombre ?? undefined}
             />
-            {errorNombre && (
-              <p id={idError} role="alert" className={ERROR}>
-                {errorNombre}
-              </p>
-            )}
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <Boton type="submit" disabled={pendiente}>
@@ -200,9 +190,7 @@ function FilaArchivada({ cuenta, restaurar, eliminar }: PropsFila) {
       )}
 
       {error && modo !== "eliminar" && (
-        <p role="alert" className={`col-start-2 pb-1 md:col-end-4 ${ERROR}`}>
-          {error}
-        </p>
+        <MensajeError mensaje={error} className="col-start-2 pb-1 md:col-end-4" />
       )}
     </li>
   );

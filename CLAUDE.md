@@ -24,6 +24,14 @@ Ante conflicto entre una propuesta y una regla, gana la regla.
 - Solo `src/repositories/supabase/servidor.ts` construye clientes de Supabase con la sesión del usuario. Nunca `service_role`.
 - Migraciones y modelo de datos: en `Tino-API` (REGLAS §8).
 
+## Diseño
+
+- `DESIGN.md` es el sistema de diseño: tokens, tipografía, las cuatro líneas, componentes y reglas. Léelo antes de tocar interfaz. Nada de colores, tamaños, radios ni espaciados fuera de sus tokens.
+- Sus «Desvíos registrados» son deuda, no precedente: no se copian. Se corrigen o se vuelven token, actualizando `DESIGN.md` primero.
+- Referencia viva: la ruta `/estilos`. Todo componente nuevo se muestra ahí en ambos modos.
+- Origen: `referencias/sistema-de-diseno-prompt.md` (intención original) y `referencias/TINO sistema de diseño.zip` (catálogo visual C1–C36).
+- `.impeccable/design.json` lo genera `/impeccable document` a partir de `DESIGN.md`; no se edita a mano.
+
 ## Specs
 
 - Numeración propia desde 03 (01 y 02 son históricos, compartidos con Tino-API).

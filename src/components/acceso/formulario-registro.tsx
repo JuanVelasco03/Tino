@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { Boton } from "@/components/boton";
 import { BotonGoogle } from "./boton-google";
-import { CampoSubrayado } from "./campo-subrayado";
-import { MensajeError } from "./mensaje-error";
+import { CampoSubrayado } from "../campo-subrayado";
+import { MensajeError } from "../mensaje-error";
 import { SeparadorCorreo } from "./separador-correo";
 import type { AccionAcceso } from "./tipos";
 

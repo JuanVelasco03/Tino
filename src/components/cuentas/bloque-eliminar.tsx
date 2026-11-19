@@ -1,4 +1,5 @@
 import { Boton } from "../boton";
+import { MensajeError } from "../mensaje-error";
 
 type Props = {
   /** Nombre de la cuenta: va en el rótulo y en el botón («Eliminar Nequi»). */
@@ -27,11 +28,7 @@ export function BloqueEliminar({ nombre, alConfirmar, alCancelar, pendiente, err
           Cancelar
         </Boton>
       </div>
-      {error && (
-        <p role="alert" className="text-etiqueta font-normal text-salida-texto">
-          {error}
-        </p>
-      )}
+      {error && <MensajeError mensaje={error} />}
     </div>
   );
 }

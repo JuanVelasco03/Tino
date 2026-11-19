@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { MensajeError } from "./mensaje-error";
 
 export type Opcion<T extends string> = {
   valor: T;
@@ -80,11 +81,7 @@ export function OpcionUnica<T extends string>({
           );
         })}
       </div>
-      {error && (
-        <p id={idError} role="alert" className="text-etiqueta font-normal text-salida-texto">
-          {error}
-        </p>
-      )}
+      {error && <MensajeError id={idError} mensaje={error} />}
     </div>
   );
 }

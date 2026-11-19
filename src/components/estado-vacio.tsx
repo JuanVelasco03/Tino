@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { Plus } from "lucide-react";
+import { EnlaceTexto } from "./enlace-texto";
 
 type Props = {
   /** Rótulo de la sección: «Movimientos · noviembre». */
@@ -13,7 +13,9 @@ type Props = {
   accion: { etiqueta: string; href: string; scroll?: boolean } | { etiqueta: string; deshabilitada: true };
 };
 
-const ACCION = "mt-3 inline-flex items-center gap-2 text-cuerpo font-semibold";
+/** Misma caja que `EnlaceTexto` (44 px), para que el estado deshabilitado no salte. */
+const ACCION_DESHABILITADA =
+  "mt-1 inline-flex h-11 cursor-not-allowed items-center gap-2 text-cuerpo font-semibold text-terciario";
 
 /** C7 · Estado vacío, primer día: la página en blanco, con renglones. */
 export function EstadoVacio({ rotulo, titulo, detalle, accion }: Props) {
@@ -32,16 +34,16 @@ export function EstadoVacio({ rotulo, titulo, detalle, accion }: Props) {
         <p className="text-cuerpo font-semibold">{titulo}</p>
         <p className="text-etiqueta font-normal text-secundario">{detalle}</p>
         {"href" in accion ? (
-          <Link href={accion.href} scroll={accion.scroll} className={`${ACCION} text-marca-texto`}>
+          <EnlaceTexto href={accion.href} scroll={accion.scroll} className="mt-1">
             <Plus size={16} strokeWidth={1.5} aria-hidden />
             {accion.etiqueta}
-          </Link>
+          </EnlaceTexto>
         ) : (
           <button
             type="button"
             aria-disabled="true"
             title="Próximamente"
-            className={`${ACCION} cursor-not-allowed text-terciario`}
+            className={ACCION_DESHABILITADA}
           >
             <Plus size={16} strokeWidth={1.5} aria-hidden />
             {accion.etiqueta}

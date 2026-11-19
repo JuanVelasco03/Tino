@@ -1,0 +1,686 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-19T23:23:09+00:00",
+  "title": "Design System: Tino",
+  "extensions": {
+    "colorMeta": {
+      "fondo": {
+        "role": "neutral",
+        "displayName": "Papel",
+        "canonical": "#FAF8F3",
+        "oklch": "oklch(97.9% 0.007 88.6)",
+        "tonalRamp": [
+          "#0C0B0A",
+          "#262523",
+          "#43423F",
+          "#63615D",
+          "#84827E",
+          "#A6A5A1",
+          "#CAC9C5",
+          "#EFEEEB"
+        ]
+      },
+      "superficie": {
+        "role": "neutral",
+        "displayName": "Hoja",
+        "canonical": "#FFFFFF",
+        "oklch": "oklch(100.0% 0.000 89.9)",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
+          "#EEEEEE"
+        ]
+      },
+      "hundido": {
+        "role": "neutral",
+        "displayName": "Papel hundido",
+        "canonical": "#F2EEE5",
+        "oklch": "oklch(95.0% 0.013 86.8)",
+        "tonalRamp": [
+          "#0C0B08",
+          "#272521",
+          "#44423C",
+          "#64615A",
+          "#86827A",
+          "#A8A59D",
+          "#CCC9C2",
+          "#F1EEE9"
+        ]
+      },
+      "texto": {
+        "role": "neutral",
+        "displayName": "Tinta",
+        "canonical": "#1A1A17",
+        "oklch": "oklch(21.7% 0.006 106.9)",
+        "tonalRamp": [
+          "#0B0B0A",
+          "#252523",
+          "#424240",
+          "#61615E",
+          "#82837F",
+          "#A5A5A2",
+          "#C9C9C6",
+          "#EFEFEC"
+        ]
+      },
+      "secundario": {
+        "role": "neutral",
+        "displayName": "Tinta secundaria",
+        "canonical": "#6B6760",
+        "oklch": "oklch(51.5% 0.012 81.8)",
+        "tonalRamp": [
+          "#0C0B09",
+          "#272521",
+          "#44423D",
+          "#64615B",
+          "#86827B",
+          "#A8A49E",
+          "#CCC9C3",
+          "#F1EEE9"
+        ]
+      },
+      "terciario": {
+        "role": "neutral",
+        "displayName": "Tinta tenue",
+        "canonical": "#9A958B",
+        "oklch": "oklch(67.1% 0.016 84.6)",
+        "tonalRamp": [
+          "#0D0B08",
+          "#272520",
+          "#45423B",
+          "#656159",
+          "#878278",
+          "#A9A59C",
+          "#CCC9C1",
+          "#F1EEE8"
+        ]
+      },
+      "linea": {
+        "role": "neutral",
+        "displayName": "Renglón",
+        "canonical": "#E4DFD4",
+        "oklch": "oklch(90.5% 0.016 86.4)",
+        "tonalRamp": [
+          "#0D0B08",
+          "#272520",
+          "#45423B",
+          "#656159",
+          "#868278",
+          "#A9A59C",
+          "#CCC9C1",
+          "#F1EEE8"
+        ]
+      },
+      "raya": {
+        "role": "neutral",
+        "displayName": "Raya",
+        "canonical": "#1A1A17",
+        "oklch": "oklch(21.7% 0.006 106.9)",
+        "tonalRamp": [
+          "#0B0B0A",
+          "#252523",
+          "#424240",
+          "#61615E",
+          "#82837F",
+          "#A5A5A2",
+          "#C9C9C6",
+          "#EFEFEC"
+        ]
+      },
+      "marca": {
+        "role": "primary",
+        "displayName": "Latón",
+        "canonical": "#A8762C",
+        "oklch": "oklch(60.3% 0.108 73.3)",
+        "tonalRamp": [
+          "#170600",
+          "#381F00",
+          "#5B3A00",
+          "#815816",
+          "#A9772E",
+          "#C99C61",
+          "#E9C290",
+          "#FFE9C0"
+        ]
+      },
+      "marca-texto": {
+        "role": "primary",
+        "displayName": "Latón · texto",
+        "canonical": "#8A5F1F",
+        "oklch": "oklch(52.0% 0.096 72.9)",
+        "tonalRamp": [
+          "#160700",
+          "#362000",
+          "#593B0F",
+          "#7E5924",
+          "#A5793C",
+          "#C59D6A",
+          "#E5C397",
+          "#FFE9C5"
+        ]
+      },
+      "entrada": {
+        "role": "secondary",
+        "displayName": "Verde libro",
+        "canonical": "#2F7D5A",
+        "oklch": "oklch(53.2% 0.095 161.0)",
+        "tonalRamp": [
+          "#001105",
+          "#012D1C",
+          "#174D36",
+          "#2F7052",
+          "#489470",
+          "#76B594",
+          "#A2D8BB",
+          "#CEFBE2"
+        ]
+      },
+      "entrada-texto": {
+        "role": "secondary",
+        "displayName": "Verde libro · texto",
+        "canonical": "#2F7D5A",
+        "oklch": "oklch(53.2% 0.095 161.0)",
+        "tonalRamp": [
+          "#001105",
+          "#012D1C",
+          "#174D36",
+          "#2F7052",
+          "#489470",
+          "#76B594",
+          "#A2D8BB",
+          "#CEFBE2"
+        ]
+      },
+      "salida": {
+        "role": "tertiary",
+        "displayName": "Terracota",
+        "canonical": "#B0452E",
+        "oklch": "oklch(53.1% 0.145 33.8)",
+        "tonalRamp": [
+          "#210000",
+          "#470E03",
+          "#702717",
+          "#9C412D",
+          "#C95D45",
+          "#E88770",
+          "#FFB09C",
+          "#FFDAC9"
+        ]
+      },
+      "salida-texto": {
+        "role": "tertiary",
+        "displayName": "Terracota · texto",
+        "canonical": "#B0452E",
+        "oklch": "oklch(53.1% 0.145 33.8)",
+        "tonalRamp": [
+          "#210000",
+          "#470E03",
+          "#702717",
+          "#9C412D",
+          "#C95D45",
+          "#E88770",
+          "#FFB09C",
+          "#FFDAC9"
+        ]
+      },
+      "fondo-oscuro": {
+        "role": "neutral",
+        "displayName": "Papel · oscuro",
+        "canonical": "#12141A",
+        "oklch": "oklch(19.2% 0.013 270.7)",
+        "tonalRamp": [
+          "#0A0B0E",
+          "#242529",
+          "#404247",
+          "#5F6168",
+          "#7F828A",
+          "#A2A5AC",
+          "#C7C9CF",
+          "#ECEEF4"
+        ]
+      },
+      "superficie-oscuro": {
+        "role": "neutral",
+        "displayName": "Hoja · oscuro",
+        "canonical": "#181B22",
+        "oklch": "oklch(22.2% 0.014 266.9)",
+        "tonalRamp": [
+          "#0A0B0E",
+          "#232529",
+          "#3F4248",
+          "#5E6169",
+          "#7E828B",
+          "#A1A5AD",
+          "#C6C9D0",
+          "#ECEEF4"
+        ]
+      },
+      "hundido-oscuro": {
+        "role": "neutral",
+        "displayName": "Papel hundido · oscuro",
+        "canonical": "#1F232C",
+        "oklch": "oklch(25.6% 0.018 266.3)",
+        "tonalRamp": [
+          "#090B0F",
+          "#23252B",
+          "#3F4249",
+          "#5D616B",
+          "#7D828D",
+          "#A0A5AF",
+          "#C5C9D2",
+          "#EBEEF6"
+        ]
+      },
+      "texto-oscuro": {
+        "role": "neutral",
+        "displayName": "Tinta · oscuro",
+        "canonical": "#E8E4DC",
+        "oklch": "oklch(92.0% 0.012 84.6)",
+        "tonalRamp": [
+          "#0C0B09",
+          "#272521",
+          "#44423D",
+          "#64615B",
+          "#85827B",
+          "#A8A59E",
+          "#CCC9C3",
+          "#F1EEE9"
+        ]
+      },
+      "secundario-oscuro": {
+        "role": "neutral",
+        "displayName": "Tinta secundaria · oscuro",
+        "canonical": "#8B8A84",
+        "oklch": "oklch(63.2% 0.009 99.0)",
+        "tonalRamp": [
+          "#0C0B09",
+          "#262522",
+          "#43423E",
+          "#62615C",
+          "#83827D",
+          "#A6A5A0",
+          "#CAC9C5",
+          "#EFEEEB"
+        ]
+      },
+      "terciario-oscuro": {
+        "role": "neutral",
+        "displayName": "Tinta tenue · oscuro",
+        "canonical": "#5E5F63",
+        "oklch": "oklch(48.6% 0.006 274.9)",
+        "tonalRamp": [
+          "#0B0B0C",
+          "#242527",
+          "#414245",
+          "#606164",
+          "#818286",
+          "#A4A5A9",
+          "#C8C9CC",
+          "#EDEEF1"
+        ]
+      },
+      "linea-oscuro": {
+        "role": "neutral",
+        "displayName": "Renglón · oscuro",
+        "canonical": "#272B34",
+        "oklch": "oklch(28.9% 0.017 266.4)",
+        "tonalRamp": [
+          "#090B0F",
+          "#23252A",
+          "#3F4249",
+          "#5D616A",
+          "#7D828D",
+          "#A1A5AF",
+          "#C5C9D2",
+          "#EBEEF6"
+        ]
+      },
+      "raya-oscuro": {
+        "role": "neutral",
+        "displayName": "Raya · oscuro",
+        "canonical": "#8B8A84",
+        "oklch": "oklch(63.2% 0.009 99.0)",
+        "tonalRamp": [
+          "#0C0B09",
+          "#262522",
+          "#43423E",
+          "#62615C",
+          "#83827D",
+          "#A6A5A0",
+          "#CAC9C5",
+          "#EFEEEB"
+        ]
+      },
+      "marca-texto-oscuro": {
+        "role": "primary",
+        "displayName": "Latón · texto oscuro",
+        "canonical": "#BC8A3E",
+        "oklch": "oklch(66.8% 0.111 75.1)",
+        "tonalRamp": [
+          "#170700",
+          "#381F00",
+          "#5B3A00",
+          "#815811",
+          "#A8782A",
+          "#C89D5F",
+          "#E8C28E",
+          "#FFE9BE"
+        ]
+      },
+      "entrada-texto-oscuro": {
+        "role": "secondary",
+        "displayName": "Verde libro · texto oscuro",
+        "canonical": "#4E9E78",
+        "oklch": "oklch(63.8% 0.098 161.1)",
+        "tonalRamp": [
+          "#001105",
+          "#002E1B",
+          "#144E35",
+          "#2B7051",
+          "#45946F",
+          "#73B694",
+          "#A0D8BA",
+          "#CDFBE2"
+        ]
+      },
+      "salida-texto-oscuro": {
+        "role": "tertiary",
+        "displayName": "Terracota · texto oscuro",
+        "canonical": "#D0664B",
+        "oklch": "oklch(63.1% 0.141 35.4)",
+        "tonalRamp": [
+          "#200000",
+          "#461003",
+          "#6F2816",
+          "#9A422C",
+          "#C75F44",
+          "#E68870",
+          "#FFB19C",
+          "#FFDBC9"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "cifra-xl": {
+        "displayName": "Cifra XL",
+        "purpose": "Cifra protagonista de una pantalla."
+      },
+      "cifra-campo": {
+        "displayName": "Cifra de campo",
+        "purpose": "Solo el campo de monto (C4)."
+      },
+      "cifra-l": {
+        "displayName": "Cifra L",
+        "purpose": "Patrimonio neto al cierre de la lista de cuentas."
+      },
+      "cifra-m": {
+        "displayName": "Cifra M",
+        "purpose": "Saldo de cuenta; total de grupo en escritorio."
+      },
+      "cifra-s": {
+        "displayName": "Cifra S",
+        "purpose": "Montos de filas y totales de sección."
+      },
+      "cifra-xs": {
+        "displayName": "Cifra XS",
+        "purpose": "Fechas, equivalencias en COP, TRM."
+      },
+      "titulo-1": {
+        "displayName": "Título 1",
+        "purpose": "Título de página."
+      },
+      "titulo-2": {
+        "displayName": "Título 2",
+        "purpose": "Título de bloque; marca TINO del menú."
+      },
+      "cuerpo": {
+        "displayName": "Cuerpo",
+        "purpose": "Texto base, conceptos, nombres, botones."
+      },
+      "etiqueta": {
+        "displayName": "Etiqueta",
+        "purpose": "Rótulos de campo y subtítulos."
+      },
+      "rotulo": {
+        "displayName": "Rótulo",
+        "purpose": "Encabezados de sección, panel y grupo, en mayúsculas."
+      }
+    },
+    "shadows": [],
+    "lines": [
+      {
+        "name": "division",
+        "value": "1px solid var(--linea)",
+        "purpose": "Entre filas de una lista."
+      },
+      {
+        "name": "raya",
+        "value": "1px solid var(--raya)",
+        "purpose": "Bajo encabezado de sección, campo de monto y borde de panel."
+      },
+      {
+        "name": "doble-raya",
+        "value": "3px double var(--raya)",
+        "purpose": "Cierre de un total (patrimonio neto)."
+      },
+      {
+        "name": "punteada",
+        "value": "1px dashed var(--terciario)",
+        "purpose": "Pendiente o sin clasificar. Provisional."
+      }
+    ],
+    "focus": {
+      "value": "outline: 2px solid var(--marca); outline-offset: 2px",
+      "purpose": "Foco de marca; contorno, nunca sombra."
+    },
+    "motion": [
+      {
+        "name": "llegada",
+        "value": "var(--llegada)",
+        "canonical": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Lo que entra en escena. Panel lateral: 320 ms escritorio, 380 ms móvil. Utilidad ease-llegada."
+      },
+      {
+        "name": "retirada",
+        "value": "var(--retirada)",
+        "canonical": "cubic-bezier(0.4, 0, 1, 1)",
+        "purpose": "Lo que sale, siempre más rápido que la entrada: panel 180 / 200 ms, campo dependiente 180 ms. Utilidad ease-retirada."
+      },
+      {
+        "name": "despliegue",
+        "value": "var(--despliegue)",
+        "canonical": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Fila que crece en su lugar (cupo al elegir tarjeta): grid-template-rows 0fr → 1fr, fundido y 4 px de asiento, 300 ms. Utilidad ease-despliegue."
+      },
+      {
+        "name": "reducido",
+        "value": "opacity",
+        "purpose": "Con prefers-reduced-motion: sin desplazamiento. Panel solo opacidad (150 / 120 ms); el campo cambia de alto de golpe y conserva el fundido."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ],
+    "themes": {
+      "mechanism": "@media (prefers-color-scheme: dark) bajo :root:not([data-theme=\"light\"]); [data-theme=\"dark\"] para el cambio manual; script previo al pintado con localStorage 'tino-tema'.",
+      "darkTokens": "Claves *-oscuro en la frontmatter de DESIGN.md. Las bases de acento no cambian en oscuro."
+    },
+    "selection": {
+      "background": "var(--linea)",
+      "color": "var(--texto)",
+      "purpose": "Selección de texto como renglón resaltado; la tinta no cambia, así que el contraste es el de siempre."
+    }
+  },
+  "components": [
+    {
+      "name": "Botón primario",
+      "kind": "button",
+      "refersTo": "boton-primario",
+      "description": "C6. Tinta llena; la acción principal. Puede llevar la cifra en mono.",
+      "html": "<button class=\"ds-btn-primario\">Registrar gasto <span class=\"ds-btn-mono\">18.500</span></button>",
+      "css": ".ds-btn-primario{display:inline-flex;align-items:center;gap:12px;height:48px;padding:0 24px;border:0;border-radius:4px;background:var(--texto);color:var(--fondo);font-family:var(--font-interfaz), system-ui, sans-serif;font-size:15px;line-height:22px;font-weight:600;cursor:pointer}.ds-btn-primario:focus-visible{outline:2px solid var(--marca);outline-offset:2px}.ds-btn-primario:disabled{background:var(--hundido);color:var(--terciario);cursor:not-allowed}.ds-btn-mono{font-family:var(--font-cifras), ui-monospace, monospace;font-weight:500;font-variant-numeric:tabular-nums}"
+    },
+    {
+      "name": "Botón secundario",
+      "kind": "button",
+      "refersTo": "boton-secundario",
+      "description": "C6. Hoja con línea; acción alternativa.",
+      "html": "<button class=\"ds-btn-secundario\">Cancelar</button>",
+      "css": ".ds-btn-secundario{display:inline-flex;align-items:center;height:48px;padding:0 24px;border:1px solid var(--linea);border-radius:4px;background:var(--superficie);color:var(--texto);font-family:var(--font-interfaz), system-ui, sans-serif;font-size:15px;line-height:22px;font-weight:500;cursor:pointer}.ds-btn-secundario:focus-visible{outline:2px solid var(--marca);outline-offset:2px}.ds-btn-secundario:disabled{color:var(--terciario);cursor:not-allowed}"
+    },
+    {
+      "name": "Botón de texto",
+      "kind": "button",
+      "refersTo": "boton-texto",
+      "description": "C6. Sin caja, en latón; acción discreta.",
+      "html": "<button class=\"ds-btn-texto\">+ Crear cuenta</button>",
+      "css": ".ds-btn-texto{display:inline-flex;align-items:center;height:48px;padding:0 4px;border:0;background:transparent;color:var(--marca-texto);font-family:var(--font-interfaz), system-ui, sans-serif;font-size:15px;line-height:22px;font-weight:600;cursor:pointer}.ds-btn-texto:focus-visible{outline:2px solid var(--marca);outline-offset:2px}"
+    },
+    {
+      "name": "Campo de monto",
+      "kind": "input",
+      "refersTo": "campo-monto",
+      "description": "C4. Sin caja: raya inferior, cifra 44/52 en mono, moneda a la derecha, cursor de latón.",
+      "html": "<label class=\"ds-monto\"><span class=\"ds-monto-et\">Monto</span><span class=\"ds-monto-fila\"><input class=\"ds-monto-in\" inputmode=\"numeric\" placeholder=\"0\" value=\"18.500\"><span class=\"ds-monto-et\">COP</span></span></label>",
+      "css": ".ds-monto{display:block;padding:8px 0 12px;border-bottom:1px solid var(--raya);font-family:var(--font-interfaz), system-ui, sans-serif}.ds-monto-et{font-size:13px;line-height:18px;font-weight:500;color:var(--secundario)}.ds-monto-fila{display:flex;align-items:baseline;gap:8px;margin-top:4px}.ds-monto-in{flex:1;min-width:0;border:0;background:transparent;padding:0;font-family:var(--font-cifras), ui-monospace, monospace;font-size:44px;line-height:52px;font-weight:500;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:var(--texto);caret-color:var(--marca);outline:none}.ds-monto-in::placeholder{color:var(--terciario)}.ds-monto:has(:focus-visible){outline:2px solid var(--marca);outline-offset:2px}.ds-monto:has(:focus){border-bottom-color:var(--marca)}"
+    },
+    {
+      "name": "Chip de categoría",
+      "kind": "chip",
+      "refersTo": "chip-categoria",
+      "description": "C5. Sugerida (borde tinta, check y «auto» en latón), normal y sin clasificar (punteado).",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip ds-chip-on\">&#10003; Mercado <span class=\"ds-chip-auto\">auto</span></button><button class=\"ds-chip\">Transporte</button><button class=\"ds-chip ds-chip-sin\">Sin clasificar</button></div>",
+      "css": ".ds-chips{display:flex;gap:8px;flex-wrap:wrap}.ds-chip{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border:1px solid var(--linea);border-radius:4px;background:var(--superficie);color:var(--texto);font-family:var(--font-interfaz), system-ui, sans-serif;font-size:15px;line-height:22px;cursor:pointer}.ds-chip:focus-visible{outline:2px solid var(--marca);outline-offset:2px}.ds-chip-on{border-color:var(--texto);font-weight:500}.ds-chip-sin{border-style:dashed;border-color:var(--terciario);color:var(--secundario);background:transparent}.ds-chip-auto{font-family:var(--font-cifras), ui-monospace, monospace;font-size:11px;line-height:14px;letter-spacing:0.08em;font-weight:400;color:var(--marca-texto)}"
+    },
+    {
+      "name": "Sección con filas de movimiento",
+      "kind": "custom",
+      "refersTo": "fila-movimiento",
+      "description": "C1 + C2. Rótulo y total sobre raya; filas sin icono, signo y color leídos desde el patrimonio.",
+      "html": "<section class=\"ds-sec\"><div class=\"ds-sec-enc\"><h2>Movimientos · noviembre</h2><span class=\"ds-sec-total\">3.631.500</span></div><div class=\"ds-mov\"><span class=\"ds-mov-f\">04 nov</span><div><div>Almuerzo</div><div class=\"ds-mov-sub\">Comida · Nequi</div></div><span class=\"ds-mov-m ds-out\">&#8722;18.500</span></div><div class=\"ds-mov\"><span class=\"ds-mov-f\">03 nov</span><div><div>Salario</div><div class=\"ds-mov-sub\">Ingreso · Bancolombia</div></div><span class=\"ds-mov-m ds-in\">+4.850.000</span></div><div class=\"ds-mov\"><span class=\"ds-mov-f\">02 nov</span><div><div>Pago tarjeta</div><div class=\"ds-mov-sub\">Transferencia · Bancolombia &#8594; Visa</div></div><span class=\"ds-mov-m\">1.200.000</span></div></section>",
+      "css": ".ds-sec{font-family:var(--font-interfaz), system-ui, sans-serif;color:var(--texto)}.ds-sec-enc{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:8px;border-bottom:1px solid var(--raya)}.ds-sec-enc h2{margin:0;font-size:11px;line-height:14px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase}.ds-sec-total{font-family:var(--font-cifras), ui-monospace, monospace;font-size:15px;line-height:22px;font-weight:500;font-variant-numeric:tabular-nums}.ds-mov{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:12px;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--linea);font-size:15px;line-height:22px}.ds-mov-f{font-family:var(--font-cifras), ui-monospace, monospace;font-size:12px;line-height:16px;color:var(--secundario)}.ds-mov-sub{font-size:13px;line-height:18px;font-weight:500;color:var(--secundario)}.ds-mov-m{font-family:var(--font-cifras), ui-monospace, monospace;font-weight:500;font-variant-numeric:tabular-nums;text-align:right}.ds-out{color:var(--salida-texto)}.ds-in{color:var(--entrada-texto)}"
+    },
+    {
+      "name": "Tarjeta de cuenta (activo en USD)",
+      "kind": "card",
+      "refersTo": "tarjeta-activo",
+      "description": "C3. Hoja con borde renglón y radio 6; cifra-m a la derecha con equivalencia y TRM.",
+      "html": "<article class=\"ds-tarjeta\"><div><div class=\"ds-tarjeta-nom\">Cuenta USD</div><div class=\"ds-tarjeta-sub\">Banco · activo en USD</div></div><div class=\"ds-tarjeta-der\"><div class=\"ds-tarjeta-cifra\">US$ 7.750,00</div><div class=\"ds-tarjeta-xs\">&#8776; 31.775.000 COP</div><div class=\"ds-tarjeta-xs\">TRM 4.100,00 · hoy</div></div></article>",
+      "css": ".ds-tarjeta{display:flex;justify-content:space-between;gap:12px;padding:16px;border:1px solid var(--linea);border-radius:6px;background:var(--superficie);font-family:var(--font-interfaz), system-ui, sans-serif;color:var(--texto)}.ds-tarjeta-nom{font-size:15px;line-height:22px;font-weight:600}.ds-tarjeta-sub{font-size:13px;line-height:18px;font-weight:500;color:var(--secundario)}.ds-tarjeta-der{text-align:right}.ds-tarjeta-cifra{font-family:var(--font-cifras), ui-monospace, monospace;font-size:20px;line-height:28px;font-weight:500;font-variant-numeric:tabular-nums}.ds-tarjeta-xs{font-family:var(--font-cifras), ui-monospace, monospace;font-size:12px;line-height:16px;color:var(--secundario);font-variant-numeric:tabular-nums}"
+    },
+    {
+      "name": "Navegación lateral",
+      "kind": "nav",
+      "refersTo": "menu-entrada-activa",
+      "description": "C14. Columna de 232 px; Registrar es el único botón en tinta; la entrada activa va sobre hundido.",
+      "html": "<nav class=\"ds-nav\"><div class=\"ds-nav-marca\">TINO</div><button class=\"ds-nav-reg\">+ Registrar</button><a class=\"ds-nav-ent ds-nav-act\" href=\"#\">Cuentas</a><a class=\"ds-nav-ent\" href=\"#\">Movimientos</a><a class=\"ds-nav-ent\" href=\"#\">Resumen</a></nav>",
+      "css": ".ds-nav{display:flex;flex-direction:column;gap:2px;width:232px;padding:28px 16px;border-right:1px solid var(--linea);font-family:var(--font-interfaz), system-ui, sans-serif}.ds-nav-marca{padding:0 8px 24px;font-size:20px;line-height:26px;font-weight:700;letter-spacing:0.16em;color:var(--texto)}.ds-nav-reg{height:44px;margin-bottom:24px;border:0;border-radius:4px;background:var(--texto);color:var(--fondo);font-family:var(--font-interfaz), system-ui, sans-serif;font-size:15px;font-weight:600;cursor:pointer}.ds-nav-reg:focus-visible{outline:2px solid var(--marca);outline-offset:2px}.ds-nav-ent{display:flex;align-items:center;height:40px;padding:0 8px;border-radius:4px;font-size:15px;line-height:22px;color:var(--secundario);text-decoration:none}.ds-nav-ent:hover{color:var(--texto)}.ds-nav-ent:focus-visible{outline:2px solid var(--marca);outline-offset:2px}.ds-nav-act{background:var(--hundido);color:var(--texto);font-weight:600}"
+    },
+    {
+      "name": "Enlace de texto",
+      "kind": "custom",
+      "refersTo": "enlace-texto",
+      "description": "Acción que navega, en latón y sin caja; 44 px de alto para un objetivo táctil completo.",
+      "html": "<a class=\"ds-enlace\" href=\"#\">+ Nueva cuenta</a>",
+      "css": ".ds-enlace{display:inline-flex;align-items:center;gap:8px;height:44px;font-family:var(--font-interfaz), system-ui, sans-serif;font-size:15px;line-height:22px;font-weight:600;color:var(--marca-texto);text-decoration:none}.ds-enlace:hover{text-decoration:underline;text-underline-offset:3px}.ds-enlace:focus-visible{outline:2px solid var(--marca);outline-offset:2px}"
+    },
+    {
+      "name": "Campo subrayado con error",
+      "kind": "input",
+      "refersTo": "campo-subrayado",
+      "description": "Texto sobre un renglón; con error la línea pasa a terracota y el mensaje va debajo.",
+      "html": "<label class=\"ds-sub\"><span class=\"ds-sub-et\">Nombre</span><input class=\"ds-sub-in ds-sub-in--error\" value=\"Nequi\" aria-invalid=\"true\"></label><p class=\"ds-error\" role=\"alert\">Ya tienes una cuenta con ese nombre.</p>",
+      "css": ".ds-sub{display:flex;flex-direction:column;gap:4px;font-family:var(--font-interfaz), system-ui, sans-serif}.ds-sub-et{font-size:13px;line-height:18px;color:var(--secundario)}.ds-sub-in{height:44px;border:0;border-bottom:1px solid var(--linea);background:transparent;padding:0;font-size:17px;color:var(--texto)}.ds-sub-in:focus{border-bottom-color:var(--raya)}.ds-sub-in::placeholder{color:var(--terciario)}.ds-sub-in--error{border-bottom-color:var(--salida)}.ds-error{margin:4px 0 0;font-size:13px;line-height:18px;color:var(--salida-texto)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "El libro de cuentas",
+    "overview": "Tino se ve como un libro contable de papel: hojas color hueso, tinta casi negra y cifras alineadas en columnas. El contenido son cifras y el diseño existe para que se lean y comparen rápido. La jerarquía se arma con líneas y espacio, como los renglones y las rayas de cierre de un libro. No hay sombras, degradados ni volumen. En modo oscuro la tinta se invierte en un azul tinta (no un gris neutro), y el papel se vuelve la línea.\n\nLa densidad es la de una herramienta de uso diario: filas de 44 a 64 px, columnas fijas para fecha y monto, y cifras que siempre van en monoespaciada con dígitos tabulares para que se alineen dígito con dígito. El color casi no aparece. El latón marca la identidad y la acción discreta. El verde y la terracota solo dicen si el patrimonio sube o baja. Una pantalla de Tino debe poder leerse en blanco y negro sin perder nada.\n\nLas tarjetas son la excepción, no la norma. Un activo puede ir en hoja (superficie con borde). Un pasivo no lleva hoja: va sobre el fondo. Agrupar se hace con una raya bajo el encabezado y divisiones entre filas, no con cajas.",
+    "keyCharacteristics": [
+      "Papel y tinta: fondo cálido, texto casi negro, modo oscuro azulado.",
+      "Toda cifra en IBM Plex Mono con dígitos tabulares; toda la interfaz en Familjen Grotesk.",
+      "Cuatro líneas (división, raya, doble raya, punteada) y el espacio construyen toda la jerarquía.",
+      "Cero sombras. Radios de 6 px como máximo.",
+      "Acentos solo en texto, iconos, cifras y gráficas finas; nunca de fondo.",
+      "Signo y color de una cifra leídos desde el patrimonio del usuario."
+    ],
+    "rules": [
+      {
+        "name": "The Ink-Only Accent Rule",
+        "body": "Los acentos son texto, iconos, cifras o gráficas finas (barras de cupo de 4 px, el cursor de 2 px). Nunca rellenan un bloque, un botón ni un fondo de fila.",
+        "section": "colors"
+      },
+      {
+        "name": "The Patrimony Sign Rule",
+        "body": "En la lista general, toda cifra se lee desde el patrimonio del usuario: salida con `−` (U+2212) en terracota, entrada con `+` en verde, transferencia en tinta y sin signo. El signo lo decide `src/domain/cuenta/naturaleza.ts` (RN-02); ningún componente lo recalcula.",
+        "section": "colors"
+      },
+      {
+        "name": "The Small-Text Variant Rule",
+        "body": "Por debajo de 24 px, un acento siempre usa su variante `-texto`.",
+        "section": "colors"
+      },
+      {
+        "name": "The Mono-Money Rule",
+        "body": "Todo importe monetario va en IBM Plex Mono con dígitos tabulares, sin excepción, también dentro de un botón («Registrar gasto 18.500»).",
+        "section": "typography"
+      },
+      {
+        "name": "The Weight-Step Rule",
+        "body": "El monto siempre va un escalón de peso por encima de su etiqueta. Nunca al revés.",
+        "section": "typography"
+      },
+      {
+        "name": "The Colombian-Format Rule",
+        "body": "Punto de miles y coma decimal. Pesos sin decimales (`1.234.567`), dólares con dos (`US$ 7.750,00`). Negativo con `−` (U+2212), nunca guion. «COP» se omite cuando toda la columna está en pesos. Toda cifra en otra moneda lleva debajo, en secundario, su equivalente y la tasa: `≈ 31.775.000 COP · TRM 4.100,00`. El formato vive en `src/domain/dinero/formato.ts`; ningún componente formatea a mano.",
+        "section": "typography"
+      },
+      {
+        "name": "The No-Shadow Rule",
+        "body": "Sin sombras en ningún componente, en ningún estado. Si algo necesita destacarse, se usa una línea, un tono de superficie o espacio.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Four-Lines Rule",
+        "body": "La jerarquía se construye solo con las cuatro líneas y el espacio. No se inventa una quinta (bordes de color, líneas gruesas, separadores decorativos).",
+        "section": "elevation"
+      },
+      {
+        "name": "The Six-Pixel Ceiling Rule",
+        "body": "Ningún radio supera los 6 px. Las píldoras y las tarjetas redondeadas no existen en Tino.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "**Do** usar solo los tokens de color, tipo, espaciado y radio de este archivo; Tailwind tiene sus escalas por defecto vaciadas para impedir lo contrario.",
+      "**Do** poner toda cifra en `font-mono tabular-nums`, alineada a la derecha, y formatearla con `src/domain/dinero/formato.ts`.",
+      "**Do** separar con divisiones y espacio; reservar la hoja (superficie con borde) para activos y paneles.",
+      "**Do** tomar signo y color de una cifra de `naturaleza.ts` (RN-02).",
+      "**Do** usar la variante `-texto` de un acento por debajo de 24 px.",
+      "**Do** mostrar cada componente nuevo y sus variantes en `/estilos`, en ambos modos.",
+      "**Do** mantener 44 px de objetivo táctil en móvil."
+    ],
+    "donts": [
+      "**Don't** usar sombras, resplandores ni elevación en ningún estado.",
+      "**Don't** usar un acento (latón, verde, terracota) como fondo de un bloque, botón o fila.",
+      "**Don't** usar radios mayores de 6 px ni píldoras.",
+      "**Don't** escribir un negativo con guion `-`; siempre `−` (U+2212).",
+      "**Don't** poner iconos en las filas de movimientos.",
+      "**Don't** dejar que una etiqueta pese más que su monto.",
+      "**Don't** introducir colores, tamaños, radios ni espaciados fuera de lo listado.",
+      "**Don't** construir un componente del catálogo que no figure en «Components» antes de que su pantalla tenga spec."
+    ]
+  }
+}

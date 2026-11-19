@@ -31,6 +31,11 @@
   --salida: #b0452e;
   --salida-texto: #b0452e;
 
+  /* Movimiento: curvas compartidas por CSS y JS (panel-lateral las lee de aquí). */
+  --llegada: cubic-bezier(0.16, 1, 0.3, 1);
+  --retirada: cubic-bezier(0.4, 0, 1, 1);
+  --despliegue: cubic-bezier(0.22, 1, 0.36, 1);
+
   color-scheme: light;
 }
 
@@ -123,6 +128,10 @@
   --color-current: currentColor;
   --color-inherit: inherit;
 
+  --ease-llegada: var(--llegada);
+  --ease-retirada: var(--retirada);
+  --ease-despliegue: var(--despliegue);
+
   --font-sans: var(--font-interfaz), system-ui, sans-serif;
   --font-mono: var(--font-cifras), ui-monospace, monospace;
 
@@ -198,6 +207,13 @@ body {
   font-size: 15px;
   line-height: 22px;
   -webkit-font-smoothing: antialiased;
+}
+
+/* La selección es un renglón resaltado, no el azul del navegador. La tinta no
+   cambia: el contraste del texto seleccionado es el de siempre. */
+::selection {
+  background: var(--linea);
+  color: var(--texto);
 }
 
 /* El foco es de marca y es un contorno, nunca una sombra. */

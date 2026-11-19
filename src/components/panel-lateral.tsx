@@ -34,8 +34,10 @@ type Props = {
  * escritorio, abajo en móvil) y el velo oscurece el libro a la vez. Entra con
  * desaceleración; sale más rápido. Con movimiento reducido, solo opacidad.
  */
-const LLEGADA = "cubic-bezier(0.16, 1, 0.3, 1)";
-const RETIRADA = "cubic-bezier(0.4, 0, 1, 1)";
+/** Curva de `globals.css` (`--llegada`, `--retirada`): WAAPI no acepta `var()`. */
+function curva(nombre: "llegada" | "retirada"): string {
+  return getComputedStyle(document.documentElement).getPropertyValue(`--${nombre}`).trim() || "ease-out";
+}
 
 type Recorrido = { hoja: Keyframe[]; entrada: number; salida: number };
 
@@ -77,8 +79,8 @@ export function PanelLateral({ titulo, alSolicitarCierre, children, ref }: Props
 
     const { hoja, entrada } = recorrido();
     const animaciones = [
-      el.animate(hoja, { duration: entrada, easing: LLEGADA }),
-      animarVelo(el, { duration: entrada, easing: LLEGADA }),
+      el.animate(hoja, { duration: entrada, easing: curva("llegada") }),
+      animarVelo(el, { duration: entrada, easing: curva("llegada") }),
     ];
     return () => {
       for (const a of animaciones) a?.cancel();
@@ -99,7 +101,7 @@ export function PanelLateral({ titulo, alSolicitarCierre, children, ref }: Props
         const { hoja, salida: duracion } = recorrido();
         const opciones: KeyframeAnimationOptions = {
           duration: duracion,
-          easing: RETIRADA,
+          easing: curva("retirada"),
           direction: "reverse",
           fill: "forwards",
         };

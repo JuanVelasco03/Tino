@@ -8,6 +8,8 @@ import { moverA, ordenCambio } from "@/domain/cuenta/orden";
 import { formatearFecha, formatearFechaSinAnio } from "@/domain/fecha/formato";
 import type { CambioOrden, Cuenta, ListaCuentas as Lista, Naturaleza, ResultadoOrden } from "@/services/cuentas";
 import { EstadoVacio } from "../estado-vacio";
+import { EnlaceTexto } from "../enlace-texto";
+import { MensajeError } from "../mensaje-error";
 import { CierrePatrimonio } from "./cierre-patrimonio";
 import { FilaCuenta } from "./fila-cuenta";
 import { GrupoCuentas } from "./grupo-cuentas";
@@ -204,9 +206,7 @@ export function ListaCuentas({ lista, guardarOrden }: Props) {
       </header>
 
       {aviso && (
-        <p role="alert" className="-mt-3 text-etiqueta font-normal text-salida-texto md:-mt-6">
-          {aviso}
-        </p>
+        <MensajeError mensaje={aviso} className="-mt-3 md:-mt-6" />
       )}
 
       {sinCuentas ? (
@@ -230,13 +230,9 @@ export function ListaCuentas({ lista, guardarOrden }: Props) {
               </GrupoCuentas>
             ))}
           </div>
-          <Link
-            href={RUTA_NUEVA}
-            scroll={false}
-            className="-my-3 flex h-11 items-center self-start text-cuerpo font-semibold text-marca-texto md:hidden"
-          >
+          <EnlaceTexto href={RUTA_NUEVA} scroll={false} className="-my-3 self-start md:hidden">
             + Nueva cuenta
-          </Link>
+          </EnlaceTexto>
           <CierrePatrimonio
             activos={lista.activos.total}
             pasivos={lista.pasivos.total}
@@ -245,12 +241,9 @@ export function ListaCuentas({ lista, guardarOrden }: Props) {
         </>
       )}
 
-      <Link
-        href="/cuentas/archivadas"
-        className={`flex h-11 items-center self-start text-cuerpo font-semibold text-marca-texto ${sinCuentas ? "" : "-mt-3 md:-mt-6 md:px-6"}`}
-      >
+      <EnlaceTexto href="/cuentas/archivadas" className={`self-start ${sinCuentas ? "" : "-mt-3 md:-mt-6 md:px-6"}`}>
         Ver archivadas
-      </Link>
+      </EnlaceTexto>
     </div>
   );
 }

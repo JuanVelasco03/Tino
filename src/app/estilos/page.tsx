@@ -2,8 +2,10 @@ import type { ReactNode } from "react";
 import { Boton } from "@/components/boton";
 import { BotonTema } from "@/components/boton-tema";
 import { CampoMonto } from "@/components/campo-monto";
+import { CampoSubrayado } from "@/components/campo-subrayado";
 import { ChipCategoria } from "@/components/chip-categoria";
 import { EncabezadoSeccion } from "@/components/encabezado-seccion";
+import { EnlaceTexto } from "@/components/enlace-texto";
 import { EstadoVacio } from "@/components/estado-vacio";
 import { FilaMovimiento } from "@/components/fila-movimiento";
 import {
@@ -212,6 +214,29 @@ function Componentes({ modo }: { modo: "light" | "dark" }) {
           detalle="Lo que registres aparecerá aquí por fecha, con el saldo al lado."
           accion={{ etiqueta: "Registrar el primero", href: "#" }}
         />
+      </div>
+
+      <div>
+        <Etiqueta>Campo subrayado · vacío, con valor, con error</Etiqueta>
+        <div className="flex flex-col gap-6">
+          <CampoSubrayado etiqueta="Nombre" placeholder="Nequi" id={`estilos-nombre-${modo}`} />
+          <CampoSubrayado etiqueta="Detalle · opcional" defaultValue="Ahorros ·· 4821" id={`estilos-detalle-${modo}`} />
+          <CampoSubrayado
+            etiqueta="Nombre"
+            defaultValue="Nequi"
+            error="Ya tienes una cuenta con ese nombre."
+            id={`estilos-error-${modo}`}
+          />
+        </div>
+      </div>
+
+      <div>
+        <Etiqueta>Enlace de texto · acción que navega</Etiqueta>
+        <div className="flex flex-wrap gap-6">
+          <EnlaceTexto href="#">← Cuentas</EnlaceTexto>
+          <EnlaceTexto href="#">+ Nueva cuenta</EnlaceTexto>
+          <EnlaceTexto href="#">Ver archivadas</EnlaceTexto>
+        </div>
       </div>
 
       <div>

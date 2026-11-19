@@ -3,6 +3,7 @@
 import type { ChangeEvent } from "react";
 import type { Moneda } from "@/domain/dinero/formato";
 import { formatearEntradaPesos } from "@/domain/dinero/entrada";
+import { MensajeError } from "./mensaje-error";
 
 export type MontoEditable = {
   alCambiar: (valor: string) => void;
@@ -62,7 +63,16 @@ function CampoEditable({ valor, moneda, etiqueta, editable }: Required<Pick<Prop
 
   return (
     <div className="flex flex-col gap-1">
-      <div className={`border-b pb-3 pt-2 ${error ? "border-salida" : "border-raya"}`}>
+      {/*
+       * El foco lo lleva el campo entero (etiqueta, cifra y moneda), con el
+       * contorno de latón del sistema. El input anula el suyo con `!`: la regla
+       * global `:focus-visible` no está en una capa y le gana a las utilidades.
+       */}
+      <div
+        className={`border-b pb-3 pt-2 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-marca ${
+          error ? "border-salida" : "border-raya has-[:focus]:border-marca"
+        }`}
+      >
         <label htmlFor={nombre} className="mb-1 block text-etiqueta text-secundario">
           {etiqueta}
         </label>
@@ -78,7 +88,7 @@ function CampoEditable({ valor, moneda, etiqueta, editable }: Required<Pick<Prop
             disabled={deshabilitado}
             aria-invalid={error ? true : undefined}
             aria-describedby={descritoPor}
-            className="min-w-0 flex-1 border-0 bg-transparent p-0 font-mono text-cifra-campo tabular-nums text-texto caret-marca outline-none placeholder:text-terciario disabled:text-terciario"
+            className="min-w-0 flex-1 border-0 bg-transparent p-0 font-mono text-cifra-campo tabular-nums text-texto caret-marca outline-none! placeholder:text-terciario disabled:text-terciario"
           />
           <span className="text-etiqueta text-secundario">{moneda}</span>
         </div>
@@ -88,11 +98,7 @@ function CampoEditable({ valor, moneda, etiqueta, editable }: Required<Pick<Prop
           {nota}
         </p>
       )}
-      {error && (
-        <p id={idError} role="alert" className="text-etiqueta font-normal text-salida-texto">
-          {error}
-        </p>
-      )}
+      {error && <MensajeError id={idError} mensaje={error} />}
     </div>
   );
 }

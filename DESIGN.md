@@ -1,0 +1,424 @@
+---
+name: Tino
+description: Finanzas personales como un libro de cuentas — papel y tinta, cifras en columnas.
+colors:
+  fondo: "#FAF8F3"
+  superficie: "#FFFFFF"
+  hundido: "#F2EEE5"
+  texto: "#1A1A17"
+  secundario: "#6B6760"
+  terciario: "#9A958B"
+  linea: "#E4DFD4"
+  raya: "#1A1A17"
+  marca: "#A8762C"
+  marca-texto: "#8A5F1F"
+  entrada: "#2F7D5A"
+  entrada-texto: "#2F7D5A"
+  salida: "#B0452E"
+  salida-texto: "#B0452E"
+  fondo-oscuro: "#12141A"
+  superficie-oscuro: "#181B22"
+  hundido-oscuro: "#1F232C"
+  texto-oscuro: "#E8E4DC"
+  secundario-oscuro: "#8B8A84"
+  terciario-oscuro: "#5E5F63"
+  linea-oscuro: "#272B34"
+  raya-oscuro: "#8B8A84"
+  marca-texto-oscuro: "#BC8A3E"
+  entrada-texto-oscuro: "#4E9E78"
+  salida-texto-oscuro: "#D0664B"
+typography:
+  cifra-xl:
+    fontFamily: "IBM Plex Mono, ui-monospace, monospace"
+    fontSize: "56px"
+    lineHeight: "60px"
+    fontWeight: 500
+    letterSpacing: "-0.03em"
+    fontFeature: "tnum"
+  cifra-campo:
+    fontFamily: "IBM Plex Mono, ui-monospace, monospace"
+    fontSize: "44px"
+    lineHeight: "52px"
+    fontWeight: 500
+    letterSpacing: "-0.02em"
+    fontFeature: "tnum"
+  cifra-l:
+    fontFamily: "IBM Plex Mono, ui-monospace, monospace"
+    fontSize: "32px"
+    lineHeight: "36px"
+    fontWeight: 500
+    letterSpacing: "-0.02em"
+    fontFeature: "tnum"
+  cifra-m:
+    fontFamily: "IBM Plex Mono, ui-monospace, monospace"
+    fontSize: "20px"
+    lineHeight: "28px"
+    fontWeight: 500
+    fontFeature: "tnum"
+  cifra-s:
+    fontFamily: "IBM Plex Mono, ui-monospace, monospace"
+    fontSize: "15px"
+    lineHeight: "22px"
+    fontWeight: 500
+    fontFeature: "tnum"
+  cifra-xs:
+    fontFamily: "IBM Plex Mono, ui-monospace, monospace"
+    fontSize: "12px"
+    lineHeight: "16px"
+    fontWeight: 400
+    fontFeature: "tnum"
+  titulo-1:
+    fontFamily: "Familjen Grotesk, system-ui, sans-serif"
+    fontSize: "28px"
+    lineHeight: "34px"
+    fontWeight: 600
+    letterSpacing: "-0.01em"
+  titulo-2:
+    fontFamily: "Familjen Grotesk, system-ui, sans-serif"
+    fontSize: "20px"
+    lineHeight: "26px"
+    fontWeight: 600
+  cuerpo:
+    fontFamily: "Familjen Grotesk, system-ui, sans-serif"
+    fontSize: "15px"
+    lineHeight: "22px"
+    fontWeight: 400
+  etiqueta:
+    fontFamily: "Familjen Grotesk, system-ui, sans-serif"
+    fontSize: "13px"
+    lineHeight: "18px"
+    fontWeight: 500
+  rotulo:
+    fontFamily: "Familjen Grotesk, system-ui, sans-serif"
+    fontSize: "11px"
+    lineHeight: "14px"
+    fontWeight: 600
+    letterSpacing: "0.08em"
+rounded:
+  fila: "0px"
+  muestra: "2px"
+  campo: "4px"
+  hoja: "6px"
+spacing:
+  "1": "4px"
+  "2": "8px"
+  "3": "12px"
+  "4": "16px"
+  "6": "24px"
+  "8": "32px"
+  "12": "48px"
+  "16": "64px"
+components:
+  boton-primario:
+    backgroundColor: "{colors.texto}"
+    textColor: "{colors.fondo}"
+    typography: "{typography.cuerpo}"
+    rounded: "{rounded.campo}"
+    padding: "0 24px"
+    height: "48px"
+  boton-primario-deshabilitado:
+    backgroundColor: "{colors.hundido}"
+    textColor: "{colors.terciario}"
+  boton-secundario:
+    backgroundColor: "{colors.superficie}"
+    textColor: "{colors.texto}"
+    typography: "{typography.cuerpo}"
+    rounded: "{rounded.campo}"
+    padding: "0 24px"
+    height: "48px"
+  boton-texto:
+    textColor: "{colors.marca-texto}"
+    typography: "{typography.cuerpo}"
+    padding: "0 4px"
+    height: "48px"
+  chip-categoria:
+    backgroundColor: "{colors.superficie}"
+    textColor: "{colors.texto}"
+    typography: "{typography.cuerpo}"
+    rounded: "{rounded.campo}"
+    padding: "0 12px"
+    height: "44px"
+  chip-categoria-sin-clasificar:
+    textColor: "{colors.secundario}"
+    rounded: "{rounded.campo}"
+  campo-monto:
+    textColor: "{colors.texto}"
+    typography: "{typography.cifra-campo}"
+    rounded: "{rounded.fila}"
+    padding: "8px 0 12px"
+  tarjeta-activo:
+    backgroundColor: "{colors.superficie}"
+    rounded: "{rounded.hoja}"
+    padding: "16px"
+  tarjeta-pasivo:
+    backgroundColor: "{colors.fondo}"
+    rounded: "{rounded.hoja}"
+    padding: "16px"
+  fila-movimiento:
+    rounded: "{rounded.fila}"
+    padding: "12px 0"
+  panel-lateral:
+    backgroundColor: "{colors.superficie}"
+    textColor: "{colors.texto}"
+    width: "400px"
+  menu-entrada-activa:
+    backgroundColor: "{colors.hundido}"
+    textColor: "{colors.texto}"
+    rounded: "{rounded.campo}"
+    height: "40px"
+---
+
+# Design System: Tino
+
+<!--
+Fuentes: código construido (src/app/globals.css, src/app/layout.tsx,
+src/app/estilos/, src/components/), cruzado con la intención original
+(referencias/sistema-de-diseno-prompt.md), el documento visual
+(referencias/TINO sistema de diseño.zip → «TINO Sistema de Diseño.dc.html»)
+y REGLAS.md §6. Donde el código se aparta del sistema, se registra como
+desvío en «Do's and Don'ts → Desvíos registrados»; un desvío no es norma.
+Referencia viva: la ruta /estilos.
+-->
+
+## Overview
+
+**Creative North Star: "El libro de cuentas"**
+
+Tino se ve como un libro contable de papel: hojas color hueso, tinta casi negra y cifras alineadas en columnas. El contenido son cifras y el diseño existe para que se lean y comparen rápido. La jerarquía se arma con líneas y espacio, como los renglones y las rayas de cierre de un libro. No hay sombras, degradados ni volumen. En modo oscuro la tinta se invierte en un azul tinta (no un gris neutro), y el papel se vuelve la línea.
+
+La densidad es la de una herramienta de uso diario: filas de 44 a 64 px, columnas fijas para fecha y monto, y cifras que siempre van en monoespaciada con dígitos tabulares para que se alineen dígito con dígito. El color casi no aparece. El latón marca la identidad y la acción discreta. El verde y la terracota solo dicen si el patrimonio sube o baja. Una pantalla de Tino debe poder leerse en blanco y negro sin perder nada.
+
+Las tarjetas son la excepción, no la norma. Un activo puede ir en hoja (superficie con borde). Un pasivo no lleva hoja: va sobre el fondo. Agrupar se hace con una raya bajo el encabezado y divisiones entre filas, no con cajas.
+
+**Key Characteristics:**
+- Papel y tinta: fondo cálido, texto casi negro, modo oscuro azulado.
+- Toda cifra en IBM Plex Mono con dígitos tabulares; toda la interfaz en Familjen Grotesk.
+- Cuatro líneas (división, raya, doble raya, punteada) y el espacio construyen toda la jerarquía.
+- Cero sombras. Radios de 6 px como máximo.
+- Acentos solo en texto, iconos, cifras y gráficas finas; nunca de fondo.
+- Signo y color de una cifra leídos desde el patrimonio del usuario.
+
+## Colors
+
+Una paleta de papel y tinta casi monocroma, con tres acentos que se reservan para identidad y dirección del dinero.
+
+Cada token tiene valor para modo claro (papel) y modo oscuro (tinta azulada). Los acentos tienen una variante **base** para iconos, gráficas y cifras de 24 px o más, y una variante **-texto** para tamaños pequeños, elegida por contraste. En modo oscuro solo cambian las variantes `-texto`; las bases se mantienen.
+
+El modo oscuro se aplica con `@media (prefers-color-scheme: dark)` bajo `:root:not([data-theme="light"])`, y también con `[data-theme="dark"]` para el cambio manual. El tema se fija antes del primer pintado con un script en el layout (clave `tino-tema` en localStorage).
+
+### Primary
+- **Latón** (`marca`; texto `marca-texto`, oscuro `marca-texto-oscuro`): la identidad. Botón de texto, enlaces de acción («+ Crear cuenta»), la etiqueta «auto» del chip sugerido, el cursor del campo de monto y el anillo de foco.
+
+### Secondary
+- **Verde libro** (`entrada`; texto `entrada-texto`, oscuro `entrada-texto-oscuro`): dinero que entra al patrimonio. Cifras de ingreso con `+`.
+
+### Tertiary
+- **Terracota** (`salida`; texto `salida-texto`, oscuro `salida-texto-oscuro`): dinero que sale del patrimonio y deuda. Cifras de gasto con `−`, saldos de pasivos, errores de validación y el borde inferior de un campo con error.
+
+### Neutral
+- **Papel** (`fondo`; oscuro `fondo-oscuro`): fondo de la página y de los pasivos.
+- **Hoja** (`superficie`; oscuro `superficie-oscuro`): tarjetas de activo, paneles laterales, chips y botón secundario.
+- **Papel hundido** (`hundido`; oscuro `hundido-oscuro`): entrada activa del menú y botón primario deshabilitado.
+- **Tinta** (`texto`; oscuro `texto-oscuro`): texto principal, cifras neutras y fondo del botón primario.
+- **Tinta secundaria** (`secundario`; oscuro `secundario-oscuro`): etiquetas, subtítulos, equivalencias en COP, navegación inactiva.
+- **Tinta tenue** (`terciario`; oscuro `terciario-oscuro`): marcadores de posición, el «0» de un campo vacío, estados deshabilitados, borde punteado.
+- **Renglón** (`linea`; oscuro `linea-oscuro`): divisiones entre filas, bordes de hojas y de controles secundarios, y el resaltado de la selección de texto (`::selection`, con la tinta sin cambiar).
+- **Raya** (`raya`; oscuro `raya-oscuro`): la línea fuerte bajo un encabezado de sección, bajo el campo de monto y en el borde del panel.
+
+### Named Rules
+**The Ink-Only Accent Rule.** Los acentos son texto, iconos, cifras o gráficas finas (barras de cupo de 4 px, el cursor de 2 px). Nunca rellenan un bloque, un botón ni un fondo de fila.
+
+**The Patrimony Sign Rule.** En la lista general, toda cifra se lee desde el patrimonio del usuario: salida con `−` (U+2212) en terracota, entrada con `+` en verde, transferencia en tinta y sin signo. El signo lo decide `src/domain/cuenta/naturaleza.ts` (RN-02); ningún componente lo recalcula.
+
+**The Small-Text Variant Rule.** Por debajo de 24 px, un acento siempre usa su variante `-texto`.
+
+## Typography
+
+**Interfaz:** Familjen Grotesk 400 / 500 / 600 / 700 (con `system-ui, sans-serif`)
+**Cifras:** IBM Plex Mono 400 / 500 (con `ui-monospace, monospace`)
+
+**Character:** una grotesca cálida y compacta para la voz de la interfaz, y una mono técnica que vuelve cada cifra un asiento contable alineado. Las dos se cargan con `next/font` (`--font-interfaz`, `--font-cifras`) y Tailwind no expone otras familias.
+
+### Hierarchy
+
+Cifras (siempre `font-mono` y `tabular-nums`):
+- **cifra-xl** (500, 56/60, −0.03em): la cifra protagonista de una pantalla, como el patrimonio en el resumen.
+- **cifra-campo** (500, 44/52, −0.02em): solo el campo de monto (C4).
+- **cifra-l** (500, 32/36, −0.02em): el patrimonio neto al cierre de la lista de cuentas (escritorio).
+- **cifra-m** (500, 20/28): saldo en la tarjeta o fila de cuenta y total de grupo en escritorio.
+- **cifra-s** (500, 15/22): montos de filas y totales de sección.
+- **cifra-xs** (400, 12/16): fechas, equivalencias en COP, TRM, «Usado 32 %».
+
+Texto:
+- **titulo-1** (600, 28/34, −0.01em): título de página.
+- **titulo-2** (600, 20/26): título de bloque; también la marca TINO del menú lateral.
+- **cuerpo** (400, 15/22): texto base, conceptos de movimiento, nombres, botones.
+- **etiqueta** (500, 13/18): rótulos de campo y subtítulos. Se usa con `font-normal` en mensajes de ayuda y error.
+- **rotulo** (600, 11/14, +0.08em, MAYÚSCULAS): rótulo de encabezado de sección, de panel y de grupo de opciones.
+
+### Named Rules
+**The Mono-Money Rule.** Todo importe monetario va en IBM Plex Mono con dígitos tabulares, sin excepción, también dentro de un botón («Registrar gasto 18.500»).
+
+**The Weight-Step Rule.** El monto siempre va un escalón de peso por encima de su etiqueta. Nunca al revés.
+
+**The Colombian-Format Rule.** Punto de miles y coma decimal. Pesos sin decimales (`1.234.567`), dólares con dos (`US$ 7.750,00`). Negativo con `−` (U+2212), nunca guion. «COP» se omite cuando toda la columna está en pesos. Toda cifra en otra moneda lleva debajo, en secundario, su equivalente y la tasa: `≈ 31.775.000 COP · TRM 4.100,00`. El formato vive en `src/domain/dinero/formato.ts`; ningún componente formatea a mano.
+
+## Layout
+
+**Espaciado:** base 4, escala cerrada `4 · 8 · 12 · 16 · 24 · 32 · 48 · 64` (en Tailwind `1 · 2 · 3 · 4 · 6 · 8 · 12 · 16`; `--spacing: 4px`). Las alturas de control (40, 44, 48, 56 px) son medidas de objetivo táctil, no pasos de espaciado.
+
+**Estructura de la aplicación:**
+- **Escritorio (md, 768 px o más):** menú lateral fijo de 232 px con borde derecho en renglón, y contenido con un ancho máximo de 1120 px. Márgenes laterales de 24 px (md) y 56 px (lg).
+- **Móvil:** márgenes de 16 px, barra inferior de cinco pestañas de 56 px más la zona segura (mínimo 28 px), con «Registrar» en el centro como único botón en tinta.
+
+**Filas y columnas:** las listas son grids con columnas fijas. La fila de movimiento usa `52px | flexible | auto`, con 12 px entre columnas y alineación por línea base. Las cifras siempre se alinean a la derecha. Objetivo táctil mínimo de 44 px en móvil (los chips crecen de 36 a 44 px).
+
+**Paneles:** en escritorio, una hoja lateral de 400 px a todo el alto con raya a la izquierda. En móvil, una hoja inferior de ancho completo (hasta 90 dvh) con radio superior de 6 px. El velo oscurece el libro con `fondo` al 60 %.
+
+**Movimiento:** se usa solo para explicar un cambio de estado. Siempre se sale más rápido de lo que se entra. Las curvas son tokens de `globals.css` y nunca se escriben a mano:
+- **Llegada** (`--llegada`, `ease-llegada`; `cubic-bezier(0.16, 1, 0.3, 1)`): desaceleración marcada, para lo que entra en escena.
+- **Retirada** (`--retirada`, `ease-retirada`; `cubic-bezier(0.4, 0, 1, 1)`): aceleración, para lo que sale.
+- **Despliegue** (`--despliegue`, `ease-despliegue`; `cubic-bezier(0.22, 1, 0.36, 1)`): desaceleración más pareja, para que se vea crecer una fila.
+
+En JavaScript (Web Animations), las curvas se leen de esas variables, porque WAAPI no acepta `var()`. Las duraciones no son tokens y van con la utilidad `duration-*`.
+
+Hay dos movimientos:
+- **Panel lateral:** la hoja llega desde el borde en que se ancla y el velo oscurece el libro a la vez. Entra con llegada (320 ms escritorio, 380 ms móvil) y sale con retirada (180 / 200 ms). La salida termina antes de que cambie la URL.
+- **Despliegue de un campo:** un campo que depende de otro (el cupo al elegir tarjeta) se abre en su lugar. La fila crece de `0fr` a `1fr` en `grid-template-rows`, sin animar `height`, y el campo aparece con un fundido y baja 4 px. Entra con despliegue en 300 ms y sale con retirada en 180 ms. Plegado queda `inert`.
+
+Con movimiento reducido no hay desplazamiento, pero se conserva la opacidad: el panel se funde (150 / 120 ms) y el campo cambia de alto de golpe.
+
+## Elevation & Depth
+
+Tino es completamente plano. Ningún componente lleva sombra, y las escalas de sombra de Tailwind están vaciadas en `globals.css` (`--shadow-*: initial` y sus variantes). La profundidad se transmite con tres recursos: el cambio de tono entre `fondo`, `superficie` y `hundido`; el borde en `linea` de una hoja; y las cuatro líneas del libro. Un panel se distingue del contenido por su raya lateral y el velo, no por elevación. El foco es un contorno de 2 px en latón con 2 px de separación, nunca un resplandor.
+
+### Las cuatro líneas
+- **División** (1 px, `linea`): entre filas de una lista.
+- **Raya** (1 px, `raya`): bajo un encabezado de sección, bajo el campo de monto y en el borde del panel.
+- **Doble raya** (3 px doble, `raya`; utilidad `doble-raya`): cierre de un total, como el patrimonio neto.
+- **Punteada** (1 px discontinua, `terciario`; utilidad `punteada`): lo pendiente o sin clasificar. Provisional.
+
+### Named Rules
+**The No-Shadow Rule.** Sin sombras en ningún componente, en ningún estado. Si algo necesita destacarse, se usa una línea, un tono de superficie o espacio.
+
+**The Four-Lines Rule.** La jerarquía se construye solo con las cuatro líneas y el espacio. No se inventa una quinta (bordes de color, líneas gruesas, separadores decorativos).
+
+## Shapes
+
+Formas rectas y sobrias, con radios casi imperceptibles y un máximo de 6 px:
+- **Fila** (0 px): filas, tablas y teclado.
+- **Muestra** (2 px): muestras de color y barras (cupo).
+- **Campo** (4 px): campos, botones, chips y la entrada activa del menú.
+- **Hoja** (6 px): hojas y paneles.
+
+Tailwind solo expone estos cuatro radios (`--radius-*: initial`). Los campos de texto no son cajas: son una línea inferior (en `linea` y en `raya` al recibir foco), como un renglón donde se escribe.
+
+### Named Rules
+**The Six-Pixel Ceiling Rule.** Ningún radio supera los 6 px. Las píldoras y las tarjetas redondeadas no existen en Tino.
+
+## Components
+
+Componentes construidos y su número en el documento de referencia. El catálogo va de C1 a C36. Los que no aparecen aquí están diseñados en `referencias/` pero no construidos, y se construyen solo cuando su pantalla tenga spec.
+
+### Botones (C6)
+Tinta llena o línea fina, sin relieve.
+- **Forma:** radio de campo (4 px), 48 px de alto, 24 px de relleno horizontal, 12 px entre el texto y la cifra.
+- **Primario:** fondo `texto`, texto `fondo`, peso 600. Deshabilitado: fondo `hundido`, texto `terciario`.
+- **Secundario:** fondo `superficie`, borde `linea`, peso 500.
+- **Texto:** sin caja, en `marca-texto`, peso 600.
+- **Con monto:** la cifra va dentro del botón en mono 500 («Registrar gasto 18.500»).
+
+### Chips de categoría (C5)
+- **Estilo:** fondo `superficie`, borde `linea`, radio de campo, 36 px de alto en escritorio y 44 px en móvil.
+- **Seleccionado o sugerido:** borde `texto`, peso 500 y marca de verificación de 16 px. El sugerido añade «auto» en mono `rotulo` latón, porque lo puso una regla de texto.
+- **Sin clasificar:** borde discontinuo `terciario`, texto `secundario`.
+
+### Tarjeta de cuenta (C3)
+- **Activo:** hoja: fondo `superficie`, borde `linea`, radio de hoja, 16 px de relleno.
+- **Pasivo:** sin hoja: borde `linea` sobre el fondo, con «DEBES» en `rotulo` sobre la cifra. El cupo va como barra de 4 px (radio de muestra) en `texto` sobre `linea`, con «Usado %» y «Disponible X de Y» en cifra-xs. El disponible se calcula (RN-18). Corte y pago límite van bajo una división.
+- **Cabecera:** grid `20px | flexible | auto`: icono de tipo de cuenta, nombre (cuerpo 600) y subtítulo, cifra-m a la derecha. En USD lleva debajo la equivalencia y la TRM con su fecha.
+
+### Fila de cuenta (C10)
+La versión en lista de la cuenta, dentro de un grupo de Activos («Lo que tienes») o Pasivos («Lo que debes»). Los activos van en hoja y los pasivos sobre el fondo. El saldo del pasivo va en `salida-texto`, y su barra de cupo en terracota base. El grupo cierra con Activos, Pasivos y, tras la doble raya, el Patrimonio neto en cifra-l.
+- **Como enlace:** fuera del modo «Ordenar», toda la fila es un enlace a su edición y toma fondo `hundido` al pasar el cursor. En «Ordenar» deja de serlo y muestra el agarre y las flechas de 44 px.
+
+### Campos
+- **Campo de monto (C4):** sin caja, con raya inferior (en `salida` si hay error). Etiqueta en `etiqueta` secundario, cifra en `cifra-campo` y moneda a la derecha. Vacío muestra un «0» en `terciario` y un cursor de 2 px en latón. En USD lleva la equivalencia debajo. Al escribir formatea los pesos sin mover el cursor. Con foco, la raya pasa a latón y el contorno de foco rodea el campo entero (etiqueta, cifra y moneda), no solo la cifra.
+- **Campo subrayado (`CampoSubrayado`):** etiqueta arriba y texto sobre una línea `linea` que pasa a `raya` con el foco. 44 px de alto. Con la prop `error`, la línea pasa a terracota (`salida`), el input queda con `aria-invalid` y el mensaje va debajo, enlazado con `aria-describedby`.
+- **Mensaje de error (`MensajeError`):** `etiqueta` con `font-normal` en `salida-texto` y `role="alert"`, bajo el campo o al pie del bloque. Es el único modo de mostrar un error; no se escribe el párrafo a mano. Los campos (`CampoSubrayado`, `CampoMonto`, `OpcionUnica`) lo usan a través de su prop `error`.
+- **Nota:** `etiqueta` con `font-normal` en `secundario` («Cambiarlo queda registrado.»).
+
+### Opción única (C34)
+Filas de 44 px separadas por divisiones, con un radio nativo oculto y dibujado como círculo de 18 px (borde `terciario`; elegido: borde y punto en `texto`, rótulo en 600). Icono opcional de 20 px en secundario. El rótulo del grupo va en `rotulo` secundario.
+
+### Encabezado de sección (C1)
+Rótulo en MAYÚSCULAS a la izquierda y cifra-s a la derecha, alineados por línea base sobre una raya, con 8 px de relleno inferior. Entre grupos se separa con 24 px de espacio, nunca con otra línea.
+
+### Fila de movimiento (C2)
+Sin icono. Grid `52px | flexible | auto` con división inferior y 12 px de relleno vertical. Fecha en cifra-xs secundaria, concepto en cuerpo, y debajo categoría · cuenta en `etiqueta` secundaria (sin clasificar: «Sin clasificar» con línea punteada). Monto en cifra-s con signo y color según patrimonio; en USD, la equivalencia debajo.
+
+### Estado vacío (C7)
+«La página en blanco»: el encabezado de sección con un «0» tenue, tres renglones vacíos de 44 px y debajo el título (cuerpo 600), el detalle y la acción con un `+` (un `EnlaceTexto`). Si el destino aún no existe, la acción va en `terciario` y deshabilitada («Próximamente»), con la misma caja de 44 px para que no salte.
+
+### Enlace de texto (`EnlaceTexto`)
+El hermano de «Botón de texto» cuando la acción navega: latón (`marca-texto`), cuerpo 600, sin caja y 44 px de alto aunque el texto mida 22, para que el objetivo táctil sea completo. Se usa en «← Cuentas», «+ Nueva cuenta», «Ver archivadas» y la acción del estado vacío. Si la acción no navega, es un `Boton variante="texto"`.
+
+### Panel lateral (C22)
+Un `<dialog>` modal: foco atrapado y fondo inerte. Cabecera de 56 px con el título en `rotulo` secundario y «Cerrar» en texto, sobre una raya. Solo se cierra cuando quien lo usa decide, así que puede preguntar antes de descartar cambios. Medidas y movimiento en Layout.
+
+### Confirmación de borrado (`bloque-eliminar`)
+La confirmación ocurre en la misma página, sin diálogo emergente: reemplaza al vínculo que la abrió, en el panel o en la fila.
+- **Contenido:** «Eliminar {nombre}» en `rotulo` y la frase de irreversibilidad en cuerpo. Debajo, el botón secundario «Eliminar {nombre}» con el texto en `salida-texto` y «Cancelar» como botón de texto.
+- **Por qué terracota:** borrar es irreversible y debe distinguirse de las demás acciones. El acento queda en el texto, nunca de fondo.
+- **Vínculo que la abre:** discreto, en `etiqueta` o cuerpo `secundario` y terminado en «…» («Eliminar cuenta…»).
+
+### Fila en edición (C19)
+Una fila que se abre en su lugar para resolver algo sin salir de la lista. Se usa al restaurar una cuenta archivada cuyo nombre ya está en uso. La fila pasa a `superficie` entre dos rayas y muestra, bajo el nombre, la explicación en `etiqueta` secundaria, un campo subrayado y la acción primaria con «Cancelar» en texto. Al cerrarse vuelve a ser una fila normal.
+
+### Campo dependiente
+Un campo que solo existe con cierta opción (el cupo de una tarjeta) no aparece ni desaparece de golpe: se despliega en su lugar, como se describe en Layout → Movimiento. Al plegarse, su valor se descarta.
+
+### Navegación (C14)
+- **Escritorio:** columna de 232 px. Arriba la marca «TINO» (titulo-2, 700, tracking amplio), luego «Registrar» como único botón en tinta y después las entradas de 40 px con icono de 20 px. Inactiva: `secundario`, pasa a `texto` al pasar el cursor. Activa: fondo `hundido`, peso 600, radio de campo. Al pie, cambiar tema y salir.
+- **Móvil:** barra inferior de cinco pestañas con icono y rótulo de 11 px. «Registrar» va al centro en un cuadro de 40 px en tinta, y «Más» abre una hoja con el resto.
+- **Deshabilitado:** los destinos sin construir se muestran en `secundario` con `aria-disabled` y el título «Próximamente».
+
+### Iconos
+Lucide, 20 px, trazo 1,5, en `currentColor` (el color del texto al que acompañan). Hay uno por destino de navegación y uno por tipo de cuenta, y solo se definen en `src/components/iconos.tsx`. Los iconos auxiliares dentro de controles (`+`, check, flechas) van a 16 o 18 px.
+
+## Do's and Don'ts
+
+### Do:
+- **Do** usar solo los tokens de color, tipo, espaciado y radio de este archivo; Tailwind tiene sus escalas por defecto vaciadas para impedir lo contrario.
+- **Do** poner toda cifra en `font-mono tabular-nums`, alineada a la derecha, y formatearla con `src/domain/dinero/formato.ts`.
+- **Do** separar con divisiones y espacio; reservar la hoja (superficie con borde) para activos y paneles.
+- **Do** tomar signo y color de una cifra de `naturaleza.ts` (RN-02).
+- **Do** usar la variante `-texto` de un acento por debajo de 24 px.
+- **Do** mostrar cada componente nuevo y sus variantes en `/estilos`, en ambos modos.
+- **Do** mantener 44 px de objetivo táctil en móvil.
+
+### Don't:
+- **Don't** usar sombras, resplandores ni elevación en ningún estado.
+- **Don't** usar un acento (latón, verde, terracota) como fondo de un bloque, botón o fila.
+- **Don't** usar radios mayores de 6 px ni píldoras.
+- **Don't** escribir un negativo con guion `-`; siempre `−` (U+2212).
+- **Don't** poner iconos en las filas de movimientos.
+- **Don't** dejar que una etiqueta pese más que su monto.
+- **Don't** introducir colores, tamaños, radios ni espaciados fuera de lo listado.
+- **Don't** construir un componente del catálogo que no figure en «Components» antes de que su pantalla tenga spec.
+
+### Desvíos registrados
+Lugares donde el código construido se aparta del sistema. **No son norma**: cada uno se corrige o se convierte en token tras decidirlo, y en ese caso se actualiza este archivo primero.
+
+1. **Tamaños tipográficos fuera de escala.**
+   - `17/22` y `17/26` en el saldo de la fila de cuenta en móvil (`cuentas/fila-cuenta.tsx`), en «Patrimonio neto» en móvil (`cuentas/cierre-patrimonio.tsx`), en el campo subrayado y en la columna de acceso (`acceso/*`).
+   - `28/32` en la cifra del patrimonio en móvil.
+   - `12/18` en acceso.
+   - `11/14` escrito a mano en la barra de pestañas, en vez de `text-rotulo`.
+
+   El documento de referencia usa 17 px en filas de cuenta y textos de introducción. Si se queda, debe pasar a token (por ejemplo `cifra-fila` o `cuerpo-l`).
+2. **Espaciados fuera de la escala base 4.** 2 px (`gap-0.5`), 6 (`gap-1.5`), 10 (`gap-2.5`, `py-2.5`, `pb-2.5`), 14 (`pt-3.5`, `px-3.5`), 18 (`pt-[18px]`), 20 (`pt-5`), 28 (`gap-7`, `py-7`), 36 (`gap-9`, `pt-9`), 40 (`gap-y-10`), 56 (`px-14`) y 76 px (`pl-[76px]`), en menú, grupos de cuentas, acceso y layout. Algunos vienen del documento de referencia (relleno de 11 px y separaciones de 10 y 14 px), que tampoco es estricto.
+3. **Radios circulares.** `rounded-full` en el círculo del radio de opción única y en el monograma «G» del botón de Google. El círculo del radio sigue la convención nativa del control; queda por decidir si se acepta como excepción explícita.
+4. **Peso 700 y tracking 0.16em fuera de la escala** en la marca «TINO» (menú lateral, acceso y `/estilos`). Viene del documento de referencia. Si se queda, debe ser un token de marca, no un estilo suelto.
+5. **Alturas sueltas.** Botones de acceso de 52 px, frente a los 48 px de C6.
+6. **Numeración.** El código llama C26 a la confirmación de borrado, pero en el catálogo C26 es «Condonar». Hay que alinear la referencia.

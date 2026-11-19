@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import { cambiosEdicion, type TipoEditable } from "@/domain/cuenta/edicion";
 import { aDigitos, desdeMonto } from "@/domain/dinero/entrada";
 import type { CampoCuenta, Cuenta, EdicionCuenta, ResultadoCuenta, ValoresCuenta } from "@/services/cuentas";
-import { CampoSubrayado } from "../acceso/campo-subrayado";
+import { CampoSubrayado } from "../campo-subrayado";
 import { Boton } from "../boton";
 import { CampoMonto } from "../campo-monto";
+import { MensajeError } from "../mensaje-error";
 import { IconoCuenta, ROTULO_TIPO_CUENTA } from "../iconos";
 import { OpcionUnica, type Opcion } from "../opcion-unica";
 import { PanelLateral, type ControlPanel } from "../panel-lateral";
@@ -177,23 +178,15 @@ export function PanelCuenta({ cuenta, acciones }: Props) {
   return (
     <PanelLateral ref={panel} titulo={esAlta ? "Nueva cuenta" : "Editar cuenta"} alSolicitarCierre={solicitarCierre}>
       <form onSubmit={guardar} noValidate className="flex flex-col gap-6">
-        <div className="flex flex-col gap-1">
-          <CampoSubrayado
-            etiqueta="Nombre"
-            name="nombre"
-            autoComplete="off"
-            value={valores.nombre}
-            onChange={(e) => cambiar("nombre", e.target.value)}
-            aria-invalid={errores.nombre ? true : undefined}
-            aria-describedby={errores.nombre ? "nombre-error" : undefined}
-            placeholder="Nequi"
-          />
-          {errores.nombre && (
-            <p id="nombre-error" role="alert" className="text-etiqueta font-normal text-salida-texto">
-              {errores.nombre}
-            </p>
-          )}
-        </div>
+        <CampoSubrayado
+          etiqueta="Nombre"
+          name="nombre"
+          autoComplete="off"
+          value={valores.nombre}
+          onChange={(e) => cambiar("nombre", e.target.value)}
+          error={errores.nombre}
+          placeholder="Nequi"
+        />
 
         {cuenta?.tipo === "tarjeta_credito" ? (
           <div className="flex flex-col gap-1">
@@ -216,23 +209,15 @@ export function PanelCuenta({ cuenta, acciones }: Props) {
           />
         )}
 
-        <div className="flex flex-col gap-1">
-          <CampoSubrayado
-            etiqueta="Detalle · opcional"
-            name="detalle"
-            autoComplete="off"
-            value={valores.detalle}
-            onChange={(e) => cambiar("detalle", e.target.value)}
-            aria-invalid={errores.detalle ? true : undefined}
-            aria-describedby={errores.detalle ? "detalle-error" : undefined}
-            placeholder="Ahorros ·· 4821"
-          />
-          {errores.detalle && (
-            <p id="detalle-error" role="alert" className="text-etiqueta font-normal text-salida-texto">
-              {errores.detalle}
-            </p>
-          )}
-        </div>
+        <CampoSubrayado
+          etiqueta="Detalle · opcional"
+          name="detalle"
+          autoComplete="off"
+          value={valores.detalle}
+          onChange={(e) => cambiar("detalle", e.target.value)}
+          error={errores.detalle}
+          placeholder="Ahorros ·· 4821"
+        />
 
         <div className="flex flex-col">
           <CampoMonto
@@ -256,16 +241,16 @@ export function PanelCuenta({ cuenta, acciones }: Props) {
             inert={!esTarjeta}
             className={`grid transition-[grid-template-rows,opacity] motion-reduce:transition-opacity ${
               esTarjeta
-                ? "grid-rows-[1fr] opacity-100 duration-[300ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
-                : "grid-rows-[0fr] opacity-0 duration-[180ms] ease-[cubic-bezier(0.4,0,1,1)]"
+                ? "grid-rows-[1fr] opacity-100 duration-300 ease-despliegue"
+                : "grid-rows-[0fr] opacity-0 duration-180 ease-retirada"
             }`}
           >
             <div className="min-h-0 overflow-hidden">
               <div
                 className={`pt-2 transition-transform motion-reduce:transition-none ${
                   esTarjeta
-                    ? "translate-y-0 duration-[300ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
-                    : "-translate-y-1 duration-[180ms] ease-[cubic-bezier(0.4,0,1,1)]"
+                    ? "translate-y-0 duration-300 ease-despliegue"
+                    : "-translate-y-1 duration-180 ease-retirada"
                 }`}
               >
                 <CampoMonto
@@ -295,11 +280,7 @@ export function PanelCuenta({ cuenta, acciones }: Props) {
               {etiquetaGuardar}
             </Boton>
           )}
-          {errorGeneral && (
-            <p role="alert" className="text-etiqueta font-normal text-salida-texto">
-              {errorGeneral}
-            </p>
-          )}
+          {errorGeneral && <MensajeError mensaje={errorGeneral} />}
         </div>
       </form>
 
@@ -312,11 +293,7 @@ export function PanelCuenta({ cuenta, acciones }: Props) {
             {cuenta.saldo !== 0n && (
               <p className="text-etiqueta font-normal text-secundario">Solo puedes archivar una cuenta con saldo cero.</p>
             )}
-            {errorArchivo && (
-              <p role="alert" className="text-etiqueta font-normal text-salida-texto">
-                {errorArchivo}
-              </p>
-            )}
+            {errorArchivo && <MensajeError mensaje={errorArchivo} />}
           </div>
 
           {confirmandoBorrado ? (
