@@ -1,6 +1,6 @@
 # SPEC 03 — Menú de la aplicación y lista de cuentas con orden
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01, Tino-API SPEC 03
 > **Fecha:** 2026-11-18
 > **Objetivo:** Que el usuario con sesión entre a `/cuentas` con el menú de la aplicación y vea sus cuentas agrupadas en activos y pasivos, con totales y patrimonio neto, y pueda reordenarlas dentro de cada grupo.
