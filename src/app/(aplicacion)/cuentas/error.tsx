@@ -8,7 +8,7 @@ import { Boton } from "@/components/boton";
  */
 export default function ErrorCuentas({ retry }: { error: unknown; retry: () => void }) {
   return (
-    <div className="flex flex-col gap-6 md:gap-9">
+    <div className="flex flex-col gap-6 md:gap-8">
       <h1 className="text-titulo-1">Cuentas</h1>
       <div role="alert" className="flex flex-col items-start gap-4">
         <p className="text-cuerpo font-semibold">No pudimos cargar tus cuentas.</p>

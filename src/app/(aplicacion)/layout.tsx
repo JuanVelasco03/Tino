@@ -13,7 +13,7 @@ export default function LayoutAplicacion({ children }: { children: ReactNode }) 
       <div className="hidden md:block">
         <MenuLateral salir={salir} />
       </div>
-      <main className="flex min-w-0 max-w-[1120px] flex-col px-4 pt-3 pb-[calc(88px+max(env(safe-area-inset-bottom),28px))] md:px-6 md:pt-9 md:pb-16 lg:px-14">
+      <main className="flex min-w-0 max-w-[1120px] flex-col px-4 pt-3 pb-[calc(88px+max(env(safe-area-inset-bottom),28px))] md:px-6 md:pt-6 md:pb-16 lg:px-12">
         {children}
       </main>
       <BarraPestanas salir={salir} />

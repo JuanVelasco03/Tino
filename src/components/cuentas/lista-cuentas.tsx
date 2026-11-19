@@ -12,7 +12,7 @@ import { EnlaceTexto } from "../enlace-texto";
 import { MensajeError } from "../mensaje-error";
 import { CierrePatrimonio } from "./cierre-patrimonio";
 import { FilaCuenta } from "./fila-cuenta";
-import { GrupoCuentas } from "./grupo-cuentas";
+import { GrupoCuentas, SANGRIA_LISTA } from "./grupo-cuentas";
 
 type Props = {
   lista: Lista;
@@ -158,16 +158,16 @@ export function ListaCuentas({ lista, guardarOrden }: Props) {
   const etiquetaOrden = guardando ? "Guardando…" : ordenando ? "Listo" : "Ordenar";
 
   return (
-    <div className="flex flex-col gap-6 md:gap-9">
+    <div className="flex flex-col gap-6 md:gap-8">
       <header className="flex flex-col gap-1 md:flex-row md:items-end md:justify-between md:gap-6">
-        <div className="flex flex-col gap-1 md:gap-1.5">
+        <div className="flex flex-col gap-1">
           <div className="flex items-center justify-between gap-3">
             <h1 className="text-titulo-1">Cuentas</h1>
             <button
               type="button"
               onClick={alternarOrden}
               disabled={sinCuentas || guardando}
-              className="h-11 px-1 text-cuerpo font-semibold text-marca-texto disabled:cursor-not-allowed disabled:text-terciario md:hidden"
+              className="-mr-1 h-11 px-1 text-cuerpo font-semibold text-marca-texto disabled:cursor-not-allowed disabled:text-terciario md:hidden"
             >
               {etiquetaOrden}
             </button>
@@ -218,7 +218,7 @@ export function ListaCuentas({ lista, guardarOrden }: Props) {
         />
       ) : (
         <>
-          <div className="flex flex-col gap-6 md:gap-9">
+          <div className="flex flex-col gap-6 md:gap-8">
             {NATURALEZAS.map((naturaleza) => (
               <GrupoCuentas
                 key={naturaleza}
@@ -230,8 +230,9 @@ export function ListaCuentas({ lista, guardarOrden }: Props) {
               </GrupoCuentas>
             ))}
           </div>
-          <EnlaceTexto href={RUTA_NUEVA} scroll={false} className="-my-3 self-start md:hidden">
-            + Nueva cuenta
+          <EnlaceTexto href={RUTA_NUEVA} scroll={false} className={`-my-3 self-start md:hidden ${SANGRIA_LISTA}`}>
+            <Plus size={16} strokeWidth={1.5} aria-hidden />
+            Nueva cuenta
           </EnlaceTexto>
           <CierrePatrimonio
             activos={lista.activos.total}
@@ -241,7 +242,7 @@ export function ListaCuentas({ lista, guardarOrden }: Props) {
         </>
       )}
 
-      <EnlaceTexto href="/cuentas/archivadas" className={`self-start ${sinCuentas ? "" : "-mt-3 md:-mt-6 md:px-6"}`}>
+      <EnlaceTexto href="/cuentas/archivadas" className={`self-start ${sinCuentas ? "" : `-mt-3 md:-mt-6 ${SANGRIA_LISTA}`}`}>
         Ver archivadas
       </EnlaceTexto>
     </div>

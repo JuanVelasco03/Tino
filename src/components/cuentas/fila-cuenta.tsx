@@ -1,4 +1,4 @@
-import type { DragEventHandler } from "react";
+import type { DragEventHandler, ReactNode } from "react";
 import Link from "next/link";
 import { ArrowDown, ArrowUp, GripVertical } from "lucide-react";
 import { formatearDinero } from "@/domain/dinero/formato";
@@ -15,11 +15,25 @@ export function saldoMostrado(cuenta: Cuenta): string {
   return pesos(cuenta.naturaleza === "pasivo" ? -cuenta.saldo : cuenta.saldo);
 }
 
-/** Subtítulo de móvil: `Banco · Ahorros ·· 4821`, `Banco`, `Tarjeta de crédito · cupo 4.000.000`. */
-function subtituloMovil(cuenta: Cuenta): string {
+/**
+ * Subtítulo de móvil: `Banco · Ahorros ·· 4821`, `Banco`, `Tarjeta de crédito · cupo 4.000.000`.
+ * El cupo es una cifra: va en mono y nunca se corta. Si no cabe, «cupo X» baja
+ * entero a la línea siguiente; el resto de subtítulos se trunca.
+ */
+function subtituloMovil(cuenta: Cuenta): ReactNode {
   const tipo = ROTULO_TIPO_CUENTA[cuenta.tipo];
-  if (cuenta.tarjeta) return `${tipo} · cupo ${pesos(cuenta.tarjeta.cupo)}`;
-  return cuenta.detalle ? `${tipo} · ${cuenta.detalle}` : tipo;
+  if (cuenta.tarjeta) {
+    return (
+      <span className="block">
+        {/* Espacio duro antes del «·»: si se parte, la línea nueva empieza en «cupo». */}
+        {tipo}&nbsp;·{" "}
+        <span className="whitespace-nowrap">
+          cupo <span className="font-mono tabular-nums">{pesos(cuenta.tarjeta.cupo)}</span>
+        </span>
+      </span>
+    );
+  }
+  return <span className="block truncate">{cuenta.detalle ? `${tipo} · ${cuenta.detalle}` : tipo}</span>;
 }
 
 export type ControlesOrden = {
@@ -44,7 +58,7 @@ type Props = {
 /** Barra de cupo usado de la tarjeta. Porcentaje y disponible vienen de la API (N-16 a N-18). */
 function BarraCupo({ tarjeta, conCupo }: { tarjeta: NonNullable<Cuenta["tarjeta"]>; conCupo: boolean }) {
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-2">
       <div
         role="meter"
         aria-label="Cupo usado"
@@ -78,7 +92,9 @@ export function FilaCuenta({ cuenta, orden }: Props) {
   const ordenando = orden !== undefined;
   const esPasivo = cuenta.naturaleza === "pasivo";
 
-  const rejilla = `grid min-h-15 items-center gap-3 py-2.5 md:min-h-16 md:grid-cols-[28px_24px_minmax(0,1.1fr)_minmax(0,1.6fr)_200px] ${
+  // El margen negativo lleva el fondo (hover, destino de arrastre) hasta el borde
+  // de la hoja; el contenido conserva la sangría de la lista.
+  const rejilla = `-mx-4 grid min-h-16 items-center gap-3 px-4 py-3 md:-mx-6 md:grid-cols-[28px_24px_minmax(0,1.1fr)_minmax(0,1.6fr)_200px] md:px-6 ${
     ordenando ? "grid-cols-[18px_20px_minmax(0,1fr)_auto]" : "grid-cols-[20px_minmax(0,1fr)_auto]"
   }`;
 
@@ -94,13 +110,13 @@ export function FilaCuenta({ cuenta, orden }: Props) {
 
       <div className="min-w-0">
         <div className="truncate text-cuerpo font-semibold">{cuenta.nombre}</div>
-        <div className="truncate text-etiqueta font-normal text-secundario">
-          <span className="hidden md:inline">{ROTULO_TIPO_CUENTA[cuenta.tipo]}</span>
+        <div className="text-etiqueta font-normal text-secundario">
+          <span className="hidden truncate md:block">{ROTULO_TIPO_CUENTA[cuenta.tipo]}</span>
           <span className="md:hidden">{subtituloMovil(cuenta)}</span>
         </div>
       </div>
 
-      <div className="hidden min-w-0 flex-col gap-1.5 text-etiqueta font-normal text-secundario md:flex">
+      <div className="hidden min-w-0 flex-col gap-2 text-etiqueta font-normal text-secundario md:flex">
         {cuenta.detalle && <span className="truncate">{cuenta.detalle}</span>}
         {cuenta.tarjeta && (
           <div className="max-w-[380px]">
@@ -133,7 +149,7 @@ export function FilaCuenta({ cuenta, orden }: Props) {
       ) : (
         <div className="text-right">
           <div
-            className={`whitespace-nowrap font-mono text-[17px] leading-[22px] font-medium tabular-nums md:text-cifra-m md:leading-[26px] ${
+            className={`whitespace-nowrap font-mono text-[17px]/[22px] font-medium tabular-nums md:text-cifra-m ${
               esPasivo ? "text-salida-texto" : "text-texto"
             }`}
           >
@@ -144,7 +160,7 @@ export function FilaCuenta({ cuenta, orden }: Props) {
       )}
 
       {cuenta.tarjeta && !ordenando && (
-        <div className="col-[2/-1] pb-0.5 md:hidden">
+        <div className="col-[2/-1] md:hidden">
           <BarraCupo tarjeta={cuenta.tarjeta} conCupo={false} />
         </div>
       )}
@@ -157,7 +173,7 @@ export function FilaCuenta({ cuenta, orden }: Props) {
         <Link
           href={`/cuentas?cuenta=${encodeURIComponent(cuenta.id)}`}
           scroll={false}
-          className={`${rejilla} hover:bg-hundido`}
+          className={`${rejilla} hover:bg-hundido focus-visible:-outline-offset-2`}
         >
           {contenido}
         </Link>
@@ -172,9 +188,8 @@ export function FilaCuenta({ cuenta, orden }: Props) {
       onDragOver={orden.alArrastrarEncima}
       onDrop={orden.alSoltar}
       onDragEnd={orden.alTerminarArrastre}
-      className={`${rejilla} ${orden.resaltada ? "bg-hundido" : ""}`}
     >
-      {contenido}
+      <div className={`${rejilla} ${orden.resaltada ? "bg-hundido" : ""}`}>{contenido}</div>
     </li>
   );
 }

@@ -268,7 +268,7 @@ Texto:
 **Espaciado:** base 4, escala cerrada `4 · 8 · 12 · 16 · 24 · 32 · 48 · 64` (en Tailwind `1 · 2 · 3 · 4 · 6 · 8 · 12 · 16`; `--spacing: 4px`). Las alturas de control (40, 44, 48, 56 px) son medidas de objetivo táctil, no pasos de espaciado.
 
 **Estructura de la aplicación:**
-- **Escritorio (md, 768 px o más):** menú lateral fijo de 232 px con borde derecho en renglón, y contenido con un ancho máximo de 1120 px. Márgenes laterales de 24 px (md) y 56 px (lg).
+- **Escritorio (md, 768 px o más):** menú lateral fijo de 232 px con borde derecho en renglón, y contenido con un ancho máximo de 1120 px. Márgenes laterales de 24 px (md) y 48 px (lg). El contenido arranca 24 px más arriba que el menú (32 px), para que «TINO» y el título de página compartan línea base.
 - **Móvil:** márgenes de 16 px, barra inferior de cinco pestañas de 56 px más la zona segura (mínimo 28 px), con «Registrar» en el centro como único botón en tinta.
 
 **Filas y columnas:** las listas son grids con columnas fijas. La fila de movimiento usa `52px | flexible | auto`, con 12 px entre columnas y alineación por línea base. Las cifras siempre se alinean a la derecha. Objetivo táctil mínimo de 44 px en móvil (los chips crecen de 36 a 44 px).
@@ -340,7 +340,8 @@ Tinta llena o línea fina, sin relieve.
 
 ### Fila de cuenta (C10)
 La versión en lista de la cuenta, dentro de un grupo de Activos («Lo que tienes») o Pasivos («Lo que debes»). Los activos van en hoja y los pasivos sobre el fondo. El saldo del pasivo va en `salida-texto`, y su barra de cupo en terracota base. El grupo cierra con Activos, Pasivos y, tras la doble raya, el Patrimonio neto en cifra-l.
-- **Como enlace:** fuera del modo «Ordenar», toda la fila es un enlace a su edición y toma fondo `hundido` al pasar el cursor. En «Ordenar» deja de serlo y muestra el agarre y las flechas de 44 px.
+- **Sangría común:** activos, pasivos, cierre y enlaces comparten la sangría de la hoja (`SANGRIA_LISTA`), así que todas las cifras caen en la misma columna, también en móvil.
+- **Como enlace:** fuera del modo «Ordenar», toda la fila es un enlace a su edición y toma fondo `hundido` al pasar el cursor, de borde a borde de la hoja; el foco va por dentro de la fila. En «Ordenar» deja de serlo y muestra el agarre y las flechas de 44 px.
 
 ### Campos
 - **Campo de monto (C4):** sin caja, con raya inferior (en `salida` si hay error). Etiqueta en `etiqueta` secundario, cifra en `cifra-campo` y moneda a la derecha. Vacío muestra un «0» en `terciario` y un cursor de 2 px en latón. En USD lleva la equivalencia debajo. Al escribir formatea los pesos sin mover el cursor. Con foco, la raya pasa a latón y el contorno de foco rodea el campo entero (etiqueta, cifra y moneda), no solo la cifra.
@@ -417,7 +418,7 @@ Lugares donde el código construido se aparta del sistema. **No son norma**: cad
    - `11/14` escrito a mano en la barra de pestañas, en vez de `text-rotulo`.
 
    El documento de referencia usa 17 px en filas de cuenta y textos de introducción. Si se queda, debe pasar a token (por ejemplo `cifra-fila` o `cuerpo-l`).
-2. **Espaciados fuera de la escala base 4.** 2 px (`gap-0.5`), 6 (`gap-1.5`), 10 (`gap-2.5`, `py-2.5`, `pb-2.5`), 14 (`pt-3.5`, `px-3.5`), 18 (`pt-[18px]`), 20 (`pt-5`), 28 (`gap-7`, `py-7`), 36 (`gap-9`, `pt-9`), 40 (`gap-y-10`), 56 (`px-14`) y 76 px (`pl-[76px]`), en menú, grupos de cuentas, acceso y layout. Algunos vienen del documento de referencia (relleno de 11 px y separaciones de 10 y 14 px), que tampoco es estricto.
+2. **Espaciados fuera de la escala base 4.** Menú, layout y lista de cuentas ya están en la escala. Quedan en acceso (`acceso/*`: 20 px `pt-5`, 28 px `gap-7` y otros). Los 76 px de «Sin activos/pasivos» en escritorio (`pl-[76px]`) no son un paso de espaciado: alinean el texto con la columna del nombre (28 + 12 + 24 + 12).
 3. **Radios circulares.** `rounded-full` en el círculo del radio de opción única y en el monograma «G» del botón de Google. El círculo del radio sigue la convención nativa del control; queda por decidir si se acepta como excepción explícita.
 4. **Peso 700 y tracking 0.16em fuera de la escala** en la marca «TINO» (menú lateral, acceso y `/estilos`). Viene del documento de referencia. Si se queda, debe ser un token de marca, no un estilo suelto.
 5. **Alturas sueltas.** Botones de acceso de 52 px, frente a los 48 px de C6.

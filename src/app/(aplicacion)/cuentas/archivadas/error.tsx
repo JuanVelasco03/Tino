@@ -9,7 +9,7 @@ import { CabeceraArchivadas } from "@/components/cuentas/lista-archivadas";
  */
 export default function ErrorArchivadas({ retry }: { error: unknown; retry: () => void }) {
   return (
-    <div className="flex flex-col gap-6 md:gap-9">
+    <div className="flex flex-col gap-6 md:gap-8">
       <CabeceraArchivadas />
       <div role="alert" className="flex flex-col items-start gap-4">
         <p className="text-cuerpo font-semibold">No pudimos cargar tus cuentas archivadas.</p>

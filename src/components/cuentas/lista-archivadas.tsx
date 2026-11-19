@@ -19,7 +19,7 @@ type Props = {
 /** Cabecera de /cuentas/archivadas, compartida con la carga y el error. */
 export function CabeceraArchivadas() {
   return (
-    <header className="flex flex-col items-start gap-1 md:gap-1.5">
+    <header className="flex flex-col items-start gap-1">
       <EnlaceTexto href="/cuentas">← Cuentas</EnlaceTexto>
       <h1 className="text-titulo-1">Cuentas archivadas</h1>
     </header>
@@ -29,7 +29,7 @@ export function CabeceraArchivadas() {
 /** Lista de cuentas archivadas, en el orden de la API (la más reciente primero). */
 export function ListaArchivadas({ cuentas, restaurar, eliminar }: Props) {
   return (
-    <div className="flex flex-col gap-6 md:gap-9">
+    <div className="flex flex-col gap-6 md:gap-8">
       <CabeceraArchivadas />
       {cuentas.length === 0 ? (
         <p className="border-t border-raya pt-6 text-cuerpo text-secundario">No tienes cuentas archivadas.</p>
@@ -116,8 +116,8 @@ function FilaArchivada({ cuenta, restaurar, eliminar }: PropsFila) {
 
   return (
     <li
-      className={`grid grid-cols-[20px_minmax(0,1fr)] gap-x-3 py-2.5 md:grid-cols-[24px_minmax(0,1fr)_auto] ${
-        abierta ? "-mt-px border-y border-raya bg-superficie px-3.5 md:px-6" : "border-b border-linea last:border-b-0"
+      className={`grid grid-cols-[20px_minmax(0,1fr)] gap-x-3 py-3 md:grid-cols-[24px_minmax(0,1fr)_auto] ${
+        abierta ? "-mt-px border-y border-raya bg-superficie px-4 md:px-6" : "border-b border-linea last:border-b-0"
       }`}
     >
       <span className="flex min-h-10 items-center text-secundario">

@@ -19,7 +19,10 @@ type Props = {
  */
 export const ALTO_PESTANAS = "calc(56px + max(env(safe-area-inset-bottom), 28px))";
 
-const PESTANA = "relative flex flex-col items-center justify-center gap-[3px] text-[11px] leading-[14px]";
+const PESTANA = "relative flex flex-col items-center justify-center gap-1 text-[11px] leading-[14px]";
+
+/** Fila de la hoja «Más»: 52 px, icono de 20 px y rótulo en cuerpo. */
+const FILA_HOJA = "grid min-h-13 items-center gap-3 text-cuerpo";
 
 function Pestana({ entrada, ruta, hojaAbierta }: { entrada: EntradaMenu; ruta: string; hojaAbierta: boolean }) {
   const esRegistrar = entrada.destino === "registrar";
@@ -107,7 +110,7 @@ export function BarraPestanas({ salir }: Props) {
                 ref={botonCerrar}
                 type="button"
                 onClick={cerrar}
-                className="h-11 px-1 text-cuerpo text-secundario"
+                className="-mr-1 h-11 px-1 text-cuerpo text-secundario"
               >
                 Cerrar
               </button>
@@ -116,19 +119,34 @@ export function BarraPestanas({ salir }: Props) {
             <ul>
               {ENTRADAS_MAS.map((entrada) => (
                 <li key={entrada.destino} className="border-t border-linea">
-                  <span
-                    aria-disabled="true"
-                    title={TITULO_PROXIMAMENTE}
-                    className="grid min-h-13 cursor-not-allowed grid-cols-[20px_minmax(0,1fr)_16px] items-center gap-3 text-secundario"
-                  >
-                    <span className="flex">
-                      <IconoNavegacion destino={entrada.destino} />
+                  {entrada.habilitado && entrada.href ? (
+                    // El chevron promete navegación: solo lo llevan los destinos que existen.
+                    <Link
+                      href={entrada.href}
+                      onClick={() => setAbierta(false)}
+                      aria-current={estaActiva(entrada, ruta) ? "page" : undefined}
+                      className={`${FILA_HOJA} grid-cols-[20px_minmax(0,1fr)_16px] text-texto aria-[current=page]:font-semibold`}
+                    >
+                      <span className="flex text-secundario">
+                        <IconoNavegacion destino={entrada.destino} />
+                      </span>
+                      <span className="truncate">{entrada.rotulo}</span>
+                      <span className="flex text-terciario">
+                        <ChevronRight size={16} strokeWidth={1.5} aria-hidden />
+                      </span>
+                    </Link>
+                  ) : (
+                    <span
+                      aria-disabled="true"
+                      title={TITULO_PROXIMAMENTE}
+                      className={`${FILA_HOJA} cursor-not-allowed grid-cols-[20px_minmax(0,1fr)] text-secundario`}
+                    >
+                      <span className="flex">
+                        <IconoNavegacion destino={entrada.destino} />
+                      </span>
+                      <span className="truncate">{entrada.rotulo}</span>
                     </span>
-                    <span className="truncate text-cuerpo">{entrada.rotulo}</span>
-                    <span className="flex text-terciario">
-                      <ChevronRight size={16} strokeWidth={1.5} aria-hidden />
-                    </span>
-                  </span>
+                  )}
                 </li>
               ))}
             </ul>
@@ -137,7 +155,7 @@ export function BarraPestanas({ salir }: Props) {
               <button
                 type="button"
                 onClick={alternarTema}
-                className="grid min-h-13 w-full grid-cols-[20px_minmax(0,1fr)] items-center gap-3 text-left text-cuerpo"
+                className={`${FILA_HOJA} w-full grid-cols-[20px_minmax(0,1fr)] text-left`}
               >
                 <span className="flex text-secundario">
                   <Moon size={20} strokeWidth={1.5} aria-hidden className="block [[data-theme=dark]_&]:hidden" />
@@ -146,10 +164,7 @@ export function BarraPestanas({ salir }: Props) {
                 Cambiar tema
               </button>
               <form action={salir} className="border-t border-linea">
-                <button
-                  type="submit"
-                  className="grid min-h-13 w-full grid-cols-[20px_minmax(0,1fr)] items-center gap-3 text-left text-cuerpo"
-                >
+                <button type="submit" className={`${FILA_HOJA} w-full grid-cols-[20px_minmax(0,1fr)] text-left`}>
                   <span className="flex text-secundario">
                     <LogOut size={20} strokeWidth={1.5} aria-hidden />
                   </span>

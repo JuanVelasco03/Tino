@@ -16,6 +16,13 @@ const TEXTOS = {
   pasivo: { titulo: "Pasivos", subtitulo: "Lo que debes", vacio: "Sin pasivos" },
 } as const;
 
+/**
+ * Sangría de la lista: borde de 1 px más el relleno de la hoja. Pasivos, cierre
+ * y enlaces la repiten (con borde transparente) para que todas las cifras caigan
+ * en la misma columna, también en móvil.
+ */
+export const SANGRIA_LISTA = "border-x border-transparent px-4 md:px-6";
+
 /** Grupo de cuentas. Activos: hoja con superficie. Pasivos: sobre el fondo, sin hoja. */
 export function GrupoCuentas({ naturaleza, total, vacio, children }: Props) {
   const textos = TEXTOS[naturaleza];
@@ -25,13 +32,11 @@ export function GrupoCuentas({ naturaleza, total, vacio, children }: Props) {
   return (
     <section
       aria-labelledby={idTitulo}
-      className={`rounded-hoja border pb-1 md:px-6 ${
-        esPasivo ? "border-transparent px-0" : "border-linea bg-superficie px-3.5"
-      }`}
+      className={`rounded-hoja border px-4 pb-1 md:px-6 ${esPasivo ? "border-transparent" : "border-linea bg-superficie"}`}
     >
-      <div className="flex items-baseline justify-between gap-3 border-b border-raya pt-3.5 pb-2 md:grid md:grid-cols-[28px_24px_minmax(0,1.1fr)_minmax(0,1.6fr)_200px] md:pt-[18px] md:pb-2.5">
+      <div className="flex items-baseline justify-between gap-3 border-b border-raya pt-4 pb-2 md:grid md:grid-cols-[28px_24px_minmax(0,1.1fr)_minmax(0,1.6fr)_200px]">
         <span className="hidden md:block" />
-        <h2 id={idTitulo} className="flex min-w-0 items-baseline gap-2 md:col-span-2 md:gap-2.5">
+        <h2 id={idTitulo} className="flex min-w-0 items-baseline gap-2 md:col-span-2">
           <span className="text-rotulo uppercase">{textos.titulo}</span>
           <span className="truncate text-etiqueta font-normal text-secundario">{textos.subtitulo}</span>
         </h2>
@@ -46,7 +51,8 @@ export function GrupoCuentas({ naturaleza, total, vacio, children }: Props) {
       </div>
 
       {vacio ? (
-        <p className="flex min-h-15 items-center text-cuerpo text-secundario md:min-h-16 md:pl-[76px]">{textos.vacio}</p>
+        // Alineado con la columna del nombre: 20 + 12 en móvil; 28 + 12 + 24 + 12 en escritorio.
+        <p className="flex min-h-16 items-center pl-8 text-cuerpo text-secundario md:pl-[76px]">{textos.vacio}</p>
       ) : (
         <ul className="divide-y divide-linea">{children}</ul>
       )}

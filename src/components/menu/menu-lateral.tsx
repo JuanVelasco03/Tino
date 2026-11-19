@@ -19,7 +19,7 @@ export function MenuLateral({ salir }: Props) {
   const ruta = usePathname();
 
   return (
-    <aside className="sticky top-0 flex h-dvh flex-col gap-7 overflow-y-auto border-r border-linea px-4 py-7">
+    <aside className="sticky top-0 flex h-dvh flex-col gap-8 overflow-y-auto border-r border-linea px-4 py-8">
       <div className="px-2 text-titulo-2 font-bold tracking-[0.16em]">TINO</div>
 
       <button
@@ -32,7 +32,7 @@ export function MenuLateral({ salir }: Props) {
         {REGISTRAR.rotulo}
       </button>
 
-      <nav aria-label="Secciones" className="flex flex-col gap-0.5">
+      <nav aria-label="Secciones" className="flex flex-col gap-1">
         {ENTRADAS.map((entrada) => {
           const contenido = (
             <>
@@ -70,7 +70,7 @@ export function MenuLateral({ salir }: Props) {
         })}
       </nav>
 
-      <div className="mt-auto flex flex-col gap-0.5">
+      <div className="mt-auto flex flex-col gap-1">
         <button
           type="button"
           onClick={alternarTema}
