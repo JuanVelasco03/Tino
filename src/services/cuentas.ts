@@ -1,16 +1,18 @@
 import { redirect } from "next/navigation";
+import type { CampoCuenta, ValoresCuenta } from "@/domain/cuenta/edicion";
 import { ErrorApi } from "@/repositories/api/cliente";
-import {
-  guardarOrdenGrupo,
-  listarCuentas,
-  type Cuenta,
-  type GrupoCuentas,
-  type ListaCuentas,
-  type Naturaleza,
-  type TipoCuenta,
+import * as api from "@/repositories/api/cuentas";
+import type {
+  AltaCuenta,
+  Cuenta,
+  EdicionCuenta,
+  GrupoCuentas,
+  ListaCuentas,
+  Naturaleza,
+  TipoCuenta,
 } from "@/repositories/api/cuentas";
 
-export type { Cuenta, GrupoCuentas, ListaCuentas, Naturaleza, TipoCuenta };
+export type { AltaCuenta, CampoCuenta, Cuenta, EdicionCuenta, GrupoCuentas, ListaCuentas, Naturaleza, TipoCuenta, ValoresCuenta };
 export { ErrorApi };
 
 /** Nuevo orden de un grupo. La server action recibe uno o dos, solo los que cambiaron. */
@@ -18,14 +20,77 @@ export type CambioOrden = { naturaleza: Naturaleza; ids: string[] };
 
 export type ResultadoOrden = { ok: true } | { ok: false; codigo: string; mensaje: string };
 
-/** Lista de cuentas del usuario. Token vencido entre el proxy y la API → `/login`. */
-export async function obtenerCuentas(): Promise<ListaCuentas> {
+/** Resultado de las server actions de cuentas. Nunca lanzan al cliente. */
+export type ResultadoCuenta =
+  | { ok: true }
+  | { ok: false; codigo: string; mensaje: string; campo?: CampoCuenta };
+
+const MENSAJE_SIN_CONEXION = "No pudimos conectar. Intenta de nuevo.";
+
+/** Campo de la API → campo del formulario. `saldoInicial` se dibuja bajo `saldo`. */
+const CAMPO_FORMULARIO: Record<string, CampoCuenta> = {
+  nombre: "nombre",
+  tipo: "tipo",
+  detalle: "detalle",
+  saldoInicial: "saldo",
+  cupo: "cupo",
+};
+
+/**
+ * Traduce un error a `ResultadoCuenta`: el `mensaje` de la API bajo su
+ * campo, o general si no trae campo. Sin conexión, texto local.
+ */
+export function resultadoDeError(error: unknown): ResultadoCuenta & { ok: false } {
+  if (!(error instanceof ErrorApi)) {
+    return { ok: false, codigo: "ERROR_INTERNO", mensaje: MENSAJE_SIN_CONEXION };
+  }
+  if (error.codigo === "SIN_CONEXION") {
+    return { ok: false, codigo: error.codigo, mensaje: MENSAJE_SIN_CONEXION };
+  }
+  const campo = error.campo === undefined ? undefined : CAMPO_FORMULARIO[error.campo];
+  return campo
+    ? { ok: false, codigo: error.codigo, mensaje: error.message, campo }
+    : { ok: false, codigo: error.codigo, mensaje: error.message };
+}
+
+/** Token vencido entre el proxy y la API → `/login`. Cualquier otro error se relanza. */
+async function conSesion<T>(llamada: () => Promise<T>): Promise<T> {
   try {
-    return await listarCuentas();
+    return await llamada();
   } catch (error) {
     if (error instanceof ErrorApi && error.estado === 401) redirect("/login");
     throw error;
   }
+}
+
+/** Lista de cuentas no archivadas del usuario. */
+export async function obtenerCuentas(): Promise<ListaCuentas> {
+  return conSesion(() => api.listarCuentas());
+}
+
+/** Cuentas archivadas, la más reciente primero. */
+export async function listarArchivadas(): Promise<Cuenta[]> {
+  return conSesion(() => api.listarArchivadas());
+}
+
+export async function crearCuenta(alta: AltaCuenta): Promise<Cuenta> {
+  return conSesion(() => api.crearCuenta(alta));
+}
+
+export async function editarCuenta(id: string, edicion: EdicionCuenta): Promise<Cuenta> {
+  return conSesion(() => api.editarCuenta(id, edicion));
+}
+
+export async function archivarCuenta(id: string): Promise<Cuenta> {
+  return conSesion(() => api.archivarCuenta(id));
+}
+
+export async function restaurarCuenta(id: string, nombre?: string): Promise<Cuenta> {
+  return conSesion(() => api.restaurarCuenta(id, nombre));
+}
+
+export async function eliminarCuenta(id: string): Promise<void> {
+  return conSesion(() => api.eliminarCuenta(id));
 }
 
 /**
@@ -34,6 +99,6 @@ export async function obtenerCuentas(): Promise<ListaCuentas> {
  */
 export async function guardarOrden(cambios: readonly CambioOrden[]): Promise<void> {
   for (const { naturaleza, ids } of cambios) {
-    await guardarOrdenGrupo(naturaleza, ids);
+    await api.guardarOrdenGrupo(naturaleza, ids);
   }
 }

@@ -19,6 +19,31 @@ export type CuentaDto = {
   archivadaEn: string | null;
 };
 
+export type ListaArchivadasDto = { cuentas: CuentaDto[] };
+
+/** Cuerpo de `POST /cuentas`. */
+export type AltaCuenta = {
+  nombre: string;
+  tipo: TipoCuenta;
+  detalle?: string;
+  /** Entero ≥ 0, `^\d{1,19}$`. En la tarjeta, la deuda inicial. */
+  saldoInicial: string;
+  /** Obligatorio y > 0 en `tarjeta_credito`; prohibido en las demás. */
+  cupo?: string;
+};
+
+/** Cuerpo de `PATCH /cuentas/:id`: solo los campos que cambian, al menos uno. */
+export type EdicionCuenta = {
+  nombre?: string;
+  /** Solo dentro de la misma naturaleza: efectivo ↔ banco. */
+  tipo?: TipoCuenta;
+  /** `null` lo borra. */
+  detalle?: string | null;
+  saldoInicial?: string;
+  /** Solo si la cuenta es `tarjeta_credito`; > 0. */
+  cupo?: string;
+};
+
 export type GrupoCuentasDto = {
   total: string;
   cuentas: CuentaDto[];
@@ -43,7 +68,11 @@ export type Cuenta = {
   detalle: string | null;
   /** En un pasivo, la deuda, positiva. */
   saldo: bigint;
+  /** En un pasivo, la deuda inicial. Solo para editarlo; para mostrar, `saldo`. */
+  saldoInicial: bigint;
   tarjeta: { cupo: bigint; disponible: bigint; porcentajeUsado: number } | null;
+  /** ISO 8601, tal cual llega. `null` = no archivada. */
+  archivadaEn: string | null;
 };
 
 export type GrupoCuentas = { total: bigint; cuentas: Cuenta[] };
@@ -62,7 +91,7 @@ function aMonto(valor: string): bigint {
   return BigInt(valor);
 }
 
-function aCuenta(dto: CuentaDto): Cuenta {
+export function aCuenta(dto: CuentaDto): Cuenta {
   return {
     id: dto.id,
     nombre: dto.nombre,
@@ -70,11 +99,13 @@ function aCuenta(dto: CuentaDto): Cuenta {
     naturaleza: dto.naturaleza,
     detalle: dto.detalle,
     saldo: aMonto(dto.saldo),
+    saldoInicial: aMonto(dto.saldoInicial),
     tarjeta: dto.tarjeta && {
       cupo: aMonto(dto.tarjeta.cupo),
       disponible: aMonto(dto.tarjeta.disponible),
       porcentajeUsado: dto.tarjeta.porcentajeUsado,
     },
+    archivadaEn: dto.archivadaEn,
   };
 }
 
@@ -102,4 +133,50 @@ export async function listarCuentas(): Promise<ListaCuentas> {
 /** `PUT /cuentas/orden`: guarda el orden completo de un grupo. Atómico en la API. */
 export async function guardarOrdenGrupo(naturaleza: Naturaleza, ids: string[]): Promise<void> {
   await enviar<null>("PUT", "/cuentas/orden", { naturaleza, ids });
+}
+
+/** Ruta de una cuenta. `id` ya validado como UUID por quien llama; se codifica igual. */
+function rutaCuenta(id: string, sufijo = ""): string {
+  return `/cuentas/${encodeURIComponent(id)}${sufijo}`;
+}
+
+/** Respuesta que debía traer una `CuentaDto` y llegó vacía. */
+function cuentaDe(dto: CuentaDto | null, ruta: string): Cuenta {
+  if (!dto) throw new ErrorApi(500, "ERROR_INTERNO", `Tino API no devolvió la cuenta en ${ruta}.`);
+  return aCuenta(dto);
+}
+
+/** `POST /cuentas`: la API la pone al final de su grupo. */
+export async function crearCuenta(alta: AltaCuenta): Promise<Cuenta> {
+  return cuentaDe(await enviar<CuentaDto>("POST", "/cuentas", alta), "/cuentas");
+}
+
+/** `PATCH /cuentas/:id` con solo los campos que cambian. */
+export async function editarCuenta(id: string, edicion: EdicionCuenta): Promise<Cuenta> {
+  const ruta = rutaCuenta(id);
+  return cuentaDe(await enviar<CuentaDto>("PATCH", ruta, edicion), ruta);
+}
+
+/** `DELETE /cuentas/:id`: borrado definitivo, archivada o no. */
+export async function eliminarCuenta(id: string): Promise<void> {
+  await enviar<null>("DELETE", rutaCuenta(id));
+}
+
+/** `POST /cuentas/:id/archivar`: solo con saldo cero (`SALDO_NO_CERO`). */
+export async function archivarCuenta(id: string): Promise<Cuenta> {
+  const ruta = rutaCuenta(id, "/archivar");
+  return cuentaDe(await enviar<CuentaDto>("POST", ruta), ruta);
+}
+
+/** `POST /cuentas/:id/restaurar`. Sin `nombre`, sin cuerpo; con él, la restaura con ese nombre. */
+export async function restaurarCuenta(id: string, nombre?: string): Promise<Cuenta> {
+  const ruta = rutaCuenta(id, "/restaurar");
+  return cuentaDe(await enviar<CuentaDto>("POST", ruta, nombre === undefined ? undefined : { nombre }), ruta);
+}
+
+/** `GET /cuentas/archivadas`: la archivada más reciente primero (orden de la API). */
+export async function listarArchivadas(): Promise<Cuenta[]> {
+  const dto = await obtener<ListaArchivadasDto>("/cuentas/archivadas");
+  if (!dto) throw new ErrorApi(404, "ERROR_INTERNO", "Tino API no encontró /cuentas/archivadas.");
+  return dto.cuentas.map(aCuenta);
 }

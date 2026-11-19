@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition, type DragEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowDownUp, Check, Plus } from "lucide-react";
 import { moverA, ordenCambio } from "@/domain/cuenta/orden";
@@ -20,6 +21,8 @@ type Props = {
 type Orden = Record<Naturaleza, string[]>;
 
 const NATURALEZAS: readonly Naturaleza[] = ["activo", "pasivo"];
+
+const RUTA_NUEVA = "/cuentas?cuenta=nueva";
 
 const AVISO_ORDEN_INVALIDO = "Tu lista cambió. La recargamos; vuelve a ordenar.";
 
@@ -189,15 +192,14 @@ export function ListaCuentas({ lista, guardarOrden }: Props) {
             )}
             {etiquetaOrden}
           </button>
-          <button
-            type="button"
-            aria-disabled="true"
-            title="Próximamente"
-            className="flex h-11 cursor-not-allowed items-center gap-2 rounded-campo bg-texto px-4 text-cuerpo font-semibold text-fondo"
+          <Link
+            href={RUTA_NUEVA}
+            scroll={false}
+            className="flex h-11 items-center gap-2 rounded-campo bg-texto px-4 text-cuerpo font-semibold text-fondo"
           >
             <Plus size={18} strokeWidth={1.5} aria-hidden />
             Nueva cuenta
-          </button>
+          </Link>
         </div>
       </header>
 
@@ -212,7 +214,7 @@ export function ListaCuentas({ lista, guardarOrden }: Props) {
           rotulo="Cuentas"
           titulo="Aún no tienes cuentas."
           detalle="Crea tu primera cuenta para ver tu patrimonio."
-          accion={{ etiqueta: "Nueva cuenta", deshabilitada: true }}
+          accion={{ etiqueta: "Nueva cuenta", href: RUTA_NUEVA, scroll: false }}
         />
       ) : (
         <>
@@ -228,6 +230,13 @@ export function ListaCuentas({ lista, guardarOrden }: Props) {
               </GrupoCuentas>
             ))}
           </div>
+          <Link
+            href={RUTA_NUEVA}
+            scroll={false}
+            className="-my-3 flex h-11 items-center self-start text-cuerpo font-semibold text-marca-texto md:hidden"
+          >
+            + Nueva cuenta
+          </Link>
           <CierrePatrimonio
             activos={lista.activos.total}
             pasivos={lista.pasivos.total}
@@ -235,6 +244,13 @@ export function ListaCuentas({ lista, guardarOrden }: Props) {
           />
         </>
       )}
+
+      <Link
+        href="/cuentas/archivadas"
+        className={`flex h-11 items-center self-start text-cuerpo font-semibold text-marca-texto ${sinCuentas ? "" : "-mt-3 md:-mt-6 md:px-6"}`}
+      >
+        Ver archivadas
+      </Link>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import type { DragEventHandler } from "react";
+import Link from "next/link";
 import { ArrowDown, ArrowUp, GripVertical } from "lucide-react";
 import { formatearDinero } from "@/domain/dinero/formato";
 import type { Cuenta } from "@/services/cuentas";
@@ -71,22 +72,18 @@ const BOTON_ORDEN =
 /**
  * Fila de cuenta. Escritorio (md+): agarre · ícono · nombre y tipo · detalle · saldo.
  * Móvil: ícono · nombre y subtítulo · saldo, con la barra de la tarjeta debajo.
+ * Fuera del modo «Ordenar», la fila es un enlace a su edición (`?cuenta=<id>`).
  */
 export function FilaCuenta({ cuenta, orden }: Props) {
   const ordenando = orden !== undefined;
   const esPasivo = cuenta.naturaleza === "pasivo";
 
-  return (
-    <li
-      draggable={ordenando}
-      onDragStart={orden?.alEmpezarArrastre}
-      onDragOver={orden?.alArrastrarEncima}
-      onDrop={orden?.alSoltar}
-      onDragEnd={orden?.alTerminarArrastre}
-      className={`grid min-h-15 items-center gap-3 py-2.5 md:min-h-16 md:grid-cols-[28px_24px_minmax(0,1.1fr)_minmax(0,1.6fr)_200px] ${
-        ordenando ? "grid-cols-[18px_20px_minmax(0,1fr)_auto]" : "grid-cols-[20px_minmax(0,1fr)_auto]"
-      } ${orden?.resaltada ? "bg-hundido" : ""}`}
-    >
+  const rejilla = `grid min-h-15 items-center gap-3 py-2.5 md:min-h-16 md:grid-cols-[28px_24px_minmax(0,1.1fr)_minmax(0,1.6fr)_200px] ${
+    ordenando ? "grid-cols-[18px_20px_minmax(0,1fr)_auto]" : "grid-cols-[20px_minmax(0,1fr)_auto]"
+  }`;
+
+  const contenido = (
+    <>
       <span className={`${ordenando ? "flex" : "hidden md:flex"} justify-center text-secundario ${ordenando ? "cursor-grab" : ""}`}>
         {ordenando && <GripVertical size={18} strokeWidth={1.5} aria-hidden />}
       </span>
@@ -151,6 +148,33 @@ export function FilaCuenta({ cuenta, orden }: Props) {
           <BarraCupo tarjeta={cuenta.tarjeta} conCupo={false} />
         </div>
       )}
+    </>
+  );
+
+  if (!orden) {
+    return (
+      <li>
+        <Link
+          href={`/cuentas?cuenta=${encodeURIComponent(cuenta.id)}`}
+          scroll={false}
+          className={`${rejilla} hover:bg-hundido`}
+        >
+          {contenido}
+        </Link>
+      </li>
+    );
+  }
+
+  return (
+    <li
+      draggable
+      onDragStart={orden.alEmpezarArrastre}
+      onDragOver={orden.alArrastrarEncima}
+      onDrop={orden.alSoltar}
+      onDragEnd={orden.alTerminarArrastre}
+      className={`${rejilla} ${orden.resaltada ? "bg-hundido" : ""}`}
+    >
+      {contenido}
     </li>
   );
 }

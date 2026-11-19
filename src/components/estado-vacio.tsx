@@ -6,8 +6,11 @@ type Props = {
   rotulo: string;
   titulo: string;
   detalle: string;
-  /** Enlace, o botón deshabilitado («Próximamente») mientras el destino no existe. */
-  accion: { etiqueta: string; href: string } | { etiqueta: string; deshabilitada: true };
+  /**
+   * Enlace, o botón deshabilitado («Próximamente») mientras el destino no existe.
+   * `scroll: false` conserva la posición (p. ej. al abrir un panel por URL).
+   */
+  accion: { etiqueta: string; href: string; scroll?: boolean } | { etiqueta: string; deshabilitada: true };
 };
 
 const ACCION = "mt-3 inline-flex items-center gap-2 text-cuerpo font-semibold";
@@ -29,7 +32,7 @@ export function EstadoVacio({ rotulo, titulo, detalle, accion }: Props) {
         <p className="text-cuerpo font-semibold">{titulo}</p>
         <p className="text-etiqueta font-normal text-secundario">{detalle}</p>
         {"href" in accion ? (
-          <Link href={accion.href} className={`${ACCION} text-marca-texto`}>
+          <Link href={accion.href} scroll={accion.scroll} className={`${ACCION} text-marca-texto`}>
             <Plus size={16} strokeWidth={1.5} aria-hidden />
             {accion.etiqueta}
           </Link>

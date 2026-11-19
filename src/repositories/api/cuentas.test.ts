@@ -7,7 +7,7 @@ vi.mock("./cliente", () => ({
   ErrorApi: class extends Error {},
 }));
 
-import { aListaCuentas, type ListaCuentasDto } from "./cuentas";
+import { aCuenta, aListaCuentas, type CuentaDto, type ListaCuentasDto } from "./cuentas";
 
 // Ejemplos JSON de `GET /cuentas` en Tino-API docs/api/cuentas.md.
 const CON_CUENTAS: ListaCuentasDto = {
@@ -68,7 +68,9 @@ describe("aListaCuentas", () => {
             naturaleza: "activo",
             detalle: null,
             saldo: 20321n,
+            saldoInicial: 20321n,
             tarjeta: null,
+            archivadaEn: null,
           },
         ],
       },
@@ -82,7 +84,9 @@ describe("aListaCuentas", () => {
             naturaleza: "pasivo",
             detalle: "Visa ·· 1234",
             saldo: 1284300n,
+            saldoInicial: 1284300n,
             tarjeta: { cupo: 4000000n, disponible: 2715700n, porcentajeUsado: 32 },
+            archivadaEn: null,
           },
         ],
       },
@@ -117,5 +121,29 @@ describe("aListaCuentas", () => {
   it("montos que exceden 2^53 no pierden precisión", () => {
     const dto: ListaCuentasDto = { ...VACIA, patrimonioNeto: "9007199254740993" };
     expect(aListaCuentas(dto).patrimonioNeto).toBe(9007199254740993n);
+  });
+});
+
+describe("aCuenta", () => {
+  const ARCHIVADA: CuentaDto = {
+    ...CON_CUENTAS.activos.cuentas[0],
+    saldo: "0",
+    saldoInicial: "20321",
+    archivadaEn: "2026-11-18T15:04:05.000Z",
+  };
+
+  it("convierte saldoInicial a bigint, aparte del saldo", () => {
+    const cuenta = aCuenta(ARCHIVADA);
+    expect(cuenta.saldo).toBe(0n);
+    expect(cuenta.saldoInicial).toBe(20321n);
+  });
+
+  it("conserva archivadaEn tal cual llega", () => {
+    expect(aCuenta(ARCHIVADA).archivadaEn).toBe("2026-11-18T15:04:05.000Z");
+    expect(aCuenta(CON_CUENTAS.activos.cuentas[0]).archivadaEn).toBeNull();
+  });
+
+  it("saldoInicial que excede 2^53 no pierde precisión", () => {
+    expect(aCuenta({ ...ARCHIVADA, saldoInicial: "9007199254740993" }).saldoInicial).toBe(9007199254740993n);
   });
 });

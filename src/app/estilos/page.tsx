@@ -17,6 +17,7 @@ import { TarjetaCuenta } from "@/components/tarjeta-cuenta";
 import type { TipoCuenta } from "@/domain/cuenta/naturaleza";
 import { formatearEquivalencia } from "@/domain/dinero/formato";
 import { AlternarTema } from "./alternar-tema";
+import { MuestraMontoEditable, MuestraOpcionUnica, MuestraPanelLateral } from "./muestras-interactivas";
 
 export const metadata = { title: "Estilos · Tino" };
 
@@ -128,7 +129,7 @@ function FilaCuenta({ nombre, cifra }: { nombre: string; cifra: string }) {
   );
 }
 
-function Componentes() {
+function Componentes({ modo }: { modo: "light" | "dark" }) {
   return (
     <>
       <div>
@@ -177,6 +178,11 @@ function Componentes() {
       </div>
 
       <div>
+        <Etiqueta>C4 · Campo de monto editable · vacío, con nota, con error</Etiqueta>
+        <MuestraMontoEditable sufijo={modo} />
+      </div>
+
+      <div>
         <Etiqueta>C5 · Chip de categoría · sugerida, normal, sin clasificar</Etiqueta>
         <div className="flex flex-wrap gap-2">
           <ChipCategoria etiqueta="Comida" estado="sugerida" />
@@ -206,6 +212,16 @@ function Componentes() {
           detalle="Lo que registres aparecerá aquí por fecha, con el saldo al lado."
           accion={{ etiqueta: "Registrar el primero", href: "#" }}
         />
+      </div>
+
+      <div>
+        <Etiqueta>C22 · Panel lateral</Etiqueta>
+        <MuestraPanelLateral />
+      </div>
+
+      <div>
+        <Etiqueta>C34 · Opción única</Etiqueta>
+        <MuestraOpcionUnica sufijo={modo} />
       </div>
     </>
   );
@@ -390,7 +406,7 @@ export default function Estilos() {
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           {(["light", "dark"] as const).map((modo) => (
             <Panel key={modo} modo={modo} titulo={modo === "light" ? "Claro · papel" : "Oscuro · tinta"} hex={modo === "light" ? "#FAF8F3" : "#12141A"}>
-              <Componentes />
+              <Componentes modo={modo} />
             </Panel>
           ))}
         </div>
