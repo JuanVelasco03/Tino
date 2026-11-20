@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Familjen Grotesk',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#8A5F1F}
+a:hover{color:#1A1A17}
+input::placeholder{color:var(--t3,#9A958B);opacity:1}
+</style>
+</helmet>
+<div style="{{ vars }}">
+<div data-screen-label="Registrar escritorio" style="width:1440px;height:1024px;overflow:hidden;display:grid;grid-template-columns:232px minmax(0,1fr) 480px;background:var(--bg,#FAF8F3);color:var(--tx,#1A1A17);font-family:'Familjen Grotesk',sans-serif;border:1px solid var(--ln,#E4DFD4);box-sizing:border-box">
+
+<aside style="border-right:1px solid var(--ln,#E4DFD4);padding:28px 16px;display:flex;flex-direction:column;gap:28px">
+<div style="padding:0 8px;font-size:20px;font-weight:700;letter-spacing:0.16em">TINO</div>
+<button style="height:44px;display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--tx,#1A1A17);border-radius:4px;background:var(--sk,#F2EEE5);color:var(--tx,#1A1A17);font-family:'Familjen Grotesk',sans-serif;font-size:15px;font-weight:600;cursor:pointer"><span style="display:flex">{{ ic.plus }}</span>Registrar<span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;color:var(--t2,#6B6760);padding:1px 5px;border:1px solid var(--ln,#E4DFD4);border-radius:2px">N</span></button>
+<nav style="display:flex;flex-direction:column;gap:2px">
+<sc-for list="{{ nav }}" as="n" hint-placeholder-count="8">
+<div style="height:40px;display:flex;align-items:center;gap:12px;padding:0 8px;border-radius:4px;background:{{ n.bg }};color:{{ n.color }};font-size:15px;font-weight:{{ n.weight }}"><span style="display:flex">{{ n.icon }}</span><span style="flex:1">{{ n.label }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--br,#8A5F1F)">{{ n.badge }}</span></div>
+</sc-for>
+</nav>
+<div style="margin-top:auto;padding:0 8px;display:flex;flex-direction:column;gap:2px;font-size:13px;color:var(--t2,#6B6760)"><span>TRM de referencia</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--tx,#1A1A17)">4.120 COP</span><span>11 nov 2026</span></div>
+</aside>
+
+<main style="padding:28px 40px 40px;display:flex;flex-direction:column;gap:24px;min-width:0">
+<header style="display:flex;justify-content:space-between;align-items:baseline;gap:24px"><h1 style="margin:0;font-size:28px;line-height:34px;font-weight:600;letter-spacing:-0.01em">Movimientos</h1><span style="font-size:13px;color:var(--t2,#6B6760)">Noviembre 2026</span></header>
+<div>
+<div style="display:grid;grid-template-columns:56px minmax(0,1fr) 112px 104px;gap:12px;padding-bottom:8px;border-bottom:1px solid var(--lf,#1A1A17);font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--t2,#6B6760)"><span>Fecha</span><span>Descripción</span><span>Cuenta</span><span style="text-align:right">Importe</span></div>
+<sc-for list="{{ ledger }}" as="r" hint-placeholder-count="14">
+<div style="display:grid;grid-template-columns:56px minmax(0,1fr) 112px 104px;gap:12px;align-items:baseline;min-height:36px;padding:8px 0;box-sizing:border-box;border-bottom:1px solid var(--ln,#E4DFD4);background:{{ r.bg }}">
+<span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--t2,#6B6760)">{{ r.f }}</span>
+<span style="min-width:0;display:flex;align-items:baseline;gap:8px;white-space:nowrap;overflow:hidden"><span style="font-size:14px;font-weight:{{ r.w }}">{{ r.d }}</span><span style="font-size:12px;color:var(--t2,#6B6760)">{{ r.cat }}</span></span>
+<span style="font-size:13px;color:var(--t2,#6B6760);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.acc }}</span>
+<span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:{{ r.w }};color:{{ r.color }}">{{ r.amt }}</span>
+</div>
+</sc-for>
+</div>
+</main>
+
+<section aria-label="Registrar movimiento" style="border-left:1px solid var(--lf,#1A1A17);background:var(--sf,#FFFFFF);display:flex;flex-direction:column;min-height:0">
+<div style="height:68px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 28px;border-bottom:1px solid var(--ln,#E4DFD4)"><span style="font-size:20px;font-weight:600">Registrar</span><button onClick="{{ reset }}" style="height:44px;display:flex;align-items:center;gap:8px;padding:0;background:none;border:none;font-family:'Familjen Grotesk',sans-serif;font-size:13px;color:var(--t2,#6B6760);cursor:pointer"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;padding:1px 5px;border:1px solid var(--ln,#E4DFD4);border-radius:2px">Esc</span><span style="display:flex">{{ ic.x }}</span></button></div>
+
+<div style="flex:1;min-height:0;overflow:auto;padding:20px 28px 0;display:flex;flex-direction:column;gap:22px">
+
+<sc-if value="{{ saved }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;align-items:center;gap:10px;min-height:44px;padding:0 4px 0 12px;border:1px solid var(--ln,#E4DFD4);border-radius:4px;background:var(--bg,#FAF8F3);font-size:14px"><span style="display:flex;color:var(--in,#2F7D5A)">{{ ic.check }}</span><span style="flex:1">Registrado: {{ savedText }}</span><button onClick="{{ undo }}" style="height:40px;padding:0 10px;background:none;border:none;font-family:'Familjen Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--br,#8A5F1F);cursor:pointer">Deshacer</button></div>
+</sc-if>
+
+<div style="display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--ln,#E4DFD4);border-radius:4px;overflow:hidden">
+<sc-for list="{{ tipos }}" as="t" hint-placeholder-count="3">
+<button onClick="{{ t.pick }}" style="height:40px;border:none;border-left:{{ t.sep }};background:{{ t.bg }};color:{{ t.color }};font-family:'Familjen Grotesk',sans-serif;font-size:14px;font-weight:{{ t.weight }};cursor:pointer">{{ t.label }}</button>
+</sc-for>
+</div>
+
+<label style="display:flex;flex-direction:column;gap:6px"><span style="display:flex;justify-content:space-between;font-size:13px;color:var(--t2,#6B6760)"><span>Monto</span><span>COP</span></span>
+<span style="display:flex;align-items:baseline;gap:6px;padding-bottom:8px;border-bottom:1px solid var(--lf,#1A1A17)"><span style="font-family:'IBM Plex Mono',monospace;font-size:48px;line-height:56px;font-weight:500;color:{{ signColor }}">{{ sign }}</span><input value="{{ amtVal }}" onChange="{{ onAmt }}" inputmode="numeric" placeholder="0" autofocus style="flex:1;min-width:0;border:none;outline:none;background:none;padding:0;font-family:'IBM Plex Mono',monospace;font-size:56px;line-height:56px;font-weight:500;letter-spacing:-0.03em;color:var(--tx,#1A1A17)"></span></label>
+
+<div style="display:flex;flex-direction:column;gap:6px">
+<span style="font-size:13px;color:var(--t2,#6B6760)">Descripción</span>
+<div style="position:relative;height:44px;border-bottom:1px solid {{ descLine }}">
+<span style="position:absolute;left:0;top:0;height:44px;display:flex;align-items:center;font-size:17px;white-space:pre;pointer-events:none"><span style="color:transparent">{{ desc }}</span><span style="color:var(--t3,#9A958B)">{{ ghost }}</span></span>
+<input value="{{ desc }}" onChange="{{ onDesc }}" onKeyDown="{{ onDescKey }}" placeholder="Almuerzo, taxi, recarga…" style="position:absolute;inset:0;width:100%;border:none;outline:none;background:none;padding:0;font-family:'Familjen Grotesk',sans-serif;font-size:17px;color:var(--tx,#1A1A17)">
+</div>
+<sc-if value="{{ hasSug }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;border:1px solid var(--ln,#E4DFD4);border-top:none;border-radius:0 0 4px 4px">
+<sc-for list="{{ sugs }}" as="s" hint-placeholder-count="2">
+<button onClick="{{ s.pick }}" style="min-height:40px;display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:0 12px;border:none;border-top:{{ s.top }};background:{{ s.bg }};color:var(--tx,#1A1A17);text-align:left;font-family:'Familjen Grotesk',sans-serif;cursor:pointer"><span style="font-size:15px">{{ s.label }}</span><span style="font-size:13px;color:var(--t2,#6B6760)">{{ s.cat }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--t2,#6B6760);padding:1px 5px;border:1px solid {{ s.kb }};border-radius:2px;opacity:{{ s.kbOp }}">Tab</span></button>
+</sc-for>
+</div>
+</sc-if>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:8px">
+<span style="display:flex;justify-content:space-between;font-size:13px;color:var(--t2,#6B6760)"><span>Categoría</span><span style="color:var(--br,#8A5F1F)">{{ catNote }}</span></span>
+<div style="display:flex;flex-wrap:wrap;gap:6px">
+<sc-for list="{{ cats }}" as="c" hint-placeholder-count="8">
+<button onClick="{{ c.pick }}" style="height:32px;display:flex;align-items:center;gap:6px;padding:0 10px;border:1px solid {{ c.border }};border-style:{{ c.style }};border-radius:4px;background:var(--sf,#FFFFFF);color:var(--tx,#1A1A17);font-family:'Familjen Grotesk',sans-serif;font-size:13px;font-weight:{{ c.weight }};cursor:pointer"><span style="display:flex">{{ c.mark }}</span>{{ c.label }}</button>
+</sc-for>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:8px">
+<span style="font-size:13px;color:var(--t2,#6B6760)">{{ accLabel }}</span>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+<sc-for list="{{ accts }}" as="a" hint-placeholder-count="4">
+<button onClick="{{ a.pick }}" style="min-height:48px;display:grid;grid-template-columns:18px minmax(0,1fr);gap:8px;align-items:center;padding:6px 10px;border:1px solid {{ a.border }};border-radius:4px;background:var(--sf,#FFFFFF);color:var(--tx,#1A1A17);text-align:left;font-family:'Familjen Grotesk',sans-serif;cursor:pointer"><span style="display:flex;color:var(--t2,#6B6760)">{{ a.icon }}</span><span style="display:flex;flex-direction:column;min-width:0"><span style="font-size:14px;font-weight:{{ a.weight }}">{{ a.name }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--t2,#6B6760);white-space:nowrap">{{ a.bal }}</span></span></button>
+</sc-for>
+</div>
+</div>
+
+<div style="display:flex;justify-content:space-between;align-items:center;min-height:44px;border-top:1px solid var(--ln,#E4DFD4);border-bottom:1px solid var(--ln,#E4DFD4)"><span style="font-size:13px;color:var(--t2,#6B6760)">Fecha</span><span style="display:flex;align-items:center;gap:12px"><span style="font-size:14px">Hoy · mié 11 nov</span><span style="font-size:13px;font-weight:600;color:var(--br,#8A5F1F)">Cambiar</span></span></div>
+
+<button onClick="{{ toggleMas }}" style="min-height:44px;display:flex;justify-content:space-between;align-items:center;padding:0;background:none;border:none;border-bottom:1px solid var(--ln,#E4DFD4);color:var(--tx,#1A1A17);font-family:'Familjen Grotesk',sans-serif;font-size:14px;cursor:pointer"><span>Más opciones <span style="color:var(--t2,#6B6760)">· notas, persona, dividir</span></span><span style="display:flex;color:var(--t2,#6B6760)">{{ masIcon }}</span></button>
+<sc-if value="{{ masOpen }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;margin-top:-22px">
+<sc-for list="{{ masRows }}" as="m" hint-placeholder-count="3">
+<div style="min-height:44px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--ln,#E4DFD4)"><span style="font-size:13px;color:var(--t2,#6B6760)">{{ m.l }}</span><span style="font-size:14px;color:var(--t3,#9A958B)">{{ m.v }}</span></div>
+</sc-for>
+</div>
+</sc-if>
+<div style="height:8px;flex:none"></div>
+</div>
+
+<div style="flex:none;padding:16px 28px 24px;border-top:1px solid var(--ln,#E4DFD4);display:flex;flex-direction:column;gap:10px">
+<button onClick="{{ save }}" style="height:56px;display:flex;align-items:center;justify-content:center;gap:10px;border:none;border-radius:4px;background:{{ btnBg }};color:{{ btnColor }};font-family:'Familjen Grotesk',sans-serif;font-size:17px;font-weight:600;cursor:pointer">{{ btnText }}<span style="font-family:'IBM Plex Mono',monospace;font-weight:500">{{ btnAmt }}</span></button>
+<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2,#6B6760)"><span><span style="font-family:'IBM Plex Mono',monospace;padding:1px 5px;border:1px solid var(--ln,#E4DFD4);border-radius:2px">↵</span> registra y deja el panel listo para otro</span><span>{{ afterText }}</span></div>
+</div>
+</section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1024},&quot;modo&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;claro&quot;,&quot;oscuro&quot;],&quot;default&quot;:&quot;claro&quot;,&quot;tsType&quot;:&quot;'claro'|'oscuro'&quot;},&quot;estado&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;vacia&quot;,&quot;sugerida&quot;,&quot;confirmada&quot;],&quot;default&quot;:&quot;vacia&quot;,&quot;tsType&quot;:&quot;'vacia'|'sugerida'|'confirmada'&quot;}}">
+const SVG = (d, s = 20) => React.createElement('svg', { width: s, height: s, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.5, strokeLinecap: 'round', strokeLinejoin: 'round', dangerouslySetInnerHTML: { __html: d } });
+const P = {
+  resumen: '<line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/>',
+  movimientos: '<path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M8 6h13"/>',
+  cuentas: '<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>',
+  deudas: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  avisos: '<path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/>',
+  recurrentes: '<path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/>',
+  metas: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  inversion: '<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
+  plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+  efectivo: '<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>',
+  banco: '<line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/>',
+  tarjeta: '<rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/>'
+};
+const ICONS = { plus: SVG(P.plus, 18), x: SVG('<path d="M18 6 6 18"/><path d="m6 6 12 12"/>', 18), check: SVG('<path d="M20 6 9 17l-5-5"/>', 16), checkS: SVG('<path d="M20 6 9 17l-5-5"/>', 13), down: SVG('<path d="m6 9 6 6 6-6"/>', 18), up: SVG('<path d="m18 15-6-6-6 6"/>', 18) };
+const MODES = {
+  claro: { '--bg':'#FAF8F3','--sf':'#FFFFFF','--sk':'#F2EEE5','--tx':'#1A1A17','--t2':'#6B6760','--t3':'#9A958B','--ln':'#E4DFD4','--lf':'#1A1A17','--br':'#8A5F1F','--in':'#2F7D5A','--out':'#B0452E' },
+  oscuro: { '--bg':'#12141A','--sf':'#181B22','--sk':'#1F232C','--tx':'#E8E4DC','--t2':'#8B8A84','--t3':'#5E5F63','--ln':'#272B34','--lf':'#8B8A84','--br':'#BC8A3E','--in':'#4E9E78','--out':'#D0664B' }
+};
+const CATS = { gasto: ['Comida','Transporte','Casa','Servicios','Suscripciones','Salud','Salidas','Otros'], ingreso: ['Salario','Trabajo independiente','Reembolso','Otros ingresos'], transferencia: [] };
+const CONCEPTS = [['Almuerzo','Comida'],['Almuerzo corrientazo','Comida'],['Desayuno','Comida'],['Agua','Comida'],['Pan','Comida'],['Mercado D1','Comida'],['Recarga datos','Servicios'],['Recarga tarjeta SITP','Transporte'],['Pago taxi','Transporte'],['Mensualidad Apple','Suscripciones'],['Gimnasio','Salud']];
+const ACCTS = [
+  { id:'nequi', name:'Nequi', icon:'banco', bal:20321 },
+  { id:'efectivo', name:'Efectivo', icon:'efectivo', bal:45000 },
+  { id:'bancolombia', name:'Bancolombia', icon:'banco', bal:910051 },
+  { id:'tc', name:'Tarjeta de crédito', icon:'tarjeta', bal:1284300, pas:true }
+];
+const LEDGER = [
+  ['11 nov','Recarga datos','Servicios','Nequi',-4000],['11 nov','Desayuno','Comida','Efectivo',-8000],['10 nov','Recarga tarjeta SITP','Transporte','Nequi',-10000],
+  ['10 nov','Mercado D1','Comida','Tarjeta de crédito',-87400],['09 nov','Pan','Comida','Efectivo',-5000],['09 nov','Pago taxi','Transporte','Bancolombia',-30000],
+  ['08 nov','Gimnasio','Salud','Bancolombia',-95000],['07 nov','Agua','Comida','Efectivo',-1100],['07 nov','Almuerzo','Comida','Nequi',-15000],
+  ['06 nov','Abono a mamá','Transferencia','Nequi → Deuda',-100000],['05 nov','Almuerzo','Comida','Nequi',-15000],['03 nov','Energía Enel','Servicios','Bancolombia',-84320],
+  ['01 nov','Arriendo','Casa','Bancolombia',-1100000],['01 nov','Mensualidad Apple','Suscripciones','Tarjeta de crédito',-3900],['31 oct','Salario Andina SAS','Salario','Bancolombia',4200000]
+];
+const fmt = n => String(Math.abs(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+const digits = s => String(s).replace(/\D/g, '');
+const PRESETS = {
+  vacia: { tipo:'gasto', amt:'', desc:'', cat:null, acc:'nequi', saved:null },
+  sugerida: { tipo:'gasto', amt:'15000', desc:'almu', cat:null, acc:'nequi', saved:null },
+  confirmada: { tipo:'gasto', amt:'', desc:'', cat:null, acc:'nequi', saved:{ d:'Almuerzo', cat:'Comida', acc:'Nequi', amt:15000 } }
+};
+
+class Component extends DCLogic {
+  constructor(p) { super(p); const e = PRESETS[p.estado ?? 'vacia'] || PRESETS.vacia; this.state = { ...e, mas:false, added: e.saved ? [e.saved] : [] }; }
+  match(desc) {
+    const t = norm(desc.trim()); if (!t) return [];
+    return CONCEPTS.filter(([c]) => norm(c).startsWith(t)).slice(0, 2);
+  }
+  doSave() {
+    const s = this.state; const n = parseInt(s.amt || '0', 10); if (!n) return;
+    const m = this.match(s.desc)[0];
+    const d = s.desc.trim() ? (m && norm(m[0]).startsWith(norm(s.desc.trim())) && !s.cat ? m[0] : s.desc.trim().replace(/^./, c => c.toUpperCase())) : (s.tipo === 'ingreso' ? 'Ingreso' : 'Gasto');
+    const cat = s.cat || (m ? m[1] : 'Otros');
+    const acc = ACCTS.find(a => a.id === s.acc).name;
+    const rec = { d, cat, acc, amt: s.tipo === 'ingreso' ? -n : n, ing: s.tipo === 'ingreso' };
+    this.setState({ amt:'', desc:'', cat:null, saved: rec, added: [rec, ...s.added], mas:false });
+  }
+  renderVals() {
+    const s = this.state;
+    const ing = s.tipo === 'ingreso', tr = s.tipo === 'transferencia';
+    const n = parseInt(s.amt || '0', 10);
+    const sugList = this.match(s.desc);
+    const top = sugList[0];
+    const autoCat = s.cat || (top ? top[1] : null);
+    const ghost = top && s.desc && norm(top[0]).startsWith(norm(s.desc)) ? top[0].slice(s.desc.length) : '';
+    const acc = ACCTS.find(a => a.id === s.acc);
+    const after = acc.pas ? acc.bal + (ing ? -n : n) : acc.bal + (ing ? n : -n);
+    const ledger = [
+      ...s.added.map((r, i) => ({ f:'11 nov', d:r.d, cat:r.cat, acc:r.acc, amt: (r.ing ? '+' : '−') + fmt(r.amt), color: r.ing ? 'var(--in,#2F7D5A)' : 'var(--out,#B0452E)', w: i === 0 ? 600 : 400, bg: i === 0 && s.saved ? 'var(--sk,#F2EEE5)' : 'transparent' })),
+      ...LEDGER.map(r => ({ f:r[0], d:r[1], cat:r[2], acc:r[3], amt: (r[4] > 0 ? '+' : r[2] === 'Transferencia' ? '' : '−') + fmt(r[4]), color: r[4] > 0 ? 'var(--in,#2F7D5A)' : r[2] === 'Transferencia' ? 'var(--tx,#1A1A17)' : 'var(--out,#B0452E)', w:400, bg:'transparent' }))
+    ].slice(0, 22);
+    const navDef = [['resumen','Resumen'],['movimientos','Movimientos'],['cuentas','Cuentas'],['deudas','Deudas y préstamos'],['recurrentes','Recurrentes'],['inversion','Inversiones'],['metas','Metas'],['avisos','Avisos']];
+    return {
+      vars: MODES[this.props.modo ?? 'claro'] || MODES.claro, ic: ICONS,
+      nav: navDef.map(([k, label]) => ({ label, icon: SVG(P[k]), badge: k === 'avisos' ? '3' : '', bg: k === 'movimientos' ? 'var(--sk,#F2EEE5)' : 'transparent', color: k === 'movimientos' ? 'var(--tx,#1A1A17)' : 'var(--t2,#6B6760)', weight: k === 'movimientos' ? 600 : 400 })),
+      ledger,
+      tipos: [['gasto','Gasto'],['ingreso','Ingreso'],['transferencia','Transferencia']].map(([k, label], i) => ({ label, sep: i ? '1px solid var(--ln,#E4DFD4)' : 'none', bg: s.tipo === k ? 'var(--tx,#1A1A17)' : 'var(--sf,#FFFFFF)', color: s.tipo === k ? 'var(--sf,#FFFFFF)' : 'var(--t2,#6B6760)', weight: s.tipo === k ? 600 : 400, pick: () => this.setState({ tipo:k, cat:null }) })),
+      sign: tr ? '' : n ? (ing ? '+' : '−') : '', signColor: ing ? 'var(--in,#2F7D5A)' : 'var(--out,#B0452E)',
+      amtVal: s.amt ? fmt(n) : '', onAmt: e => this.setState({ amt: digits(e.target.value).slice(0, 10), saved:null }),
+      desc: s.desc, ghost, descLine: s.desc ? 'var(--lf,#1A1A17)' : 'var(--ln,#E4DFD4)',
+      onDesc: e => this.setState({ desc: e.target.value, cat:null, saved:null }),
+      onDescKey: e => { if (e.key === 'Tab' && top && ghost) { e.preventDefault(); this.setState({ desc: top[0] }); } else if (e.key === 'Enter') { e.preventDefault(); this.doSave(); } },
+      hasSug: !!sugList.length && !tr && !(sugList.length === 1 && norm(sugList[0][0]) === norm(s.desc)),
+      sugs: sugList.map((x, i) => ({ label:x[0], cat:x[1], top: i ? '1px solid var(--ln,#E4DFD4)' : 'none', bg: i ? 'transparent' : 'var(--sk,#F2EEE5)', kb: i ? 'transparent' : 'var(--ln,#E4DFD4)', kbOp: i ? 0 : 1, pick: () => this.setState({ desc:x[0] }) })),
+      catNote: !s.cat && top ? `Sugerida por «${norm(top[0]).split(' ')[0]}»` : '',
+      cats: CATS[s.tipo].map(c => { const on = autoCat === c, sug = on && !s.cat; return { label:c, border: on ? 'var(--tx,#1A1A17)' : 'var(--ln,#E4DFD4)', style: sug ? 'dashed' : 'solid', weight: on ? 600 : 400, mark: on && !sug ? ICONS.checkS : null, pick: () => this.setState({ cat: s.cat === c ? null : c }) }; }),
+      accLabel: tr ? 'De la cuenta' : 'Cuenta · Nequi es la predeterminada',
+      accts: ACCTS.map(a => ({ name:a.name, icon: SVG(P[a.icon], 16), border: s.acc === a.id ? 'var(--tx,#1A1A17)' : 'var(--ln,#E4DFD4)', weight: s.acc === a.id ? 600 : 400, bal: (a.pas ? 'debe ' : '') + fmt(a.bal) + (s.acc === a.id && n ? ' → ' + (a.pas ? 'debe ' : '') + (after < 0 ? '−' : '') + fmt(after) : ''), pick: () => this.setState({ acc:a.id }) })),
+      masOpen: s.mas, masIcon: s.mas ? ICONS.up : ICONS.down, toggleMas: () => this.setState({ mas: !s.mas }),
+      masRows: [{ l:'Nota', v:'Sin nota' }, { l:'Persona', v:'Nadie' }, { l:'Dividir entre categorías', v:'No' }],
+      btnText: ing ? 'Registrar ingreso' : tr ? 'Registrar transferencia' : 'Registrar gasto', btnAmt: n ? (tr ? '' : ing ? '+' : '−') + fmt(n) : '',
+      btnBg: n ? 'var(--tx,#1A1A17)' : 'var(--ln,#E4DFD4)', btnColor: n ? 'var(--bg,#FAF8F3)' : 'var(--t2,#6B6760)',
+      save: () => this.doSave(),
+      afterText: n && !tr ? `${acc.name} quedará en ${acc.pas ? 'debe ' : ''}${after < 0 ? '−' : ''}${fmt(after)}` : '',
+      saved: !!s.saved, savedText: s.saved ? `${s.saved.d} ${s.saved.ing ? '+' : '−'}${fmt(s.saved.amt)} en ${s.saved.acc}` : '',
+      undo: () => this.setState({ added: s.added.slice(1), saved:null }),
+      reset: () => this.setState({ amt:'', desc:'', cat:null, saved:null })
+    };
+  }
+}
+</script>
+</body>
+</html>
