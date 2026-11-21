@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Familjen Grotesk',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#8A5F1F}
+a:hover{color:#1A1A17}
+</style>
+</helmet>
+<div style="{{ vars }}">
+
+<sc-if value="{{ esc }}" hint-placeholder-val="{{ true }}">
+<div data-screen-label="Resumen escritorio" style="width:1440px;min-height:1024px;display:grid;grid-template-columns:232px minmax(0,1fr);background:var(--bg,#FAF8F3);color:var(--tx,#1A1A17);font-family:'Familjen Grotesk',sans-serif;border:1px solid var(--ln,#E4DFD4);box-sizing:border-box">
+<aside style="border-right:1px solid var(--ln,#E4DFD4);padding:28px 16px;display:flex;flex-direction:column;gap:28px">
+<div style="padding:0 8px;font-size:20px;font-weight:700;letter-spacing:0.16em">TINO</div>
+<button style="height:44px;display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:4px;background:var(--tx,#1A1A17);color:var(--bg,#FAF8F3);font-family:'Familjen Grotesk',sans-serif;font-size:15px;font-weight:600;cursor:pointer"><span style="display:flex">{{ ic.plus }}</span>Registrar</button>
+<nav style="display:flex;flex-direction:column;gap:2px">
+<sc-for list="{{ nav }}" as="n" hint-placeholder-count="8">
+<div style="height:40px;display:flex;align-items:center;gap:12px;padding:0 8px;border-radius:4px;background:{{ n.bg }};color:{{ n.color }};font-size:15px;font-weight:{{ n.weight }};cursor:pointer"><span style="display:flex">{{ n.icon }}</span><span style="flex:1">{{ n.label }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--br,#8A5F1F)">{{ n.badge }}</span></div>
+</sc-for>
+</nav>
+<div style="margin-top:auto;padding:0 8px;display:flex;flex-direction:column;gap:2px;font-size:13px;color:var(--t2,#6B6760)"><span>TRM de referencia</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--tx,#1A1A17)">4.120 COP</span><span>11 nov 2026</span></div>
+</aside>
+
+<main style="padding:36px 56px 64px;display:flex;flex-direction:column;gap:48px;min-width:0">
+<header style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px">
+<div style="display:flex;flex-direction:column;gap:6px">
+<span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--t2,#6B6760)">Resumen del mes</span>
+<div style="display:flex;align-items:center;gap:4px;margin-left:-10px">
+<button aria-label="Mes anterior" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--tx,#1A1A17);cursor:pointer">{{ ic.chevL }}</button>
+<h1 style="margin:0;font-size:28px;line-height:34px;font-weight:600;letter-spacing:-0.01em">Octubre 2026</h1>
+<button aria-label="Mes siguiente" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--tx,#1A1A17);cursor:pointer">{{ ic.chevR }}</button>
+</div>
+</div>
+<span style="font-size:13px;color:var(--t2,#6B6760)">1 – 31 oct · <span style="font-family:'IBM Plex Mono',monospace">142</span> movimientos · comparado con septiembre</span>
+</header>
+
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--lf,#1A1A17)">
+<sc-for list="{{ figs }}" as="f" hint-placeholder-count="3">
+<div style="padding:20px 28px 4px;padding-left:{{ f.pl }};border-left:{{ f.sep }};display:flex;flex-direction:column;gap:14px">
+<span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase">{{ f.label }}</span>
+<span style="font-family:'IBM Plex Mono',monospace;font-size:40px;line-height:44px;font-weight:500;letter-spacing:-0.03em;color:{{ f.color }}">{{ f.amt }}</span>
+<div style="display:flex;flex-direction:column">
+<div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-top:1px solid var(--ln,#E4DFD4)"><span style="font-size:13px;color:var(--t2,#6B6760)">Septiembre</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--t2,#6B6760)">{{ f.prev }}</span></div>
+<div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-top:1px solid var(--ln,#E4DFD4)"><span style="font-size:13px;color:var(--t2,#6B6760)">Variación</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px">{{ f.delta }} <span style="color:var(--t2,#6B6760)">· {{ f.deltaPct }}</span></span></div>
+</div>
+</div>
+</sc-for>
+</div>
+
+<div>
+<div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:8px;border-bottom:1px solid var(--lf,#1A1A17)">
+<span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase">Gasto por categoría</span>
+<button style="display:flex;align-items:baseline;gap:6px;padding:0;background:none;border:none;font-family:'Familjen Grotesk',sans-serif;font-size:13px;color:var(--t2,#6B6760);cursor:pointer"><span style="font-family:'IBM Plex Mono',monospace;border-bottom:1px dashed var(--t3,#9A958B)">{{ sinPct }}</span><span>sin categoría ·</span><span style="font-weight:600;color:var(--br,#8A5F1F)">Clasificar {{ sinN }}</span></button>
+</div>
+<div style="display:grid;grid-template-columns:160px minmax(0,1fr) 120px 72px 120px 110px;gap:16px;padding:10px 0 8px;border-bottom:1px solid var(--ln,#E4DFD4);font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--t2,#6B6760)"><span>Categoría</span><span></span><span style="text-align:right">Octubre</span><span style="text-align:right">%</span><span style="text-align:right">Sept.</span><span style="text-align:right">Var.</span></div>
+<sc-for list="{{ cats }}" as="c" hint-placeholder-count="9">
+<div style="display:grid;grid-template-columns:160px minmax(0,1fr) 120px 72px 120px 110px;gap:16px;align-items:center;padding:11px 0;border-bottom:1px solid var(--ln,#E4DFD4);border-top:{{ c.top }}">
+<span style="font-size:15px;color:{{ c.nameColor }}"><span style="border-bottom:{{ c.under }}">{{ c.name }}</span></span>
+<div style="height:6px"><div style="height:6px;width:{{ c.w }}%;background:{{ c.barBg }};border:{{ c.barBorder }};box-sizing:border-box;border-radius:1px"></div></div>
+<span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:500">{{ c.amt }}</span>
+<span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--t2,#6B6760)">{{ c.pct }}</span>
+<span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--t2,#6B6760)">{{ c.prev }}</span>
+<span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:13px">{{ c.delta }}</span>
+</div>
+</sc-for>
+<div style="display:grid;grid-template-columns:160px minmax(0,1fr) 120px 72px 120px 110px;gap:16px;align-items:baseline;padding:12px 0 9px;border-bottom:3px double var(--lf,#1A1A17)">
+<span style="font-size:15px;font-weight:600">Total gastos</span><span></span>
+<span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600">{{ totGasto }}</span>
+<span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--t2,#6B6760)">100 %</span>
+<span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--t2,#6B6760)">{{ totPrev }}</span>
+<span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:13px">{{ totDelta }}</span>
+</div>
+</div>
+
+<div style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:56px;align-items:start">
+<div>
+<div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:8px;border-bottom:1px solid var(--lf,#1A1A17)"><span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase">Patrimonio neto · 12 meses</span><span style="font-size:13px;color:var(--t2,#6B6760)">dic 2025 – hoy</span></div>
+<div style="display:flex;justify-content:space-between;align-items:baseline;padding:18px 0 20px"><span style="font-family:'IBM Plex Mono',monospace;font-size:32px;line-height:36px;font-weight:500;letter-spacing:-0.02em">{{ nwHoy }}</span><span style="font-size:13px;color:var(--t2,#6B6760)"><span style="font-family:'IBM Plex Mono',monospace;color:var(--tx,#1A1A17)">{{ nwDelta }}</span> en 12 meses</span></div>
+<div style="display:flex">{{ chartD }}</div>
+</div>
+<div>
+<div style="padding-bottom:8px;border-bottom:1px solid var(--lf,#1A1A17);font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase">Cambio en octubre</div>
+<sc-for list="{{ bridge }}" as="b" hint-placeholder-count="3">
+<div style="display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--ln,#E4DFD4)"><span style="font-size:15px;color:{{ b.color }}">{{ b.l }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:500">{{ b.v }}</span></div>
+</sc-for>
+<div style="display:flex;justify-content:space-between;align-items:baseline;padding:12px 0 9px;border-bottom:3px double var(--lf,#1A1A17)"><span style="font-size:15px;font-weight:600">Patrimonio al 31 oct</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600">{{ nwOct }}</span></div>
+</div>
+</div>
+</main>
+</div>
+</sc-if>
+
+<sc-if value="{{ mov }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Resumen móvil" style="width:390px;background:var(--bg,#FAF8F3);color:var(--tx,#1A1A17);font-family:'Familjen Grotesk',sans-serif;border:1px solid var(--ln,#E4DFD4);box-sizing:border-box;display:flex;flex-direction:column">
+<div style="height:48px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 30px 6px;font-size:15px;font-weight:600"><span>9:41</span><span style="font-size:12px">5G</span></div>
+<div style="padding:12px 16px 0;display:flex;flex-direction:column;gap:4px">
+<span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--t2,#6B6760)">Resumen del mes</span>
+<div style="display:flex;align-items:center;justify-content:space-between"><h1 style="margin:0;font-size:28px;line-height:34px;font-weight:600;letter-spacing:-0.01em">Octubre 2026</h1><div style="display:flex;margin-right:-10px"><button aria-label="Mes anterior" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--tx,#1A1A17)">{{ ic.chevL }}</button><button aria-label="Mes siguiente" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--tx,#1A1A17)">{{ ic.chevR }}</button></div></div>
+</div>
+
+<div style="padding:20px 16px 0">
+<sc-for list="{{ figsM }}" as="f" hint-placeholder-count="3">
+<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:14px 0 12px;border-top:{{ f.top }};border-bottom:{{ f.bottom }}">
+<span style="font-size:15px;font-weight:{{ f.weight }}">{{ f.label }}</span>
+<div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:{{ f.size }}px;line-height:1.15;font-weight:500;letter-spacing:-0.02em;color:{{ f.color }}">{{ f.amt }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--t2,#6B6760)">{{ f.deltaPct }} vs sept.</span></div>
+</div>
+</sc-for>
+</div>
+
+<div style="padding:40px 16px 0">
+<div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:8px;border-bottom:1px solid var(--lf,#1A1A17)"><span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase">Gasto por categoría</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500">{{ totGasto }}</span></div>
+<sc-for list="{{ cats }}" as="c" hint-placeholder-count="9">
+<div style="display:flex;flex-direction:column;gap:7px;padding:11px 0 12px;border-bottom:1px solid var(--ln,#E4DFD4);border-top:{{ c.top }}">
+<div style="display:grid;grid-template-columns:minmax(0,1fr) auto 52px;gap:12px;align-items:baseline"><span style="font-size:15px;color:{{ c.nameColor }}"><span style="border-bottom:{{ c.under }}">{{ c.name }}</span></span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:500">{{ c.amt }}</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--t2,#6B6760)">{{ c.pct }}</span></div>
+<div style="height:4px;padding-right:64px"><div style="height:4px;width:{{ c.w }}%;background:{{ c.barBg }};border:{{ c.barBorder }};box-sizing:border-box;border-radius:1px"></div></div>
+</div>
+</sc-for>
+<button style="width:100%;min-height:44px;display:flex;align-items:center;gap:6px;padding:12px 0 0;background:none;border:none;font-family:'Familjen Grotesk',sans-serif;font-size:13px;color:var(--t2,#6B6760);text-align:left"><span style="font-family:'IBM Plex Mono',monospace;border-bottom:1px dashed var(--t3,#9A958B)">{{ sinPct }}</span><span>sin categoría, en {{ sinN }} movimientos ·</span><span style="font-weight:600;color:var(--br,#8A5F1F)">Clasificar</span></button>
+</div>
+
+<div style="padding:40px 16px 32px">
+<div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:8px;border-bottom:1px solid var(--lf,#1A1A17)"><span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase">Patrimonio neto · 12 meses</span></div>
+<div style="display:flex;flex-direction:column;gap:2px;padding:16px 0 18px"><span style="font-family:'IBM Plex Mono',monospace;font-size:32px;line-height:36px;font-weight:500;letter-spacing:-0.02em">{{ nwHoy }}</span><span style="font-size:13px;color:var(--t2,#6B6760)"><span style="font-family:'IBM Plex Mono',monospace;color:var(--tx,#1A1A17)">{{ nwDelta }}</span> desde dic 2025</span></div>
+<div style="display:flex">{{ chartM }}</div>
+</div>
+
+<div style="position:sticky;bottom:0;height:84px;box-sizing:border-box;padding-bottom:28px;display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--ln,#E4DFD4);background:var(--bg,#FAF8F3)">
+<sc-for list="{{ tabbar }}" as="t" hint-placeholder-count="5">
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:{{ t.color }};font-size:11px;font-weight:{{ t.weight }}"><span style="display:flex;align-items:center;justify-content:center;width:{{ t.box }}px;height:{{ t.box }}px;border-radius:4px;background:{{ t.bg }};color:{{ t.icColor }}">{{ t.icon }}</span><span>{{ t.label }}</span></div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1024},&quot;modo&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;claro&quot;,&quot;oscuro&quot;],&quot;default&quot;:&quot;claro&quot;,&quot;tsType&quot;:&quot;'claro'|'oscuro'&quot;},&quot;formato&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;escritorio&quot;,&quot;movil&quot;],&quot;default&quot;:&quot;escritorio&quot;,&quot;tsType&quot;:&quot;'escritorio'|'movil'&quot;}}">
+const SVG = (d, s = 20) => React.createElement('svg', { width: s, height: s, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.5, strokeLinecap: 'round', strokeLinejoin: 'round', dangerouslySetInnerHTML: { __html: d } });
+const P = {
+  resumen: '<line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/>',
+  movimientos: '<path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M8 6h13"/>',
+  cuentas: '<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>',
+  deudas: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+  avisos: '<path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/>',
+  recurrentes: '<path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/>',
+  metas: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  inversion: '<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
+  mas: '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>'
+};
+const ICONS = { plus: SVG(P.plus, 18), chevL: SVG('<path d="m15 18-6-6 6-6"/>'), chevR: SVG('<path d="m9 18 6-6-6-6"/>') };
+const MODES = {
+  claro: { '--bg':'#FAF8F3','--sf':'#FFFFFF','--sk':'#F2EEE5','--tx':'#1A1A17','--t2':'#6B6760','--t3':'#9A958B','--ln':'#E4DFD4','--lf':'#1A1A17','--br':'#8A5F1F','--in':'#2F7D5A','--out':'#B0452E' },
+  oscuro: { '--bg':'#12141A','--sf':'#181B22','--sk':'#1F232C','--tx':'#E8E4DC','--t2':'#8B8A84','--t3':'#5E5F63','--ln':'#272B34','--lf':'#8B8A84','--br':'#BC8A3E','--in':'#4E9E78','--out':'#D0664B' }
+};
+const OCT = { Casa:1146800, Comida:647400, Salidas:164300, Servicios:146180, Transporte:138700, Salud:118450, Suscripciones:47700, Otros:38900 };
+const SEP = { Casa:1139250, Comida:702150, Salidas:196300, Servicios:151320, Transporte:162400, Salud:118450, Suscripciones:47700, Otros:38740 };
+const SIN = { oct:212940, sep:318600, n:14 };
+const ING = { oct:4262500, sep:4200000 };
+const NW = [['dic',27412380],['ene',27958110],['feb',28301645],['mar',28077920],['abr',29115430],['may',29884210],['jun',30402775],['jul',31268940],['ago',31050315],['sep',32106940],['oct',33784215],['hoy',34121072]];
+const REVAL = 76145;
+const fmt = n => String(Math.abs(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+const fs = n => n > 0 ? '+' + fmt(n) : n < 0 ? '−' + fmt(n) : '0';
+const pc = (v, d = 1) => v.toFixed(d).replace('.', ',') + ' %';
+const pd = (a, b) => { const p = (a - b) / b * 100; return (p > 0 ? '+' : p < 0 ? '−' : '') + pc(Math.abs(p)); };
+
+function chart(w, h) {
+  const e = React.createElement;
+  const L = 14, R = w - 44, T = 8, B = h - 28, min = 26.5e6, max = 35e6;
+  const x = i => L + (R - L) * i / 11, y = v => B - (B - T) * (v - min) / (max - min);
+  const mono = { fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, fill: 'var(--t2,#6B6760)' };
+  const k = [];
+  [28e6, 31e6, 34e6].forEach(g => {
+    k.push(e('line', { key: 'g' + g, x1: 0, x2: R + 8, y1: y(g), y2: y(g), style: { stroke: 'var(--ln,#E4DFD4)' }, strokeWidth: 1 }));
+    k.push(e('text', { key: 't' + g, x: w, y: y(g) + 4, textAnchor: 'end', style: mono }, (g / 1e6) + ' M'));
+  });
+  k.push(e('line', { key: 'base', x1: 0, x2: R + 8, y1: B + 6, y2: B + 6, style: { stroke: 'var(--lf,#1A1A17)' }, strokeWidth: 1 }));
+  k.push(e('polyline', { key: 'p', points: NW.map((d, i) => x(i) + ',' + y(d[1])).join(' '), fill: 'none', style: { stroke: 'var(--tx,#1A1A17)' }, strokeWidth: 1.5, strokeLinejoin: 'round' }));
+  NW.forEach((d, i) => {
+    k.push(e('circle', { key: 'c' + i, cx: x(i), cy: y(d[1]), r: i === 11 ? 3.5 : 2.2, style: { fill: i === 11 ? 'var(--tx,#1A1A17)' : 'var(--bg,#FAF8F3)', stroke: 'var(--tx,#1A1A17)' }, strokeWidth: 1.5 }));
+    k.push(e('text', { key: 'm' + i, x: x(i), y: h - 4, textAnchor: 'middle', style: { ...mono, fill: i === 11 ? 'var(--tx,#1A1A17)' : 'var(--t2,#6B6760)' } }, d[0]));
+  });
+  return e('svg', { width: w, height: h, viewBox: `0 0 ${w} ${h}`, style: { display: 'block', overflow: 'visible' } }, k);
+}
+
+class Component extends DCLogic {
+  renderVals() {
+    const modo = this.props.modo ?? 'claro';
+    const esc = (this.props.formato ?? 'escritorio') === 'escritorio';
+    const totO = Object.values(OCT).reduce((a, b) => a + b, 0) + SIN.oct;
+    const totS = Object.values(SEP).reduce((a, b) => a + b, 0) + SIN.sep;
+    const netO = ING.oct - totO, netS = ING.sep - totS;
+    const names = Object.keys(OCT).sort((a, b) => OCT[b] - OCT[a]);
+    const maxV = OCT[names[0]];
+    const cats = names.map(n => ({ name:n, amt: fmt(OCT[n]), pct: pc(OCT[n] / totO * 100), prev: fmt(SEP[n]), delta: fs(OCT[n] - SEP[n]), w: OCT[n] / maxV * 100, barBg:'var(--tx,#1A1A17)', barBorder:'none', under:'none', nameColor:'var(--tx,#1A1A17)', top:'none' }))
+      .concat([{ name:'Sin categoría', amt: fmt(SIN.oct), pct: pc(SIN.oct / totO * 100), prev: fmt(SIN.sep), delta: fs(SIN.oct - SIN.sep), w: SIN.oct / maxV * 100, barBg:'transparent', barBorder:'1px dashed var(--t3,#9A958B)', under:'1px dashed var(--t3,#9A958B)', nameColor:'var(--t2,#6B6760)', top:'1px dashed var(--t3,#9A958B)' }]);
+    const figs = [
+      { label:'Ingresos', amt:'+' + fmt(ING.oct), color:'var(--in,#2F7D5A)', prev: fmt(ING.sep), delta: fs(ING.oct - ING.sep), deltaPct: pd(ING.oct, ING.sep) },
+      { label:'Gastos', amt:'−' + fmt(totO), color:'var(--out,#B0452E)', prev: fmt(totS), delta: fs(totO - totS), deltaPct: pd(totO, totS) },
+      { label:'Resultado neto', amt: fs(netO), color:'var(--tx,#1A1A17)', prev: fs(netS), delta: fs(netO - netS), deltaPct: pd(netO, netS) }
+    ].map((f, i) => ({ ...f, sep: i ? '1px solid var(--ln,#E4DFD4)' : 'none', pl: i ? '28px' : '0' }));
+    const figsM = figs.map((f, i) => ({ ...f, size: i === 2 ? 32 : 24, weight: i === 2 ? 600 : 400, top: i === 2 ? '1px solid var(--lf,#1A1A17)' : 'none', bottom: i === 2 ? '3px double var(--lf,#1A1A17)' : '1px solid var(--ln,#E4DFD4)' }));
+    const navDef = [['resumen','Resumen'],['movimientos','Movimientos'],['cuentas','Cuentas'],['deudas','Deudas y préstamos'],['recurrentes','Recurrentes'],['inversion','Inversiones'],['metas','Metas'],['avisos','Avisos']];
+    const nav = navDef.map(([k, label]) => ({ label, icon: SVG(P[k]), badge: k === 'avisos' ? '3' : '', bg: k === 'resumen' ? 'var(--sk,#F2EEE5)' : 'transparent', color: k === 'resumen' ? 'var(--tx,#1A1A17)' : 'var(--t2,#6B6760)', weight: k === 'resumen' ? 600 : 400 }));
+    const tabbar = [['resumen','Resumen'],['movimientos','Movimientos'],['plus','Registrar'],['cuentas','Cuentas'],['mas','Más']].map(([k, label]) => ({ label, icon: SVG(P[k], k === 'plus' ? 22 : 20), box: k === 'plus' ? 40 : 24, bg: k === 'plus' ? 'var(--tx,#1A1A17)' : 'transparent', icColor: k === 'plus' ? 'var(--bg,#FAF8F3)' : 'inherit', color: k === 'resumen' ? 'var(--tx,#1A1A17)' : 'var(--t2,#6B6760)', weight: k === 'resumen' ? 600 : 400 }));
+    const nwSep = NW[9][1], nwOct = NW[10][1];
+    return {
+      vars: MODES[modo] || MODES.claro, esc, mov: !esc, ic: ICONS, nav, tabbar,
+      figs, figsM, cats,
+      totGasto: fmt(totO), totPrev: fmt(totS), totDelta: fs(totO - totS),
+      sinPct: pc(SIN.oct / totO * 100, 0), sinN: SIN.n,
+      nwHoy: fmt(NW[11][1]), nwDelta: fs(NW[11][1] - NW[0][1]), nwOct: fmt(nwOct),
+      bridge: [
+        { l:'Patrimonio al 30 sep', v: fmt(nwSep), color:'var(--t2,#6B6760)' },
+        { l:'Resultado del mes', v: fs(netO), color:'var(--tx,#1A1A17)' },
+        { l:'Revaluación eToro', v: fs(nwOct - nwSep - netO), color:'var(--tx,#1A1A17)' }
+      ],
+      chartD: esc ? chart(690, 240) : null,
+      chartM: esc ? null : chart(358, 180)
+    };
+  }
+}
+</script>
+</body>
+</html>
