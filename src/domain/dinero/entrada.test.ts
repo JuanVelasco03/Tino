@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { aDigitos, desdeMonto, formatearEntradaPesos } from "./entrada";
+import { aDigitos, aplicarTecla, desdeMonto, formatearEntradaPesos, type TeclaNumerica } from "./entrada";
 
 describe("formatearEntradaPesos", () => {
   it.each<[string, string]>([
@@ -64,5 +64,38 @@ describe("desdeMonto", () => {
     [9_007_199_254_740_993n, "9.007.199.254.740.993"],
   ])("%s → %j", (monto, esperado) => {
     expect(desdeMonto(monto)).toBe(esperado);
+  });
+});
+
+describe("aplicarTecla", () => {
+  function teclear(teclas: TeclaNumerica[], inicial = ""): string {
+    return teclas.reduce(aplicarTecla, inicial);
+  }
+
+  it("1, 5, 000 → 15.000", () => {
+    expect(teclear(["1", "5", "000"])).toBe("15.000");
+  });
+
+  it("0 o 000 como primera tecla no escriben nada", () => {
+    expect(teclear(["0"])).toBe("");
+    expect(teclear(["000"])).toBe("");
+    expect(teclear(["0", "0", "7"])).toBe("7");
+  });
+
+  it("los ceros después de otro dígito sí cuentan", () => {
+    expect(teclear(["1", "0", "0"])).toBe("100");
+  });
+
+  it("borrar quita un dígito y reagrupa", () => {
+    expect(aplicarTecla("15.000", "borrar")).toBe("1.500");
+    expect(aplicarTecla("5", "borrar")).toBe("");
+    expect(aplicarTecla("", "borrar")).toBe("");
+  });
+
+  it("no pasa de 19 dígitos", () => {
+    const lleno = teclear(Array<TeclaNumerica>(19).fill("9"));
+    expect(lleno.replace(/\./g, "")).toHaveLength(19);
+    expect(aplicarTecla(lleno, "1")).toBe(lleno);
+    expect(aplicarTecla(teclear(Array<TeclaNumerica>(17).fill("9")), "000").replace(/\./g, "")).toHaveLength(17);
   });
 });

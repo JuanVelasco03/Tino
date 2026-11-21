@@ -1,6 +1,6 @@
 # SPEC 05 — Captura rápida y movimientos del mes
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 03, SPEC 04, Tino-API SPEC 04
 > **Fecha:** 2026-11-19
 > **Objetivo:** Que el usuario registre un gasto, ingreso o transferencia en menos de diez segundos desde cualquier página, y lo vea arriba de la lista de movimientos del mes.

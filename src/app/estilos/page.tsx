@@ -19,7 +19,17 @@ import { TarjetaCuenta } from "@/components/tarjeta-cuenta";
 import type { TipoCuenta } from "@/domain/cuenta/naturaleza";
 import { formatearEquivalencia } from "@/domain/dinero/formato";
 import { AlternarTema } from "./alternar-tema";
-import { MuestraMontoEditable, MuestraOpcionUnica, MuestraPanelLateral } from "./muestras-interactivas";
+import {
+  MuestraAvisoRegistro,
+  MuestraChipsInteractivos,
+  MuestraEstadoVacioBoton,
+  MuestraFichasCuenta,
+  MuestraMontoEditable,
+  MuestraOpcionUnica,
+  MuestraPanelLateral,
+  MuestraSelectorTipo,
+  MuestraTeclado,
+} from "./muestras-interactivas";
 
 export const metadata = { title: "Estilos · Tino" };
 
@@ -153,10 +163,12 @@ function Componentes({ modo }: { modo: "light" | "dark" }) {
       <div>
         <Etiqueta>C2 · Fila de movimiento · lista general</Etiqueta>
         <div className="border-t border-linea">
-          <FilaMovimiento fecha="04 nov" concepto="Almuerzo corrientazo" tipo="gasto" tipoCuenta="banco" monto={{ monto: 18_500n, moneda: "COP" }} categoria="Comida" cuenta="Nequi" omitirCOP />
-          <FilaMovimiento fecha="03 nov" concepto="Compra D1" tipo="gasto" tipoCuenta="tarjeta_credito" monto={{ monto: 27_900n, moneda: "COP" }} categoria={null} cuenta="Visa Oro" omitirCOP />
+          <FilaMovimiento fecha="04 nov" concepto="Almuerzo corrientazo" tipo="gasto" monto={{ monto: 18_500n, moneda: "COP" }} categoria="Comida" cuenta="Nequi" omitirCOP />
+          <FilaMovimiento fecha="03 nov" concepto="Compra D1" tipo="gasto" monto={{ monto: 27_900n, moneda: "COP" }} categoria={null} cuenta="Visa Oro" omitirCOP />
           <FilaMovimiento fecha="02 nov" concepto="Pago tarjeta" tipo="transferencia" transferencia={{ origen: "Bancolombia", destino: "Visa Oro" }} monto={{ monto: 1_200_000n, moneda: "COP" }} omitirCOP />
-          <FilaMovimiento fecha="01 nov" concepto="Nómina octubre" tipo="ingreso" tipoCuenta="banco" monto={{ monto: 4_850_000n, moneda: "COP" }} categoria="Salario" cuenta="Bancolombia" omitirCOP />
+          <FilaMovimiento fecha="19 nov" concepto="Almuerzo · recién registrado" tipo="gasto" monto={{ monto: 15_000n, moneda: "COP" }} categoria="Comida" cuenta="Nequi" omitirCOP resaltada />
+          <FilaMovimiento fecha="18 nov" concepto="Almuerzo y mercado" tipo="gasto" monto={{ monto: 30_000n, moneda: "COP" }} categoria="Dividido" cuenta="Nequi" omitirCOP />
+          <FilaMovimiento fecha="01 nov" concepto="Nómina octubre" tipo="ingreso" monto={{ monto: 4_850_000n, moneda: "COP" }} categoria="Salario" cuenta="Bancolombia" omitirCOP />
           <FilaMovimiento fecha="01 nov" concepto="Compra VOO" tipo="transferencia" transferencia={{ origen: "Bancolombia", destino: "Interactive Brokers" }} monto={{ monto: 50_000n, moneda: "USD" }} equivalenteCOP={2_050_000n} omitirCOP />
         </div>
       </div>
@@ -197,6 +209,11 @@ function Componentes({ modo }: { modo: "light" | "dark" }) {
       </div>
 
       <div>
+        <Etiqueta>C5 · Chip de categoría interactivo · tocar la propuesta la quita</Etiqueta>
+        <MuestraChipsInteractivos />
+      </div>
+
+      <div>
         <Etiqueta>C6 · Botones</Etiqueta>
         <div className="flex flex-wrap items-center gap-3">
           <Boton monto="18.500">Registrar gasto</Boton>
@@ -214,6 +231,11 @@ function Componentes({ modo }: { modo: "light" | "dark" }) {
           detalle="Lo que registres aparecerá aquí por fecha, con el saldo al lado."
           accion={{ etiqueta: "Registrar el primero", href: "#" }}
         />
+      </div>
+
+      <div>
+        <Etiqueta>C7 · Estado vacío · acción que abre la captura</Etiqueta>
+        <MuestraEstadoVacioBoton />
       </div>
 
       <div>
@@ -247,6 +269,26 @@ function Componentes({ modo }: { modo: "light" | "dark" }) {
       <div>
         <Etiqueta>C34 · Opción única</Etiqueta>
         <MuestraOpcionUnica sufijo={modo} />
+      </div>
+
+      <div>
+        <Etiqueta>Selector de tipo · segmentado (escritorio) y pestañas (móvil)</Etiqueta>
+        <MuestraSelectorTipo />
+      </div>
+
+      <div>
+        <Etiqueta>Ficha de cuenta · vista previa del saldo en la elegida</Etiqueta>
+        <MuestraFichasCuenta />
+      </div>
+
+      <div>
+        <Etiqueta>Aviso de registro · deshacer y oferta de regla</Etiqueta>
+        <MuestraAvisoRegistro />
+      </div>
+
+      <div>
+        <Etiqueta>Teclado numérico · captura en móvil</Etiqueta>
+        <MuestraTeclado />
       </div>
     </>
   );

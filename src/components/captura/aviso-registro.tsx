@@ -1,0 +1,109 @@
+import { Check } from "lucide-react";
+import { formatearDinero } from "@/domain/dinero/formato";
+import type { TipoMovimiento } from "@/domain/movimiento/cuerpo";
+import { importeEnPatrimonio } from "@/domain/movimiento/vista-previa";
+import { Boton } from "../boton";
+import { MensajeError } from "../mensaje-error";
+
+const ROTULO_TIPO: Record<TipoMovimiento, string> = { gasto: "Gasto", ingreso: "Ingreso", transferencia: "Transferencia" };
+
+export type DatosAviso = {
+  tipo: TipoMovimiento;
+  /** Siempre positivo. */
+  monto: bigint;
+  descripcion: string | null;
+  /** «Nequi»; en transferencia, «Nequi → Visa Oro». */
+  cuenta: string;
+  alDeshacer: () => void;
+  deshaciendo: boolean;
+  error?: string | null;
+};
+
+export type DatosOferta = {
+  /** «¿Siempre «peluquería» → Hogar?». */
+  pregunta: string;
+  /** «Crear regla» o «Cambiar regla». */
+  accion: string;
+  alAceptar: () => void;
+  alRechazar: () => void;
+  pendiente: boolean;
+  error?: string | null;
+};
+
+type Props = {
+  /** `panel`: escritorio, una línea con «Registrado: …». `hoja`: móvil, compacto, sobre el botón. */
+  formato?: "panel" | "hoja";
+  aviso?: DatosAviso | null;
+  oferta?: DatosOferta | null;
+};
+
+/** Importe con signo y color desde el patrimonio: gasto −, ingreso +, transferencia sin signo. */
+function Importe({ tipo, monto }: { tipo: TipoMovimiento; monto: bigint }) {
+  const efecto = importeEnPatrimonio(tipo, monto);
+  const cifra = formatearDinero({ monto: efecto ?? monto, moneda: "COP" }, { omitirCOP: true, signoMas: efecto !== null });
+  const color = efecto === null ? "" : efecto < 0n ? "text-salida-texto" : "text-entrada-texto";
+  return <span className={`whitespace-nowrap font-mono text-cifra-s tabular-nums ${color}`}>{cifra}</span>;
+}
+
+/**
+ * Aviso tras registrar: «Registrado: …» con «Deshacer» durante 5 s y, si
+ * aplica, la oferta de crear o ajustar la regla (RN-11), que sigue hasta que
+ * el usuario responde o registra otro. Sin sombra: borde de renglón.
+ */
+export function AvisoRegistro({ formato = "panel", aviso, oferta }: Props) {
+  if (!aviso && !oferta) return null;
+  const enHoja = formato === "hoja";
+
+  return (
+    <div
+      role="status"
+      className={`flex flex-col rounded-campo border border-linea ${enHoja ? "bg-superficie" : "bg-fondo"}`}
+    >
+      {aviso && (
+        <div className="flex flex-col pl-3">
+          <div className="flex min-h-11 items-center gap-3">
+            <span className="flex text-entrada">
+              <Check size={16} strokeWidth={1.5} aria-hidden />
+            </span>
+            {enHoja ? (
+              <>
+                <span className="min-w-0 flex-1 truncate text-cuerpo">
+                  {aviso.descripcion ?? ROTULO_TIPO[aviso.tipo]} · {aviso.cuenta}
+                </span>
+                <Importe tipo={aviso.tipo} monto={aviso.monto} />
+              </>
+            ) : (
+              <span className="min-w-0 flex-1 text-cuerpo">
+                Registrado: {aviso.descripcion ?? ROTULO_TIPO[aviso.tipo]} <Importe tipo={aviso.tipo} monto={aviso.monto} /> en{" "}
+                {aviso.cuenta}
+              </span>
+            )}
+            <Boton variante="texto" onClick={aviso.alDeshacer} disabled={aviso.deshaciendo} className="h-11 shrink-0 px-3">
+              {aviso.deshaciendo ? "Deshaciendo…" : "Deshacer"}
+            </Boton>
+          </div>
+          {aviso.error && <MensajeError mensaje={aviso.error} className="pr-3 pb-2" />}
+        </div>
+      )}
+      {oferta && (
+        <div className={`flex flex-col pl-3 ${aviso ? "border-t border-linea" : ""}`}>
+          <div className="flex min-h-11 flex-wrap items-center gap-x-3">
+            <span className="min-w-0 flex-1 py-2 text-etiqueta text-secundario">{oferta.pregunta}</span>
+            <span className="flex shrink-0 items-center">
+              <Boton variante="texto" onClick={oferta.alAceptar} disabled={oferta.pendiente} className="h-11 px-2">
+                {oferta.pendiente ? "Guardando…" : oferta.accion}
+              </Boton>
+              <span aria-hidden className="text-terciario">
+                ·
+              </span>
+              <Boton variante="texto" onClick={oferta.alRechazar} disabled={oferta.pendiente} className="h-11 px-3">
+                No
+              </Boton>
+            </span>
+          </div>
+          {oferta.error && <MensajeError mensaje={oferta.error} className="pr-3 pb-2" />}
+        </div>
+      )}
+    </div>
+  );
+}

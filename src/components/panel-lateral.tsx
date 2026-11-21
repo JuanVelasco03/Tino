@@ -26,6 +26,13 @@ type Props = {
    */
   alSolicitarCierre: () => void;
   children: ReactNode;
+  /**
+   * `normal`: 400 px (C22). `amplio`: 480 px, para formularios en dos
+   * columnas (la captura rápida). Solo cambia el ancho en escritorio.
+   */
+  ancho?: "normal" | "amplio";
+  /** Pie fijo bajo el contenido desplazable, sobre una división (la acción principal). */
+  pie?: ReactNode;
   ref?: Ref<ControlPanel>;
 };
 
@@ -51,6 +58,8 @@ function recorrido(): Recorrido {
   return { hoja: [{ transform: "translateY(100%)" }, { transform: "none" }], entrada: 380, salida: 200 };
 }
 
+const ANCHOS = { normal: "md:w-[400px]", amplio: "md:w-[480px]" } as const;
+
 const VELO: Keyframe[] = [{ opacity: 0 }, { opacity: 1 }];
 
 /** `::backdrop` con WAAPI no existe en todos los navegadores: sin él, el velo aparece sin fundido. */
@@ -64,10 +73,10 @@ function animarVelo(el: HTMLElement, opciones: KeyframeAnimationOptions): Animat
 
 /**
  * C22 · Panel lateral. `<dialog>` modal (foco atrapado, fondo inerte, capa
- * superior). Escritorio (md+): hoja de 400 px a la derecha, alto completo,
+ * superior). Escritorio (md+): hoja de 400 px (480 en `amplio`) a la derecha, alto completo,
  * raya a la izquierda. Móvil: hoja inferior de ancho completo. Sin sombra.
  */
-export function PanelLateral({ titulo, alSolicitarCierre, children, ref }: Props) {
+export function PanelLateral({ titulo, alSolicitarCierre, children, ancho = "normal", pie, ref }: Props) {
   const dialogo = useRef<HTMLDialogElement>(null);
   const salida = useRef<Promise<void> | null>(null);
   const idTitulo = useId();
@@ -134,7 +143,7 @@ export function PanelLateral({ titulo, alSolicitarCierre, children, ref }: Props
       aria-labelledby={idTitulo}
       onCancel={alCancelar}
       onClick={alPulsar}
-      className="fixed inset-x-0 top-auto bottom-0 m-0 max-h-[90dvh] w-full max-w-none overflow-hidden rounded-t-hoja border-0 border-t border-raya bg-superficie p-0 text-texto backdrop:bg-fondo/60 md:inset-y-0 md:right-0 md:left-auto md:h-dvh md:max-h-none md:w-[400px] md:rounded-none md:border-t-0 md:border-l"
+      className={`fixed inset-x-0 top-auto bottom-0 m-0 max-h-[90dvh] w-full max-w-none overflow-hidden rounded-t-hoja border-0 border-t border-raya bg-superficie p-0 text-texto backdrop:bg-fondo/60 md:inset-y-0 md:right-0 md:left-auto md:h-dvh md:max-h-none md:rounded-none md:border-t-0 md:border-l ${ANCHOS[ancho]}`}
     >
       <div className="flex max-h-[90dvh] flex-col md:h-dvh md:max-h-none">
         <div className="flex h-14 shrink-0 items-center justify-between border-b border-raya px-4 md:px-6">
@@ -145,9 +154,16 @@ export function PanelLateral({ titulo, alSolicitarCierre, children, ref }: Props
             Cerrar
           </button>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-6 pb-[max(24px,env(safe-area-inset-bottom))] md:px-6">
+        <div
+          className={`min-h-0 flex-1 overflow-y-auto px-4 pt-6 md:px-6 ${pie ? "pb-6" : "pb-[max(24px,env(safe-area-inset-bottom))]"}`}
+        >
           {children}
         </div>
+        {pie && (
+          <div className="shrink-0 border-t border-linea px-4 pt-4 pb-[max(24px,env(safe-area-inset-bottom))] md:px-6">
+            {pie}
+          </div>
+        )}
       </div>
     </dialog>
   );

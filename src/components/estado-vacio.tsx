@@ -7,13 +7,18 @@ type Props = {
   titulo: string;
   detalle: string;
   /**
-   * Enlace, o botón deshabilitado («Próximamente») mientras el destino no existe.
+   * Enlace; botón (`alPulsar`) si la acción no navega, como abrir la captura;
+   * o botón deshabilitado («Próximamente») mientras el destino no existe.
    * `scroll: false` conserva la posición (p. ej. al abrir un panel por URL).
    */
-  accion: { etiqueta: string; href: string; scroll?: boolean } | { etiqueta: string; deshabilitada: true };
+  accion:
+    | { etiqueta: string; href: string; scroll?: boolean }
+    | { etiqueta: string; alPulsar: () => void }
+    | { etiqueta: string; deshabilitada: true };
 };
 
 /** Misma caja que `EnlaceTexto` (44 px), para que el estado deshabilitado no salte. */
+const ACCION = "mt-1 inline-flex h-11 items-center gap-2 text-cuerpo font-semibold";
 const ACCION_DESHABILITADA =
   "mt-1 inline-flex h-11 cursor-not-allowed items-center gap-2 text-cuerpo font-semibold text-terciario";
 
@@ -38,6 +43,12 @@ export function EstadoVacio({ rotulo, titulo, detalle, accion }: Props) {
             <Plus size={16} strokeWidth={1.5} aria-hidden />
             {accion.etiqueta}
           </EnlaceTexto>
+        ) : "alPulsar" in accion ? (
+          // Mismo aspecto que `EnlaceTexto`, pero no navega.
+          <button type="button" onClick={accion.alPulsar} className={`${ACCION} text-marca-texto`}>
+            <Plus size={16} strokeWidth={1.5} aria-hidden />
+            {accion.etiqueta}
+          </button>
         ) : (
           <button
             type="button"

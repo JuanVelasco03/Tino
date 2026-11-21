@@ -161,6 +161,30 @@ components:
     backgroundColor: "{colors.superficie}"
     textColor: "{colors.texto}"
     width: "400px"
+  panel-lateral-amplio:
+    backgroundColor: "{colors.superficie}"
+    textColor: "{colors.texto}"
+    width: "480px"
+  selector-tipo-activo:
+    backgroundColor: "{colors.texto}"
+    textColor: "{colors.fondo}"
+    rounded: "{rounded.campo}"
+    height: "40px"
+  ficha-cuenta:
+    backgroundColor: "{colors.superficie}"
+    rounded: "{rounded.campo}"
+    padding: "8px 12px"
+    height: "48px"
+  aviso-registro:
+    backgroundColor: "{colors.fondo}"
+    rounded: "{rounded.campo}"
+    height: "44px"
+  teclado-numerico:
+    backgroundColor: "{colors.fondo}"
+    textColor: "{colors.texto}"
+    typography: "{typography.cifra-m}"
+    rounded: "{rounded.fila}"
+    height: "56px"
   menu-entrada-activa:
     backgroundColor: "{colors.hundido}"
     textColor: "{colors.texto}"
@@ -228,7 +252,7 @@ El modo oscuro se aplica con `@media (prefers-color-scheme: dark)` bajo `:root:n
 ### Named Rules
 **The Ink-Only Accent Rule.** Los acentos son texto, iconos, cifras o gráficas finas (barras de cupo de 4 px, el cursor de 2 px). Nunca rellenan un bloque, un botón ni un fondo de fila.
 
-**The Patrimony Sign Rule.** En la lista general, toda cifra se lee desde el patrimonio del usuario: salida con `−` (U+2212) en terracota, entrada con `+` en verde, transferencia en tinta y sin signo. El signo lo decide `src/domain/cuenta/naturaleza.ts` (RN-02); ningún componente lo recalcula.
+**The Patrimony Sign Rule.** En la lista general, toda cifra se lee desde el patrimonio del usuario: salida con `−` (U+2212) en terracota, entrada con `+` en verde, transferencia en tinta y sin signo. El signo lo decide el dominio (RN-02): `efectoEnPatrimonio` en `src/domain/cuenta/naturaleza.ts` y, para un movimiento, `importeEnPatrimonio` en `src/domain/movimiento/vista-previa.ts` (gasto −, ingreso +, transferencia sin signo; coincide con el anterior para cualquier cuenta). Ningún componente lo recalcula.
 
 **The Small-Text Variant Rule.** Por debajo de 24 px, un acento siempre usa su variante `-texto`.
 
@@ -273,7 +297,9 @@ Texto:
 
 **Filas y columnas:** las listas son grids con columnas fijas. La fila de movimiento usa `52px | flexible | auto`, con 12 px entre columnas y alineación por línea base. Las cifras siempre se alinean a la derecha. Objetivo táctil mínimo de 44 px en móvil (los chips crecen de 36 a 44 px).
 
-**Paneles:** en escritorio, una hoja lateral de 400 px a todo el alto con raya a la izquierda. En móvil, una hoja inferior de ancho completo (hasta 90 dvh) con radio superior de 6 px. El velo oscurece el libro con `fondo` al 60 %.
+**Paneles:** en escritorio, una hoja lateral de 400 px a todo el alto con raya a la izquierda; 480 px (`ancho="amplio"`) cuando el formulario necesita dos columnas, como la captura rápida. Un panel puede llevar un pie fijo (la acción principal) bajo el contenido desplazable, sobre una división. En móvil, una hoja inferior de ancho completo (hasta 90 dvh) con radio superior de 6 px. El velo oscurece el libro con `fondo` al 60 %.
+
+**Captura rápida en móvil:** no es un panel sino una hoja a pantalla completa (`<dialog>`, por encima de la barra de pestañas): cabecera de 56 px con cerrar, tipos y «Hoy −X»; el monto en el centro (`cifra-xl`, `cifra-campo` si pasa de 9 caracteres); los conceptos en una fila desplazable de chips; la fila Categoría │ Cuenta │ Fecha (56 px, cada celda abre una hoja inferior con «Listo»); el teclado numérico; y el botón. El aviso de registro flota sobre el botón.
 
 **Movimiento:** se usa solo para explicar un cambio de estado. Siempre se sale más rápido de lo que se entra. Las curvas son tokens de `globals.css` y nunca se escriben a mano:
 - **Llegada** (`--llegada`, `ease-llegada`; `cubic-bezier(0.16, 1, 0.3, 1)`): desaceleración marcada, para lo que entra en escena.
@@ -283,7 +309,7 @@ Texto:
 En JavaScript (Web Animations), las curvas se leen de esas variables, porque WAAPI no acepta `var()`. Las duraciones no son tokens y van con la utilidad `duration-*`.
 
 Hay dos movimientos:
-- **Panel lateral:** la hoja llega desde el borde en que se ancla y el velo oscurece el libro a la vez. Entra con llegada (320 ms escritorio, 380 ms móvil) y sale con retirada (180 / 200 ms). La salida termina antes de que cambie la URL.
+- **Panel lateral:** la hoja llega desde el borde en que se ancla y el velo oscurece el libro a la vez. Entra con llegada (320 ms escritorio, 380 ms móvil) y sale con retirada (180 / 200 ms). La salida termina antes de que cambie la URL. La hoja de captura móvil sube desde abajo con las mismas medidas que el panel en móvil.
 - **Despliegue de un campo:** un campo que depende de otro (el cupo al elegir tarjeta) se abre en su lugar. La fila crece de `0fr` a `1fr` en `grid-template-rows`, sin animar `height`, y el campo aparece con un fundido y baja 4 px. Entra con despliegue en 300 ms y sale con retirada en 180 ms. Plegado queda `inert`.
 
 Con movimiento reducido no hay desplazamiento, pero se conserva la opacidad: el panel se funde (150 / 120 ms) y el campo cambia de alto de golpe.
@@ -332,6 +358,8 @@ Tinta llena o línea fina, sin relieve.
 - **Estilo:** fondo `superficie`, borde `linea`, radio de campo, 36 px de alto en escritorio y 44 px en móvil.
 - **Seleccionado o sugerido:** borde `texto`, peso 500 y marca de verificación de 16 px. El sugerido añade «auto» en mono `rotulo` latón, porque lo puso una regla de texto.
 - **Sin clasificar:** borde discontinuo `terciario`, texto `secundario`.
+- **Interactivo:** con `onClick` es un interruptor (`aria-pressed`). En la captura, tocar el sugerido lo quita (RN-11: la regla propone, el usuario dispone) y se registra sin clasificar; tocar otro lo elige. Sobre los chips, «Sugerida por «palabra»» en `etiqueta` latón.
+- **Como opción:** el mismo chip sirve para elegir entre opciones cortas que no son categorías (conceptos frecuentes; Hoy · Ayer · Anteayer · Otra fecha).
 
 ### Tarjeta de cuenta (C3)
 - **Activo:** hoja: fondo `superficie`, borde `linea`, radio de hoja, 16 px de relleno.
@@ -344,7 +372,7 @@ La versión en lista de la cuenta, dentro de un grupo de Activos («Lo que tiene
 - **Como enlace:** fuera del modo «Ordenar», toda la fila es un enlace a su edición y toma fondo `hundido` al pasar el cursor, de borde a borde de la hoja; el foco va por dentro de la fila. En «Ordenar» deja de serlo y muestra el agarre y las flechas de 44 px.
 
 ### Campos
-- **Campo de monto (C4):** sin caja, con raya inferior (en `salida` si hay error). Etiqueta en `etiqueta` secundario, cifra en `cifra-campo` y moneda a la derecha. Vacío muestra un «0» en `terciario` y un cursor de 2 px en latón. En USD lleva la equivalencia debajo. Al escribir formatea los pesos sin mover el cursor. Con foco, la raya pasa a latón y el contorno de foco rodea el campo entero (etiqueta, cifra y moneda), no solo la cifra.
+- **Campo de monto (C4):** sin caja, con raya inferior (en `salida` si hay error). Con `signo`, lleva delante `−` o `+` en la base del acento (la cifra mide 44 px). Etiqueta en `etiqueta` secundario, cifra en `cifra-campo` y moneda a la derecha. Vacío muestra un «0» en `terciario` y un cursor de 2 px en latón. En USD lleva la equivalencia debajo. Al escribir formatea los pesos sin mover el cursor. Con foco, la raya pasa a latón y el contorno de foco rodea el campo entero (etiqueta, cifra y moneda), no solo la cifra.
 - **Campo subrayado (`CampoSubrayado`):** etiqueta arriba y texto sobre una línea `linea` que pasa a `raya` con el foco. 44 px de alto. Con la prop `error`, la línea pasa a terracota (`salida`), el input queda con `aria-invalid` y el mensaje va debajo, enlazado con `aria-describedby`.
 - **Mensaje de error (`MensajeError`):** `etiqueta` con `font-normal` en `salida-texto` y `role="alert"`, bajo el campo o al pie del bloque. Es el único modo de mostrar un error; no se escribe el párrafo a mano. Los campos (`CampoSubrayado`, `CampoMonto`, `OpcionUnica`) lo usan a través de su prop `error`.
 - **Nota:** `etiqueta` con `font-normal` en `secundario` («Cambiarlo queda registrado.»).
@@ -356,16 +384,33 @@ Filas de 44 px separadas por divisiones, con un radio nativo oculto y dibujado c
 Rótulo en MAYÚSCULAS a la izquierda y cifra-s a la derecha, alineados por línea base sobre una raya, con 8 px de relleno inferior. Entre grupos se separa con 24 px de espacio, nunca con otra línea.
 
 ### Fila de movimiento (C2)
-Sin icono. Grid `52px | flexible | auto` con división inferior y 12 px de relleno vertical. Fecha en cifra-xs secundaria, concepto en cuerpo, y debajo categoría · cuenta en `etiqueta` secundaria (sin clasificar: «Sin clasificar» con línea punteada). Monto en cifra-s con signo y color según patrimonio; en USD, la equivalencia debajo.
+Sin icono. Grid `52px | flexible | auto` con división inferior y 12 px de relleno vertical. Fecha en cifra-xs secundaria, concepto en cuerpo, y debajo categoría · cuenta en `etiqueta` secundaria (sin clasificar: «Sin clasificar» con línea punteada; con partes: «Dividido»). Monto en cifra-s con signo y color según patrimonio, tomado del tipo; en USD, la equivalencia debajo. El recién registrado (`resaltada`) toma fondo `hundido` y peso 600 en concepto y monto mientras dura su aviso.
+
+### Libro de movimientos (`/movimientos`)
+En escritorio, rejilla de cuatro columnas `52px | flexible | hasta 176px | 128px` (Fecha, Descripción con la categoría debajo, Cuenta, Importe a la derecha) con rótulos sobre una raya y divisiones entre filas. En móvil, filas C2. Transferencia: «origen → destino» en la cuenta y sin signo.
 
 ### Estado vacío (C7)
-«La página en blanco»: el encabezado de sección con un «0» tenue, tres renglones vacíos de 44 px y debajo el título (cuerpo 600), el detalle y la acción con un `+` (un `EnlaceTexto`). Si el destino aún no existe, la acción va en `terciario` y deshabilitada («Próximamente»), con la misma caja de 44 px para que no salte.
+«La página en blanco»: el encabezado de sección con un «0» tenue, tres renglones vacíos de 44 px y debajo el título (cuerpo 600), el detalle y la acción con un `+` (un `EnlaceTexto`; si la acción no navega, como abrir la captura, un botón con el mismo aspecto). Si el destino aún no existe, la acción va en `terciario` y deshabilitada («Próximamente»), con la misma caja de 44 px para que no salte.
 
 ### Enlace de texto (`EnlaceTexto`)
 El hermano de «Botón de texto» cuando la acción navega: latón (`marca-texto`), cuerpo 600, sin caja y 44 px de alto aunque el texto mida 22, para que el objetivo táctil sea completo. Se usa en «← Cuentas», «+ Nueva cuenta», «Ver archivadas» y la acción del estado vacío. Si la acción no navega, es un `Boton variante="texto"`.
 
 ### Panel lateral (C22)
-Un `<dialog>` modal: foco atrapado y fondo inerte. Cabecera de 56 px con el título en `rotulo` secundario y «Cerrar» en texto, sobre una raya. Solo se cierra cuando quien lo usa decide, así que puede preguntar antes de descartar cambios. Medidas y movimiento en Layout.
+Un `<dialog>` modal: foco atrapado y fondo inerte. Cabecera de 56 px con el título en `rotulo` secundario y «Cerrar» en texto, sobre una raya. Solo se cierra cuando quien lo usa decide, así que puede preguntar antes de descartar cambios. Anchos `normal` (400) y `amplio` (480); `pie` opcional fijo. Medidas y movimiento en Layout.
+
+### Selector de tipo (`SelectorTipo`)
+Gasto · Ingreso · Transferencia, cada uno un interruptor (`aria-pressed`).
+- **Segmentado (escritorio):** tres tramos de 40 px en una caja con borde `linea` y radio de campo, separados por divisiones. Activo: fondo `texto`, texto `fondo`, 600 (como el botón primario). Inactivo: `superficie`, texto `secundario`.
+- **Pestañas (móvil):** texto en cuerpo de 44 px; el activo en 600 y tinta, con raya debajo; la transferencia se llama «Transferir».
+
+### Ficha de cuenta (`FichaCuenta`)
+Para elegir la cuenta en la captura de escritorio, dos por fila. Grid `20px | flexible`: icono de tipo en `secundario`, nombre en cuerpo y saldo en cifra-xs secundaria («debe 1.284.300» en un pasivo). Borde `linea`, radio de campo, 48 px mínimo. Elegida: borde `texto` y nombre en 600; con monto muestra la vista previa «20.321 → 5.321» (presentación; el saldo vigente lo da la API).
+
+### Aviso de registro (`AvisoRegistro`)
+Tras registrar: marca de 16 px en verde base, «Registrado: Almuerzo −15.000 en Nequi» en cuerpo (monto en cifra-s con signo) y «Deshacer» como botón de texto, durante 5 s. Debajo, tras una división, la oferta de regla en `etiqueta` secundaria con «Crear regla» / «Cambiar regla» · «No», que sigue hasta que el usuario responde o registra otro. Borde `linea`, radio de campo, fondo `fondo` en el panel y `superficie` en la hoja móvil (formato compacto: «Almuerzo · Nequi   −15.000   Deshacer»). Sin sombra.
+
+### Teclado numérico (`TecladoNumerico`)
+Solo en la captura móvil, en vez del teclado del sistema. Tres columnas de teclas de 56 px (1–9, 000, 0, borrar) en cifra-m 400, fondo `fondo`, separadas por divisiones de 1 px y radio 0; pulsada, `hundido`. Ignora los ceros a la izquierda y no pasa de 19 dígitos (`aplicarTecla`, en `src/domain/dinero/entrada.ts`).
 
 ### Confirmación de borrado (`bloque-eliminar`)
 La confirmación ocurre en la misma página, sin diálogo emergente: reemplaza al vínculo que la abrió, en el panel o en la fila.
@@ -380,8 +425,8 @@ Una fila que se abre en su lugar para resolver algo sin salir de la lista. Se us
 Un campo que solo existe con cierta opción (el cupo de una tarjeta) no aparece ni desaparece de golpe: se despliega en su lugar, como se describe en Layout → Movimiento. Al plegarse, su valor se descarta.
 
 ### Navegación (C14)
-- **Escritorio:** columna de 232 px. Arriba la marca «TINO» (titulo-2, 700, tracking amplio), luego «Registrar» como único botón en tinta y después las entradas de 40 px con icono de 20 px. Inactiva: `secundario`, pasa a `texto` al pasar el cursor. Activa: fondo `hundido`, peso 600, radio de campo. Al pie, cambiar tema y salir.
-- **Móvil:** barra inferior de cinco pestañas con icono y rótulo de 11 px. «Registrar» va al centro en un cuadro de 40 px en tinta, y «Más» abre una hoja con el resto.
+- **Escritorio:** columna de 232 px. Arriba la marca «TINO» (titulo-2, 700, tracking amplio), luego «Registrar» como único botón en tinta (con la marca de tecla «N» en mono cifra-xs, borde `secundario`, radio de muestra) y después las entradas de 40 px con icono de 20 px. Inactiva: `secundario`, pasa a `texto` al pasar el cursor. Activa: fondo `hundido`, peso 600, radio de campo. Al pie, cambiar tema y salir. «Registrar» y la tecla N abren la captura sobre la página actual, sin cambiar la URL.
+- **Móvil:** barra inferior de cinco pestañas con icono y rótulo de 11 px. «Registrar» va al centro en un cuadro de 40 px en tinta y abre la captura a pantalla completa; «Más» abre una hoja con el resto.
 - **Deshabilitado:** los destinos sin construir se muestran en `secundario` con `aria-disabled` y el título «Próximamente».
 
 ### Iconos

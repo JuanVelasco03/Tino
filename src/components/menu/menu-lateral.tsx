@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LogOut, Moon, Plus, Sun } from "lucide-react";
 import { alternarTema } from "../boton-tema";
+import { useContextoCaptura } from "../captura/proveedor-captura";
 import { IconoNavegacion } from "../iconos";
 import { ENTRADAS, estaActiva, REGISTRAR, TITULO_PROXIMAMENTE } from "./entradas";
 
@@ -17,6 +18,7 @@ const FILA = "flex h-10 items-center gap-3 rounded-campo px-2 text-cuerpo";
 /** Menú de escritorio (md+): barra lateral de 232 px. */
 export function MenuLateral({ salir }: Props) {
   const ruta = usePathname();
+  const { abrir } = useContextoCaptura();
 
   return (
     <aside className="sticky top-0 flex h-dvh flex-col gap-8 overflow-y-auto border-r border-linea px-4 py-8">
@@ -24,12 +26,13 @@ export function MenuLateral({ salir }: Props) {
 
       <button
         type="button"
-        aria-disabled="true"
-        title={TITULO_PROXIMAMENTE}
-        className="flex h-11 shrink-0 cursor-not-allowed items-center justify-center gap-2 rounded-campo bg-texto text-cuerpo font-semibold text-fondo"
+        onClick={abrir}
+        aria-keyshortcuts="N"
+        className="flex h-11 shrink-0 items-center justify-center gap-2 rounded-campo bg-texto text-cuerpo font-semibold text-fondo"
       >
         <Plus size={18} strokeWidth={1.5} aria-hidden />
         {REGISTRAR.rotulo}
+        <kbd className="rounded-muestra border border-secundario px-1 font-mono text-cifra-xs text-terciario">N</kbd>
       </button>
 
       <nav aria-label="Secciones" className="flex flex-col gap-1">

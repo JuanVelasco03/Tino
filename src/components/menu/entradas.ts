@@ -3,7 +3,7 @@ import { ROTULO_DESTINO, type DestinoNavegacion } from "../iconos";
 /**
  * Destinos del menú de la aplicación. Las secciones futuras se ven y están
  * deshabilitadas («Próximamente»): el menú no cambia de forma con cada spec.
- * Hoy solo «Cuentas» navega.
+ * Hoy navegan «Movimientos» y «Cuentas»; «Registrar» abre la captura.
  */
 export type EntradaMenu = {
   destino: DestinoNavegacion;
@@ -22,7 +22,7 @@ export const TITULO_PROXIMAMENTE = "Próximamente";
 /** Las ocho secciones de la barra lateral, en el orden del diseño. */
 export const ENTRADAS: readonly EntradaMenu[] = [
   entrada("resumen"),
-  entrada("movimientos"),
+  entrada("movimientos", "/movimientos"),
   entrada("cuentas", "/cuentas"),
   entrada("deudas", null, "Deudas y préstamos"),
   entrada("recurrentes"),
@@ -31,8 +31,11 @@ export const ENTRADAS: readonly EntradaMenu[] = [
   entrada("avisos"),
 ];
 
-/** «Registrar» (captura rápida): botón aparte en la barra lateral y pestaña central en móvil. */
-export const REGISTRAR = entrada("registrar");
+/**
+ * «Registrar» (captura rápida): botón aparte en la barra lateral y pestaña
+ * central en móvil. No navega: abre la captura sobre la página actual.
+ */
+export const REGISTRAR: EntradaMenu = { ...entrada("registrar"), habilitado: true };
 
 const EN_PESTANAS: readonly DestinoNavegacion[] = ["resumen", "movimientos", "cuentas"];
 

@@ -33,3 +33,54 @@ export function formatearFechaSinAnio(fecha: string): string {
   const { mes, dia } = partir(fecha);
   return `${dia} ${mes}`;
 }
+
+const DIAS_SEMANA = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"] as const;
+
+const MESES_LARGOS = [
+  "Enero",
+  "Febrero",
+  "Marzo",
+  "Abril",
+  "Mayo",
+  "Junio",
+  "Julio",
+  "Agosto",
+  "Septiembre",
+  "Octubre",
+  "Noviembre",
+  "Diciembre",
+] as const;
+
+/**
+ * Milisegundos del día a medianoche UTC. Solo se usa como calendario: suma de
+ * días y día de la semana en UTC, nunca en la zona del navegador.
+ */
+function aMarcaUtc(fecha: string): number {
+  partir(fecha); // valida la forma
+  const [anio, mes, dia] = fecha.split("-").map((parte) => Number.parseInt(parte, 10));
+  const marca = Date.UTC(anio, mes - 1, dia);
+  // `Date.UTC` desborda (31 de febrero → 3 de marzo): una fecha inexistente es un error.
+  if (new Date(marca).getUTCDate() !== dia) throw new Error(`Fecha inexistente: "${fecha}".`);
+  return marca;
+}
+
+const MS_DIA = 86_400_000;
+
+/** `"2026-11-01"`, `-1` → `"2026-10-31"`. Aritmética de calendario, sin zona horaria. */
+export function sumarDias(fecha: string, dias: number): string {
+  return new Date(aMarcaUtc(fecha) + dias * MS_DIA).toISOString().slice(0, 10);
+}
+
+/** `"2026-11-19"` → `"jue 19 nov"`. */
+export function formatearDiaSemana(fecha: string): string {
+  const diaSemana = DIAS_SEMANA[new Date(aMarcaUtc(fecha)).getUTCDay()];
+  return `${diaSemana} ${formatearFechaSinAnio(fecha)}`;
+}
+
+/** `"2026-11"` → `"Noviembre 2026"`. */
+export function formatearMes(mes: string): string {
+  const coincidencia = /^(\d{4})-(\d{2})$/.exec(mes);
+  const nombre = coincidencia ? MESES_LARGOS[Number.parseInt(coincidencia[2], 10) - 1] : undefined;
+  if (!coincidencia || !nombre) throw new Error(`Mes mal formado: "${mes}". Se espera "YYYY-MM".`);
+  return `${nombre} ${coincidencia[1]}`;
+}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRight, Ellipsis, LogOut, Moon, Sun } from "lucide-react";
 import { alternarTema } from "../boton-tema";
+import { useContextoCaptura } from "../captura/proveedor-captura";
 import { IconoNavegacion } from "../iconos";
 import { ENTRADAS_MAS, estaActiva, PESTANAS, TITULO_PROXIMAMENTE, type EntradaMenu } from "./entradas";
 
@@ -25,6 +26,7 @@ const PESTANA = "relative flex flex-col items-center justify-center gap-1 text-[
 const FILA_HOJA = "grid min-h-13 items-center gap-3 text-cuerpo";
 
 function Pestana({ entrada, ruta, hojaAbierta }: { entrada: EntradaMenu; ruta: string; hojaAbierta: boolean }) {
+  const { abrir } = useContextoCaptura();
   const esRegistrar = entrada.destino === "registrar";
   const icono = esRegistrar ? (
     <span className="flex size-10 items-center justify-center rounded-campo bg-texto text-fondo">
@@ -35,6 +37,16 @@ function Pestana({ entrada, ruta, hojaAbierta }: { entrada: EntradaMenu; ruta: s
       <IconoNavegacion destino={entrada.destino} />
     </span>
   );
+
+  if (esRegistrar) {
+    // No navega: abre la captura a pantalla completa sobre la página actual.
+    return (
+      <button type="button" onClick={abrir} className={`${PESTANA} font-normal text-secundario`}>
+        {icono}
+        <span>{entrada.rotulo}</span>
+      </button>
+    );
+  }
 
   if (!entrada.habilitado || !entrada.href) {
     return (

@@ -39,3 +39,20 @@ export function aDigitos(texto: string): string | null {
 export function desdeMonto(monto: bigint): string {
   return formatearDinero({ monto, moneda: "COP" }, { omitirCOP: true });
 }
+
+/** Tecla del teclado numérico propio (móvil). */
+export type TeclaNumerica = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "000" | "borrar";
+
+/**
+ * Aplica una tecla a lo tecleado (`"1.500"`) y devuelve el nuevo valor
+ * formateado. Ignora los ceros a la izquierda (`0` o `000` sobre vacío no
+ * escriben nada) y no pasa de 19 dígitos. `borrar` quita el último dígito.
+ */
+export function aplicarTecla(valor: string, tecla: TeclaNumerica): string {
+  const digitos = valor.replace(/\D/g, "");
+  if (tecla === "borrar") return formatearEntradaPesos(digitos.slice(0, -1));
+
+  const siguiente = sinCerosIzquierda(`${digitos}${tecla}`).replace(/^0+$/, "");
+  if (siguiente.length > MAX_DIGITOS) return valor;
+  return formatearEntradaPesos(siguiente);
+}

@@ -25,7 +25,18 @@ type Props = {
   equivalencia?: string;
   /** Con ella, el campo es un input real que formatea pesos al teclear. Sin ella, solo presenta. */
   editable?: MontoEditable;
+  /** Signo leído desde el patrimonio («−» terracota, «+» verde), visible solo con valor. */
+  signo?: "salida" | "entrada";
 };
+
+/** Signo antes de la cifra: base del acento, porque la cifra mide 44 px (≥ 24). */
+function Signo({ signo }: { signo: "salida" | "entrada" }) {
+  return (
+    <span aria-hidden className={`font-mono text-cifra-campo ${signo === "salida" ? "text-salida" : "text-entrada"}`}>
+      {signo === "salida" ? "−" : "+"}
+    </span>
+  );
+}
 
 /**
  * Posición del cursor tras formatear: la misma cantidad de dígitos a su
@@ -43,7 +54,13 @@ function cursorTrasFormato(crudo: string, cursor: number, formateado: string): n
   return formateado.length;
 }
 
-function CampoEditable({ valor, moneda, etiqueta, editable }: Required<Pick<Props, "valor" | "moneda" | "etiqueta" | "editable">>) {
+function CampoEditable({
+  valor,
+  moneda,
+  etiqueta,
+  editable,
+  signo,
+}: Required<Pick<Props, "valor" | "moneda" | "etiqueta" | "editable">> & Pick<Props, "signo">) {
   const { alCambiar, nombre, error, nota, deshabilitado } = editable;
   const idError = `${nombre}-error`;
   const idNota = `${nombre}-nota`;
@@ -77,6 +94,7 @@ function CampoEditable({ valor, moneda, etiqueta, editable }: Required<Pick<Prop
           {etiqueta}
         </label>
         <div className="flex items-baseline gap-2">
+          {signo && valor !== "" && <Signo signo={signo} />}
           <input
             id={nombre}
             name={nombre}
@@ -107,8 +125,8 @@ function CampoEditable({ valor, moneda, etiqueta, editable }: Required<Pick<Prop
  * C4 · Campo de monto. Vacío muestra un 0 en terciario y el cursor de marca;
  * con valor, la cifra va en tinta. Con `editable` es un input real (pesos).
  */
-export function CampoMonto({ valor, moneda, etiqueta = "Monto", equivalencia, editable }: Props) {
-  if (editable) return <CampoEditable valor={valor} moneda={moneda} etiqueta={etiqueta} editable={editable} />;
+export function CampoMonto({ valor, moneda, etiqueta = "Monto", equivalencia, editable, signo }: Props) {
+  if (editable) return <CampoEditable valor={valor} moneda={moneda} etiqueta={etiqueta} editable={editable} signo={signo} />;
 
   const vacio = valor === "";
 
@@ -116,6 +134,7 @@ export function CampoMonto({ valor, moneda, etiqueta = "Monto", equivalencia, ed
     <div role="group" aria-label={etiqueta} className="border-b border-raya pb-3 pt-2">
       <div className="mb-1 text-etiqueta text-secundario">{etiqueta}</div>
       <div className="flex items-baseline gap-2">
+        {signo && !vacio && <Signo signo={signo} />}
         <span
           className={`font-mono text-cifra-campo tabular-nums ${vacio ? "text-terciario" : ""}`}
         >

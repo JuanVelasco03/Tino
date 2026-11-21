@@ -3,9 +3,17 @@
 import { useRef, useState } from "react";
 import { Boton } from "@/components/boton";
 import { CampoMonto } from "@/components/campo-monto";
+import { AvisoRegistro } from "@/components/captura/aviso-registro";
+import { FichaCuenta } from "@/components/captura/ficha-cuenta";
+import { SelectorTipo } from "@/components/captura/selector-tipo";
+import { TecladoNumerico } from "@/components/captura/teclado-numerico";
+import { ChipCategoria } from "@/components/chip-categoria";
+import { EstadoVacio } from "@/components/estado-vacio";
 import { IconoCuenta } from "@/components/iconos";
 import { OpcionUnica } from "@/components/opcion-unica";
 import { PanelLateral, type ControlPanel } from "@/components/panel-lateral";
+import type { TipoMovimiento } from "@/domain/movimiento/cuerpo";
+import { saldoResultante } from "@/domain/movimiento/vista-previa";
 
 type Tipo = "banco" | "efectivo" | "tarjeta_credito";
 
@@ -78,5 +86,117 @@ export function MuestraPanelLateral() {
         </PanelLateral>
       )}
     </>
+  );
+}
+
+/** C5 interactivo: la propuesta se toca para quitarla; otra se elige; la elegida se toca para quitarla. */
+export function MuestraChipsInteractivos() {
+  const [decision, setDecision] = useState<string>("propuesta");
+  const categorias = ["Comida", "Transporte", "Hogar", "Ocio"];
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex justify-between text-etiqueta text-secundario">
+        <span>Categoría</span>
+        {decision === "propuesta" && <span className="text-marca-texto">Sugerida por «almuerzo»</span>}
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {categorias.map((c) => (
+          <ChipCategoria
+            key={c}
+            etiqueta={c}
+            estado={decision === "propuesta" && c === "Comida" ? "sugerida" : "normal"}
+            seleccionada={decision === c}
+            onClick={() => setDecision((d) => ((d === "propuesta" && c === "Comida") || d === c ? "quitada" : c))}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Selector de tipo en sus dos variantes. */
+export function MuestraSelectorTipo() {
+  const [tipo, setTipo] = useState<TipoMovimiento>("gasto");
+  return (
+    <div className="flex flex-col gap-4">
+      <SelectorTipo valor={tipo} alCambiar={setTipo} />
+      <SelectorTipo valor={tipo} alCambiar={setTipo} variante="pestanas" />
+    </div>
+  );
+}
+
+/** Teclado numérico (móvil) con el monto que escribe. */
+export function MuestraTeclado() {
+  const [monto, setMonto] = useState("15.000");
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex items-baseline justify-center gap-2">
+        <output className={`font-mono text-cifra-xl tabular-nums ${monto === "" ? "text-terciario" : ""}`}>{monto || "0"}</output>
+        <span className="text-etiqueta text-secundario">COP</span>
+      </div>
+      <TecladoNumerico valor={monto} alCambiar={setMonto} />
+    </div>
+  );
+}
+
+const FICHAS = [
+  { id: "nequi", nombre: "Nequi", tipo: "banco", naturaleza: "activo", saldo: 20_321n },
+  { id: "efectivo", nombre: "Efectivo", tipo: "efectivo", naturaleza: "activo", saldo: 45_000n },
+  { id: "visa", nombre: "Visa Oro", tipo: "tarjeta_credito", naturaleza: "pasivo", saldo: 1_284_300n },
+] as const;
+
+/** Fichas de cuenta con la vista previa de un gasto de 15.000 en la elegida. */
+export function MuestraFichasCuenta() {
+  const [elegida, setElegida] = useState<string>("nequi");
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      {FICHAS.map((cuenta) => (
+        <FichaCuenta
+          key={cuenta.id}
+          cuenta={cuenta}
+          elegida={cuenta.id === elegida}
+          resultante={cuenta.id === elegida ? saldoResultante(cuenta, "salida", 15_000n) : null}
+          alPulsar={() => setElegida(cuenta.id)}
+        />
+      ))}
+    </div>
+  );
+}
+
+/** Aviso tras registrar: con oferta de crear regla, de ajustarla (con error) y en formato hoja. */
+export function MuestraAvisoRegistro() {
+  const nada = () => {};
+  const aviso = { tipo: "gasto" as const, monto: 15_000n, descripcion: "Peluquería", cuenta: "Nequi", alDeshacer: nada, deshaciendo: false };
+  return (
+    <div className="flex flex-col gap-4">
+      <AvisoRegistro
+        aviso={aviso}
+        oferta={{ pregunta: "¿Siempre «Peluquería» → Hogar?", accion: "Crear regla", alAceptar: nada, alRechazar: nada, pendiente: false }}
+      />
+      <AvisoRegistro
+        oferta={{
+          pregunta: "¿Cambiar la regla «almuerzo» a Ocio?",
+          accion: "Cambiar regla",
+          alAceptar: nada,
+          alRechazar: nada,
+          pendiente: false,
+          error: "La regla no existe.",
+        }}
+      />
+      <AvisoRegistro formato="hoja" aviso={{ ...aviso, descripcion: "Almuerzo" }} />
+    </div>
+  );
+}
+
+/** C7 con una acción que no navega (en la app, abre la captura). */
+export function MuestraEstadoVacioBoton() {
+  const [veces, setVeces] = useState(0);
+  return (
+    <EstadoVacio
+      rotulo="Movimientos · noviembre"
+      titulo="Aún no registras movimientos este mes."
+      detalle={veces === 0 ? "Registra tu primer gasto." : `Abriría la captura (${veces}).`}
+      accion={{ etiqueta: "Registrar", alPulsar: () => setVeces((v) => v + 1) }}
+    />
   );
 }
