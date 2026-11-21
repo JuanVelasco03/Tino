@@ -31,7 +31,7 @@ export type MovimientoDto = {
 
 export type ListaMovimientosDto = { mes: string; movimientos: MovimientoDto[] };
 
-/** Cuerpo de `POST /movimientos`. */
+/** Cuerpo de `POST /movimientos` y de `PUT /movimientos/:id` (con `fecha` obligatoria). */
 export type MovimientoCuerpo = {
   tipo: TipoMovimiento;
   /** `^\d{1,19}$`, > 0. */
@@ -49,10 +49,9 @@ export type MovimientoCuerpo = {
   partes?: { categoriaId: string; monto: string }[] | null;
 };
 
-/*
- * Modelo de la web. Monto en `bigint` (REGLAS §6). `dividido` = tiene partes;
- * el detalle de las partes llega con SPEC 06.
- */
+/* Modelo de la web. Montos en `bigint` (REGLAS §6). */
+export type Parte = { categoria: Ref; monto: bigint };
+
 export type Movimiento = {
   id: string;
   tipo: TipoMovimiento;
@@ -61,10 +60,12 @@ export type Movimiento = {
   /** `"YYYY-MM-DD"`. */
   fecha: string;
   descripcion: string | null;
+  nota: string | null;
   cuentaOrigen: Ref | null;
   cuentaDestino: Ref | null;
   categoria: Ref | null;
-  dividido: boolean;
+  /** `[]` si no está dividido. */
+  partes: Parte[];
 };
 
 export type ListaMovimientos = {
@@ -82,10 +83,11 @@ export function aMovimiento(dto: MovimientoDto): Movimiento {
     monto: BigInt(dto.monto),
     fecha: dto.fecha,
     descripcion: dto.descripcion,
+    nota: dto.nota,
     cuentaOrigen: dto.cuentaOrigen,
     cuentaDestino: dto.cuentaDestino,
     categoria: dto.categoria,
-    dividido: dto.partes.length > 0,
+    partes: dto.partes.map((parte) => ({ categoria: parte.categoria, monto: BigInt(parte.monto) })),
   };
 }
 
@@ -104,6 +106,13 @@ export async function listarMovimientos(mes?: string): Promise<ListaMovimientos>
 /** `POST /movimientos` → `201 MovimientoDto`. */
 export async function crearMovimiento(cuerpo: MovimientoCuerpo): Promise<Movimiento> {
   const dto = await enviar<MovimientoDto>("POST", "/movimientos", cuerpo);
+  if (!dto) throw new ErrorApi(500, "ERROR_INTERNO", "Tino API no devolvió el movimiento.");
+  return aMovimiento(dto);
+}
+
+/** `PUT /movimientos/:id`: reemplazo completo, con `fecha`. */
+export async function reemplazarMovimiento(id: string, cuerpo: MovimientoCuerpo): Promise<Movimiento> {
+  const dto = await enviar<MovimientoDto>("PUT", `/movimientos/${encodeURIComponent(id)}`, cuerpo);
   if (!dto) throw new ErrorApi(500, "ERROR_INTERNO", "Tino API no devolvió el movimiento.");
   return aMovimiento(dto);
 }

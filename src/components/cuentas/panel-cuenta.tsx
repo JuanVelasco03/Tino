@@ -12,7 +12,7 @@ import { MensajeError } from "../mensaje-error";
 import { IconoCuenta, ROTULO_TIPO_CUENTA } from "../iconos";
 import { OpcionUnica, type Opcion } from "../opcion-unica";
 import { PanelLateral, type ControlPanel } from "../panel-lateral";
-import { BloqueEliminar } from "./bloque-eliminar";
+import { BloqueEliminar, DETALLE_ELIMINAR_CUENTA } from "../bloque-eliminar";
 
 /** Server actions; llegan por prop desde la página (los componentes no importan `app/`). */
 export type AccionesCuenta = {
@@ -300,6 +300,7 @@ export function PanelCuenta({ cuenta, acciones }: Props) {
             <div className="border-t border-linea pt-6">
               <BloqueEliminar
                 nombre={cuenta.nombre}
+                detalle={DETALLE_ELIMINAR_CUENTA}
                 alConfirmar={eliminar}
                 alCancelar={() => {
                   setConfirmandoBorrado(false);

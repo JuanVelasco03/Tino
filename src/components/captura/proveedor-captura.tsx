@@ -30,7 +30,7 @@ function suscribir(avisar: () => void): () => void {
 }
 
 /** Escritorio (md) o móvil. Solo importa con la captura abierta, que nunca se pinta en el servidor. */
-function useEscritorio(): boolean {
+export function useEscritorio(): boolean {
   return useSyncExternalStore(
     suscribir,
     () => window.matchMedia(ESCRITORIO).matches,

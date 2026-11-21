@@ -1,21 +1,64 @@
+import { redirect } from "next/navigation";
 import { LibroMovimientos } from "@/components/movimientos/libro-movimientos";
-import { formatearMes } from "@/domain/fecha/formato";
+import { NavegacionMes } from "@/components/movimientos/navegacion-mes";
+import type { AccionesEdicion } from "@/components/movimientos/usar-edicion";
+import { esMes, mesEnZona } from "@/domain/fecha/formato";
+import { cargar as cargarCaptura } from "@/services/captura";
 import { listarDelMes } from "@/services/movimientos";
+import { obtenerPerfil } from "@/services/perfil";
+import { ajustarRegla, crearRegla, sugerir } from "../captura/acciones";
+import { eliminarMovimiento, guardarMovimiento } from "./acciones";
 
 export const metadata = { title: "Movimientos · Tino" };
 
-/** Movimientos del mes actual, en solo lectura (`GET /movimientos` sin `mes`). */
-export default async function PaginaMovimientos() {
-  const { mes, movimientos } = await listarDelMes();
-  const nombreMes = formatearMes(mes);
+const ACCIONES: AccionesEdicion = {
+  guardar: guardarMovimiento,
+  eliminar: eliminarMovimiento,
+  sugerir,
+  crearRegla,
+  ajustarRegla,
+};
+
+/** Zona si el usuario no tiene perfil (anterior a SPEC 02): la de la moneda base del producto. */
+const ZONA_POR_DEFECTO = "America/Bogota";
+
+function texto(valor: string | string[] | undefined): string | undefined {
+  return typeof valor === "string" ? valor : undefined;
+}
+
+/**
+ * Movimientos de un mes. `?mes=YYYY-MM` elige el mes (sin él, el actual en
+ * la zona del usuario); `?movimiento=<id>` abre su edición. Un mes mal
+ * formado vuelve a `/movimientos`; un id que no está en el mes, a `?mes=`.
+ */
+export default async function PaginaMovimientos({ searchParams }: PageProps<"/movimientos">) {
+  const parametros = await searchParams;
+  const mesPedido = texto(parametros.mes);
+  const idPedido = texto(parametros.movimiento);
+  if (mesPedido !== undefined && !esMes(mesPedido)) redirect("/movimientos");
+
+  const [{ mes, movimientos }, perfil] = await Promise.all([
+    listarDelMes(mesPedido),
+    mesPedido === undefined ? null : obtenerPerfil(),
+  ]);
+
+  // Sin `?mes` manda la API; con él, el actual se calcula en la zona del perfil (REGLAS §6).
+  const actual = mesPedido === undefined ? mes : mesEnZona(perfil?.zonaHoraria ?? ZONA_POR_DEFECTO, new Date());
+
+  let edicion = null;
+  if (idPedido !== undefined) {
+    const movimiento = movimientos.find((m) => m.id === idPedido);
+    if (!movimiento) redirect(`/movimientos?mes=${mes}`);
+    edicion = { movimiento, datos: await cargarCaptura() };
+  }
 
   return (
     <div className="flex flex-col gap-6 md:gap-8">
-      <header className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+      <header className="flex flex-col gap-1">
         <h1 className="text-titulo-1">Movimientos</h1>
-        <p className="text-etiqueta text-secundario">{nombreMes}</p>
+        <NavegacionMes mes={mes} actual={actual} />
       </header>
-      <LibroMovimientos mes={mes} movimientos={movimientos} nombreMes={nombreMes.split(" ")[0].toLowerCase()} />
+      <LibroMovimientos mes={mes} esActual={mes === actual} movimientos={movimientos} edicion={edicion} acciones={ACCIONES} />
     </div>
   );
 }

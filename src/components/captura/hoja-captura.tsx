@@ -5,16 +5,29 @@ import { Check, X } from "lucide-react";
 import { formatearDinero } from "@/domain/dinero/formato";
 import { formatearDiaSemana, formatearFechaSinAnio } from "@/domain/fecha/formato";
 import type { Cuenta } from "@/services/captura";
+import { BloqueEliminar } from "../bloque-eliminar";
 import { Boton } from "../boton";
 import { ChipCategoria } from "../chip-categoria";
 import { IconoCuenta, ROTULO_TIPO_CUENTA } from "../iconos";
 import { MensajeError } from "../mensaje-error";
 import { AvisoRegistro } from "./aviso-registro";
-import { ErrorCarga, SinCuentas } from "./panel-captura";
+import { EditorPartes } from "./editor-partes";
+import {
+  AvisoSoloLectura,
+  conceptoDe,
+  ConfirmarDescarte,
+  detalleEliminar,
+  ErrorCarga,
+  etiquetaEnviar,
+  SinCuentas,
+  usarSiempre,
+  type EstadoFormulario,
+} from "./panel-captura";
 import { opcionesFecha } from "./selector-fecha";
 import { SelectorTipo } from "./selector-tipo";
 import { TecladoNumerico } from "./teclado-numerico";
-import { datosAviso, datosOferta, etiquetaRegistrar, MAX_DESCRIPCION, type EstadoCaptura, type RolCuenta } from "./usar-captura";
+import { datosAviso, datosOferta } from "./usar-captura";
+import { MAX_DESCRIPCION, type RolCuenta } from "./usar-formulario";
 
 type Hoja = "categoria" | "cuenta" | "destino" | "fecha";
 
@@ -140,16 +153,19 @@ function rotuloFechaCorto(fecha: string, fechaHoy: string | null): string {
 }
 
 /**
- * Captura rápida en móvil (< 768 px): `<dialog>` a pantalla completa, sobre
- * la barra de pestañas, con teclado numérico propio. Misma lógica que el
- * panel de escritorio (`useCaptura`).
+ * Formulario de movimiento en móvil (< 768 px): `<dialog>` a pantalla
+ * completa, sobre la barra de pestañas, con teclado numérico propio. Misma
+ * lógica que el panel de escritorio, en registro (captura) o en edición.
  */
-export function HojaCaptura({ c }: { c: EstadoCaptura }) {
+export function HojaCaptura({ c }: { c: EstadoFormulario }) {
   const dialogo = useRef<HTMLDialogElement>(null);
   const saliendo = useRef<Promise<void> | null>(null);
   const [hoja, setHoja] = useState<Hoja | null>(null);
   const { valores } = c;
   const esTransferencia = valores.tipo === "transferencia";
+  const registro = c.modo === "registro" ? c : null;
+  const edicion = c.modo === "edicion" ? c : null;
+  const soloLectura = edicion?.soloLectura ?? null;
 
   useEffect(() => {
     const el = dialogo.current;
@@ -163,7 +179,8 @@ export function HojaCaptura({ c }: { c: EstadoCaptura }) {
     };
   }, []);
 
-  async function cerrar() {
+  /** Retira la hoja y avisa (la captura se oculta; la edición quita `?movimiento=`). */
+  async function cerrarYa() {
     const el = dialogo.current;
     if (!el) return c.cerrar();
     if (!saliendo.current) {
@@ -179,20 +196,24 @@ export function HojaCaptura({ c }: { c: EstadoCaptura }) {
     c.cerrar();
   }
 
-  function alCancelar(evento: SyntheticEvent<HTMLDialogElement>) {
-    // Escape cierra primero la hoja inferior; después, la captura.
-    evento.preventDefault();
-    if (hoja) setHoja(null);
-    else void cerrar();
+  function solicitarCierre() {
+    if (c.solicitarCierre()) void cerrarYa();
   }
 
-  function enviar(evento: FormEvent<HTMLFormElement>) {
+  function alCancelar(evento: SyntheticEvent<HTMLDialogElement>) {
+    // Escape cierra primero la hoja inferior; después, el formulario.
     evento.preventDefault();
-    void c.registrar();
+    if (hoja) setHoja(null);
+    else solicitarCierre();
+  }
+
+  async function enviar(evento: FormEvent<HTMLFormElement>) {
+    evento.preventDefault();
+    if (await c.enviar()) await cerrarYa();
   }
 
   const fechaHoy = c.captura?.fechaHoy ?? null;
-  const gastosHoy = c.captura?.gastosHoy ?? 0n;
+  const gastosHoy = registro?.captura?.gastosHoy ?? 0n;
   const errorCarga = c.estadoCarga === "error" && c.captura === null;
   const listo = c.captura !== null;
 
@@ -206,49 +227,109 @@ export function HojaCaptura({ c }: { c: EstadoCaptura }) {
     valores.categoria.modo === "elegida"
       ? (c.categorias.find((cat) => valores.categoria.modo === "elegida" && cat.id === valores.categoria.id) ?? null)
       : (propuestaActiva?.categoria ?? null);
+  const dividido = valores.partes !== null;
 
-  // Sin texto: los frecuentes del tipo. Al escribir: las sugerencias.
+  // Sin texto: los frecuentes del tipo (solo en la captura). Al escribir: las sugerencias.
   const conTexto = valores.descripcion.trim() !== "";
-  const chips = conTexto ? c.conceptos.map((co) => co.descripcion) : (c.captura?.conceptosFrecuentes[valores.tipo] ?? []);
+  const chips = conTexto ? c.conceptos.map((co) => co.descripcion) : (registro?.captura?.conceptosFrecuentes[valores.tipo] ?? []);
 
-  const nombreCuenta = (id: string | null) => c.cuentas.find((cu) => cu.id === id)?.nombre ?? null;
+  const erroresPie = [
+    c.errores.tipo,
+    c.errores.categoria,
+    c.errores.partes,
+    c.errores.cuenta,
+    c.errores.destino,
+    c.errores.fecha,
+    c.errores.nota,
+    c.errorGeneral,
+    registro?.errorPredeterminada,
+  ].filter((e): e is string => Boolean(e));
 
-  const erroresPie = [c.errores.tipo, c.errores.categoria, c.errores.cuenta, c.errores.destino, c.errores.fecha, c.errores.nota, c.errorGeneral].filter(
-    (e): e is string => Boolean(e),
-  );
+  const usar = usarSiempre(c);
 
   function listaCuentas(rol: RolCuenta) {
     const elegida = rol === "cuenta" ? valores.cuentaId : valores.destinoId;
-    return c.cuentas.map((cuenta: Cuenta) => (
-      <FilaHoja
-        key={cuenta.id}
-        icono={<IconoCuenta tipo={cuenta.tipo} />}
-        nombre={cuenta.nombre}
-        detalle={cuenta.naturaleza === "pasivo" ? `${ROTULO_TIPO_CUENTA[cuenta.tipo]} · pasivo` : ROTULO_TIPO_CUENTA[cuenta.tipo]}
-        previo={cuenta.naturaleza === "pasivo" ? "Debes" : undefined}
-        cifra={pesos(cuenta.saldo)}
-        elegida={cuenta.id === elegida}
-        alPulsar={() => {
-          c.cambiar(rol === "cuenta" ? "cuentaId" : "destinoId", cuenta.id);
-          setHoja(null);
-        }}
-      />
-    ));
+    const idPredeterminada = c.predeterminada?.id ?? null;
+    return c.cuentas.map((cuenta: Cuenta) => {
+      const tipo = cuenta.naturaleza === "pasivo" ? `${ROTULO_TIPO_CUENTA[cuenta.tipo]} · pasivo` : ROTULO_TIPO_CUENTA[cuenta.tipo];
+      return (
+        <FilaHoja
+          key={cuenta.id}
+          icono={<IconoCuenta tipo={cuenta.tipo} />}
+          nombre={cuenta.nombre}
+          detalle={cuenta.id === idPredeterminada ? `${tipo} · Predeterminada` : tipo}
+          previo={cuenta.naturaleza === "pasivo" ? "Debes" : undefined}
+          cifra={pesos(cuenta.saldo)}
+          elegida={cuenta.id === elegida}
+          alPulsar={() => {
+            c.cambiar(rol === "cuenta" ? "cuentaId" : "destinoId", cuenta.id);
+            setHoja(null);
+          }}
+        />
+      );
+    });
+  }
+
+  function pie() {
+    if (soloLectura) return <AvisoSoloLectura cuenta={soloLectura.nombre} />;
+    if (edicion?.confirmandoBorrado) {
+      return (
+        <BloqueEliminar
+          nombre={conceptoDe(edicion.movimiento)}
+          detalle={detalleEliminar(edicion)}
+          alConfirmar={() => void edicion.eliminar().then((ok) => (ok ? cerrarYa() : undefined))}
+          alCancelar={edicion.cancelarBorrado}
+          pendiente={edicion.eliminando}
+          error={edicion.errorBorrado}
+        />
+      );
+    }
+    return (
+      <>
+        {erroresPie.map((error) => (
+          <MensajeError key={error} mensaje={error} className="pb-2" />
+        ))}
+        {edicion?.confirmandoDescarte ? (
+          <ConfirmarDescarte alDescartar={() => void cerrarYa()} alSeguir={edicion.seguirEditando} />
+        ) : (
+          <Boton
+            type="submit"
+            disabled={!c.puedeEnviar}
+            monto={registro && c.montoNumero !== null ? pesos(c.montoNumero) : undefined}
+            className="w-full justify-center"
+          >
+            {etiquetaEnviar(c)}
+          </Boton>
+        )}
+        {edicion && !edicion.confirmandoDescarte && (
+          <button
+            type="button"
+            onClick={edicion.pedirBorrado}
+            disabled={edicion.enviando}
+            className="mt-1 h-11 text-etiqueta font-normal text-secundario disabled:cursor-not-allowed"
+          >
+            Eliminar movimiento…
+          </button>
+        )}
+      </>
+    );
   }
 
   return (
     <dialog
       ref={dialogo}
-      aria-label="Registrar"
+      aria-label={edicion ? "Editar movimiento" : "Registrar"}
       onCancel={alCancelar}
       className="fixed inset-0 m-0 h-dvh max-h-none w-full max-w-none overflow-hidden border-0 bg-fondo p-0 text-texto backdrop:bg-fondo"
     >
-      <form onSubmit={enviar} noValidate className="relative flex h-dvh flex-col">
+      <form onSubmit={(e) => void enviar(e)} noValidate className="relative flex h-dvh flex-col">
         <header className="flex h-14 shrink-0 items-center gap-2 pr-4 pl-1">
-          <button type="button" aria-label="Cerrar" onClick={() => void cerrar()} className="flex size-11 shrink-0 items-center justify-center">
+          <button type="button" aria-label="Cerrar" onClick={solicitarCierre} className="flex size-11 shrink-0 items-center justify-center">
             <X size={20} strokeWidth={1.5} aria-hidden />
           </button>
-          <SelectorTipo variante="pestanas" valor={valores.tipo} alCambiar={c.cambiarTipo} />
+          <fieldset disabled={soloLectura !== null} className="m-0 flex min-w-0 border-0 p-0">
+            <SelectorTipo variante="pestanas" valor={valores.tipo} alCambiar={c.cambiarTipo} />
+          </fieldset>
           {gastosHoy > 0n && (
             <div className="ml-auto shrink-0 text-right">
               <div className="text-rotulo uppercase text-secundario">Hoy</div>
@@ -263,98 +344,109 @@ export function HojaCaptura({ c }: { c: EstadoCaptura }) {
           </div>
         ) : (
           <>
-            <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-6">
-              <div role="group" aria-label="Monto" className="flex max-w-full items-baseline gap-2">
-                {signo && (
-                  <span aria-hidden className={`font-mono text-cifra-l ${valores.tipo === "gasto" ? "text-salida" : "text-entrada"}`}>
-                    {signo}
-                  </span>
-                )}
-                <output aria-live="polite" className={`truncate font-mono tabular-nums ${tamano} ${valores.monto === "" ? "text-terciario" : ""}`}>
-                  {montoTexto}
-                </output>
-                <span className="text-etiqueta text-secundario">COP</span>
-              </div>
-              {c.errores.monto && <MensajeError mensaje={c.errores.monto} />}
-              <input
-                aria-label="Descripción"
-                value={valores.descripcion}
-                onChange={(e) => c.cambiarDescripcion(e.target.value)}
-                maxLength={MAX_DESCRIPCION}
-                autoComplete="off"
-                enterKeyHint="done"
-                placeholder="¿En qué? Escribe o elige abajo"
-                className={`h-11 w-full max-w-[280px] rounded-none border-0 border-b bg-transparent p-0 text-center text-cuerpo text-texto placeholder:text-terciario ${
-                  c.errores.descripcion ? "border-salida" : "border-linea focus:border-raya"
-                }`}
-              />
-              <div className="flex min-h-4 items-center">
-                {c.errores.descripcion ? (
-                  <MensajeError mensaje={c.errores.descripcion} />
-                ) : (
-                  propuestaActiva && (
-                    <span className="font-mono text-cifra-xs text-marca-texto">
-                      Regla «{propuestaActiva.regla.palabraClave}» → {propuestaActiva.categoria.nombre}
+            <fieldset disabled={soloLectura !== null} className="m-0 flex min-h-0 flex-1 flex-col border-0 p-0">
+              <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-6">
+                <div role="group" aria-label="Monto" className="flex max-w-full items-baseline gap-2">
+                  {signo && (
+                    <span aria-hidden className={`font-mono text-cifra-l ${valores.tipo === "gasto" ? "text-salida" : "text-entrada"}`}>
+                      {signo}
                     </span>
-                  )
-                )}
+                  )}
+                  <output aria-live="polite" className={`truncate font-mono tabular-nums ${tamano} ${valores.monto === "" ? "text-terciario" : ""}`}>
+                    {montoTexto}
+                  </output>
+                  <span className="text-etiqueta text-secundario">COP</span>
+                </div>
+                {c.errores.monto && <MensajeError mensaje={c.errores.monto} />}
+                <input
+                  aria-label="Descripción"
+                  value={valores.descripcion}
+                  onChange={(e) => c.cambiarDescripcion(e.target.value)}
+                  maxLength={MAX_DESCRIPCION}
+                  autoComplete="off"
+                  enterKeyHint="done"
+                  placeholder="¿En qué? Escribe o elige abajo"
+                  className={`h-11 w-full max-w-[280px] rounded-none border-0 border-b bg-transparent p-0 text-center text-cuerpo text-texto placeholder:text-terciario ${
+                    c.errores.descripcion ? "border-salida" : "border-linea focus:border-raya"
+                  }`}
+                />
+                <div className="flex min-h-4 items-center">
+                  {c.errores.descripcion ? (
+                    <MensajeError mensaje={c.errores.descripcion} />
+                  ) : (
+                    propuestaActiva &&
+                    !dividido && (
+                      <span className="font-mono text-cifra-xs text-marca-texto">
+                        Regla «{propuestaActiva.regla.palabraClave}» → {propuestaActiva.categoria.nombre}
+                      </span>
+                    )
+                  )}
+                </div>
               </div>
-            </div>
 
-            <div className="flex h-14 shrink-0 items-start gap-2 overflow-x-auto px-4 [scrollbar-width:none]">
-              {chips.length > 0 ? (
-                chips.map((concepto) => (
-                  <ChipCategoria
-                    key={concepto}
-                    etiqueta={concepto}
-                    seleccionada={concepto === valores.descripcion}
-                    onClick={() => c.aceptarConcepto(concepto === valores.descripcion ? "" : concepto)}
-                  />
-                ))
-              ) : !conTexto && listo ? (
-                <p className="flex h-11 items-center text-etiqueta font-normal text-secundario">Tus conceptos frecuentes aparecerán aquí.</p>
-              ) : null}
-            </div>
+              <div className="flex h-14 shrink-0 items-start gap-2 overflow-x-auto px-4 [scrollbar-width:none]">
+                {chips.length > 0 ? (
+                  chips.map((concepto) => (
+                    <ChipCategoria
+                      key={concepto}
+                      etiqueta={concepto}
+                      seleccionada={concepto === valores.descripcion}
+                      onClick={() => c.aceptarConcepto(concepto === valores.descripcion ? "" : concepto)}
+                    />
+                  ))
+                ) : registro && !conTexto && listo ? (
+                  <p className="flex h-11 items-center text-etiqueta font-normal text-secundario">Tus conceptos frecuentes aparecerán aquí.</p>
+                ) : null}
+              </div>
 
-            <div className="grid h-14 shrink-0 grid-cols-[1.25fr_1fr_0.9fr] border-t border-linea">
-              {esTransferencia ? (
-                <>
-                  <Celda primera rotulo="Desde" valor={nombreCuenta(valores.cuentaId) ?? "Elegir"} vacio={!valores.cuentaId} alPulsar={() => setHoja("cuenta")} />
-                  <Celda rotulo="Hacia" valor={nombreCuenta(valores.destinoId) ?? "Elegir"} vacio={!valores.destinoId} alPulsar={() => setHoja("destino")} />
-                </>
-              ) : (
-                <>
-                  <Celda
-                    primera
-                    rotulo="Categoría"
-                    valor={categoriaElegida?.nombre ?? "Sin categoría"}
-                    vacio={!categoriaElegida}
-                    etiqueta={propuestaActiva ? "auto" : undefined}
-                    alPulsar={() => setHoja("categoria")}
-                  />
-                  <Celda rotulo="Cuenta" valor={nombreCuenta(valores.cuentaId) ?? "Elegir"} vacio={!valores.cuentaId} alPulsar={() => setHoja("cuenta")} />
-                </>
-              )}
-              <Celda rotulo="Fecha" valor={rotuloFechaCorto(valores.fecha, fechaHoy)} alPulsar={() => setHoja("fecha")} />
-            </div>
+              <div className="grid h-14 shrink-0 grid-cols-[1.25fr_1fr_0.9fr] border-t border-linea">
+                {esTransferencia ? (
+                  <>
+                    <Celda
+                      primera
+                      rotulo="Desde"
+                      valor={c.nombreCuenta(valores.cuentaId) ?? "Elegir"}
+                      vacio={!valores.cuentaId}
+                      alPulsar={() => setHoja("cuenta")}
+                    />
+                    <Celda
+                      rotulo="Hacia"
+                      valor={c.nombreCuenta(valores.destinoId) ?? "Elegir"}
+                      vacio={!valores.destinoId}
+                      alPulsar={() => setHoja("destino")}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Celda
+                      primera
+                      rotulo="Categoría"
+                      valor={dividido ? "Dividido" : (categoriaElegida?.nombre ?? "Sin categoría")}
+                      vacio={!dividido && !categoriaElegida}
+                      etiqueta={propuestaActiva && !dividido ? "auto" : undefined}
+                      alPulsar={() => setHoja("categoria")}
+                    />
+                    <Celda
+                      rotulo="Cuenta"
+                      valor={c.nombreCuenta(valores.cuentaId) ?? "Elegir"}
+                      vacio={!valores.cuentaId}
+                      alPulsar={() => setHoja("cuenta")}
+                    />
+                  </>
+                )}
+                <Celda rotulo="Fecha" valor={rotuloFechaCorto(valores.fecha, fechaHoy)} alPulsar={() => setHoja("fecha")} />
+              </div>
 
-            <TecladoNumerico valor={valores.monto} alCambiar={(v) => c.cambiar("monto", v)} />
+              <TecladoNumerico valor={valores.monto} alCambiar={(v) => c.cambiar("monto", v)} />
+            </fieldset>
 
             <div className="relative shrink-0 px-4 pt-3 pb-[max(24px,env(safe-area-inset-bottom))]">
-              <div className="absolute inset-x-4 bottom-full mb-2">
-                <AvisoRegistro formato="hoja" aviso={datosAviso(c)} oferta={datosOferta(c)} />
-              </div>
-              {erroresPie.map((error) => (
-                <MensajeError key={error} mensaje={error} className="pb-2" />
-              ))}
-              <Boton
-                type="submit"
-                disabled={!c.puedeRegistrar}
-                monto={c.montoNumero === null ? undefined : pesos(c.montoNumero)}
-                className="w-full justify-center"
-              >
-                {etiquetaRegistrar(c)}
-              </Boton>
+              {registro && (
+                <div className="absolute inset-x-4 bottom-full mb-2">
+                  <AvisoRegistro formato="hoja" aviso={datosAviso(registro)} oferta={datosOferta(registro)} />
+                </div>
+              )}
+              {pie()}
             </div>
           </>
         )}
@@ -362,19 +454,39 @@ export function HojaCaptura({ c }: { c: EstadoCaptura }) {
 
       {hoja === "categoria" && (
         <HojaInferior titulo="Categoría" alCerrar={() => setHoja(null)}>
-          <div className="flex flex-wrap gap-2 pb-2">
-            {c.categorias.map((cat) => (
-              <ChipCategoria
-                key={cat.id}
-                etiqueta={cat.nombre}
-                estado={propuestaActiva?.categoria.id === cat.id ? "sugerida" : "normal"}
-                seleccionada={valores.categoria.modo === "elegida" && valores.categoria.id === cat.id}
-                onClick={() => {
-                  c.tocarCategoria(cat.id);
-                  setHoja(null);
-                }}
+          <div className="flex flex-col gap-4 pb-2">
+            {/* Con partes, los chips de categoría se ocultan: la categoría va en cada parte. */}
+            {!dividido && (
+              <div className="flex flex-wrap gap-2">
+                {c.categorias.map((cat) => (
+                  <ChipCategoria
+                    key={cat.id}
+                    etiqueta={cat.nombre}
+                    estado={propuestaActiva?.categoria.id === cat.id ? "sugerida" : "normal"}
+                    seleccionada={valores.categoria.modo === "elegida" && valores.categoria.id === cat.id}
+                    onClick={() => {
+                      c.tocarCategoria(cat.id);
+                      setHoja(null);
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+            <div className={dividido ? "" : "border-t border-linea pt-2"}>
+              <EditorPartes
+                idBase="hoja"
+                total={c.montoNumero}
+                partes={valores.partes}
+                categorias={c.categorias}
+                alActivar={c.activarPartes}
+                alDesactivar={c.desactivarPartes}
+                alCambiar={c.cambiarParte}
+                alAgregar={c.agregarParte}
+                alQuitar={c.quitarParte}
+                alCompletar={c.completarResto}
+                error={c.errores.partes ?? c.errorDePartes}
               />
-            ))}
+            </div>
           </div>
         </HojaInferior>
       )}
@@ -382,6 +494,14 @@ export function HojaCaptura({ c }: { c: EstadoCaptura }) {
       {(hoja === "cuenta" || hoja === "destino") && (
         <HojaInferior titulo={hoja === "destino" ? "Hacia" : esTransferencia ? "Desde" : "Cuenta"} alCerrar={() => setHoja(null)}>
           <div className="border-t border-linea">{listaCuentas(hoja)}</div>
+          {hoja === "cuenta" && usar && (
+            <div className="flex flex-col items-start pt-2">
+              <Boton variante="texto" onClick={usar.alPulsar} disabled={usar.pendiente} className="h-11">
+                Usar {usar.cuenta.nombre} siempre
+              </Boton>
+              {registro?.errorPredeterminada && <MensajeError mensaje={registro.errorPredeterminada} />}
+            </div>
+          )}
         </HojaInferior>
       )}
 

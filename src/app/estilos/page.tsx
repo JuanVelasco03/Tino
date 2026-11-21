@@ -8,6 +8,7 @@ import { EncabezadoSeccion } from "@/components/encabezado-seccion";
 import { EnlaceTexto } from "@/components/enlace-texto";
 import { EstadoVacio } from "@/components/estado-vacio";
 import { FilaMovimiento } from "@/components/fila-movimiento";
+import { NavegacionMes } from "@/components/movimientos/navegacion-mes";
 import {
   IconoCuenta,
   IconoNavegacion,
@@ -21,7 +22,9 @@ import { formatearEquivalencia } from "@/domain/dinero/formato";
 import { AlternarTema } from "./alternar-tema";
 import {
   MuestraAvisoRegistro,
+  MuestraBloqueEliminar,
   MuestraChipsInteractivos,
+  MuestraEditorPartes,
   MuestraEstadoVacioBoton,
   MuestraFichasCuenta,
   MuestraMontoEditable,
@@ -167,7 +170,20 @@ function Componentes({ modo }: { modo: "light" | "dark" }) {
           <FilaMovimiento fecha="03 nov" concepto="Compra D1" tipo="gasto" monto={{ monto: 27_900n, moneda: "COP" }} categoria={null} cuenta="Visa Oro" omitirCOP />
           <FilaMovimiento fecha="02 nov" concepto="Pago tarjeta" tipo="transferencia" transferencia={{ origen: "Bancolombia", destino: "Visa Oro" }} monto={{ monto: 1_200_000n, moneda: "COP" }} omitirCOP />
           <FilaMovimiento fecha="19 nov" concepto="Almuerzo · recién registrado" tipo="gasto" monto={{ monto: 15_000n, moneda: "COP" }} categoria="Comida" cuenta="Nequi" omitirCOP resaltada />
-          <FilaMovimiento fecha="18 nov" concepto="Almuerzo y mercado" tipo="gasto" monto={{ monto: 30_000n, moneda: "COP" }} categoria="Dividido" cuenta="Nequi" omitirCOP />
+          <FilaMovimiento
+            fecha="18 nov"
+            concepto="Almuerzo y mercado · dividido, con sub-renglones"
+            tipo="gasto"
+            monto={{ monto: 30_000n, moneda: "COP" }}
+            categoria="Dividido"
+            cuenta="Nequi"
+            partes={[
+              { categoria: "Comida", monto: 20_000n },
+              { categoria: "Mercado", monto: 10_000n },
+            ]}
+            omitirCOP
+          />
+          <FilaMovimiento fecha="17 nov" concepto="Taxi · como enlace a su edición" tipo="gasto" monto={{ monto: 12_000n, moneda: "COP" }} categoria="Transporte" cuenta="Efectivo" omitirCOP href="#" />
           <FilaMovimiento fecha="01 nov" concepto="Nómina octubre" tipo="ingreso" monto={{ monto: 4_850_000n, moneda: "COP" }} categoria="Salario" cuenta="Bancolombia" omitirCOP />
           <FilaMovimiento fecha="01 nov" concepto="Compra VOO" tipo="transferencia" transferencia={{ origen: "Bancolombia", destino: "Interactive Brokers" }} monto={{ monto: 50_000n, moneda: "USD" }} equivalenteCOP={2_050_000n} omitirCOP />
         </div>
@@ -289,6 +305,24 @@ function Componentes({ modo }: { modo: "light" | "dark" }) {
       <div>
         <Etiqueta>Teclado numérico · captura en móvil</Etiqueta>
         <MuestraTeclado />
+      </div>
+
+      <div>
+        <Etiqueta>Navegación de meses · actual y otro mes (con «Este mes»)</Etiqueta>
+        <div className="flex flex-col gap-2">
+          <NavegacionMes mes="2026-11" actual="2026-11" ruta="/estilos" />
+          <NavegacionMes mes="2026-10" actual="2026-11" ruta="/estilos" />
+        </div>
+      </div>
+
+      <div>
+        <Etiqueta>Editor de partes · dividir entre categorías</Etiqueta>
+        <MuestraEditorPartes sufijo={modo} />
+      </div>
+
+      <div>
+        <Etiqueta>C26 · Confirmación de borrado · con el detalle de un movimiento</Etiqueta>
+        <MuestraBloqueEliminar />
       </div>
     </>
   );

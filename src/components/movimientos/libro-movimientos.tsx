@@ -1,40 +1,40 @@
 "use client";
 
+import Link from "next/link";
 import { formatearDinero } from "@/domain/dinero/formato";
-import { formatearFechaSinAnio } from "@/domain/fecha/formato";
+import { formatearFechaSinAnio, formatearMes } from "@/domain/fecha/formato";
 import { importeEnPatrimonio } from "@/domain/movimiento/vista-previa";
-import type { Movimiento, TipoMovimiento } from "@/services/movimientos";
+import type { DatosCaptura } from "@/services/captura";
+import type { Movimiento } from "@/services/movimientos";
+import { AvisoRegistro, type DatosAviso } from "../captura/aviso-registro";
+import { conceptoDe } from "../captura/panel-captura";
 import { useContextoCaptura } from "../captura/proveedor-captura";
+import { cuentaDe, datosDeOferta } from "../captura/usar-captura";
 import { EstadoVacio } from "../estado-vacio";
-import { FilaMovimiento } from "../fila-movimiento";
+import { FilaMovimiento, SubRenglones, type ParteFila } from "../fila-movimiento";
+import { EdicionMovimiento } from "./edicion-movimiento";
+import { useAvisoEdicion, type AccionesEdicion, type ResultadoEdicion } from "./usar-edicion";
 
 type Props = {
   /** `"YYYY-MM"` del mes listado. */
   mes: string;
+  /** ¿Es el mes actual? Cambia el texto del estado vacío. */
+  esActual: boolean;
   /** En el orden de la API: fecha desc, el último registrado primero. */
   movimientos: Movimiento[];
-  /** Nombre del mes en minúsculas para el estado vacío («noviembre»). */
-  nombreMes: string;
+  /** `?movimiento=<id>`: el movimiento y lo que su formulario necesita, cargados con la página. */
+  edicion: { movimiento: Movimiento; datos: DatosCaptura } | null;
+  acciones: AccionesEdicion;
 };
-
-const ROTULO_TIPO: Record<TipoMovimiento, string> = { gasto: "Gasto", ingreso: "Ingreso", transferencia: "Transferencia" };
-
-/** Concepto de la fila: la descripción o, si no tiene, el tipo. */
-function concepto(m: Movimiento): string {
-  return m.descripcion ?? ROTULO_TIPO[m.tipo];
-}
 
 /** Categoría como se lee: «Dividido» con partes; `null` = sin clasificar. Una transferencia no lleva. */
 function categoria(m: Movimiento): string | null {
-  if (m.dividido) return "Dividido";
+  if (m.partes.length > 0) return "Dividido";
   return m.categoria?.nombre ?? null;
 }
 
-function cuenta(m: Movimiento): string {
-  const origen = m.cuentaOrigen?.nombre ?? "";
-  const destino = m.cuentaDestino?.nombre ?? "";
-  if (m.tipo === "transferencia") return `${origen} → ${destino}`;
-  return m.tipo === "gasto" ? origen : destino;
+function partesDe(m: Movimiento): ParteFila[] {
+  return m.partes.map((p) => ({ categoria: p.categoria.nombre, monto: p.monto }));
 }
 
 /** Importe con signo y color desde el patrimonio: gasto −, ingreso +, transferencia sin signo. */
@@ -45,88 +45,131 @@ function Importe({ m, peso }: { m: Movimiento; peso: string }) {
   return <span className={`text-right font-mono text-cifra-s tabular-nums ${color} ${peso}`}>{cifra}</span>;
 }
 
+/** «Guardado: Almuerzo −18.000 en Nequi · ahora en Octubre 2026» / «Eliminado: …». */
+function datosAvisoEdicion(resultado: ResultadoEdicion | null): DatosAviso | null {
+  if (!resultado) return null;
+  const { movimiento } = resultado;
+  return {
+    tipo: movimiento.tipo,
+    monto: movimiento.monto,
+    descripcion: movimiento.descripcion,
+    cuenta: cuentaDe(movimiento),
+    verbo: resultado.tipo === "guardado" ? "Guardado" : "Eliminado",
+    sufijo: resultado.tipo === "guardado" && resultado.mesNuevo ? ` · ahora en ${formatearMes(resultado.mesNuevo)}` : undefined,
+  };
+}
+
 const COLUMNAS = "grid-cols-[52px_minmax(0,1fr)_minmax(0,176px)_128px]";
 
 /**
- * Lista del mes en solo lectura. Escritorio: rejilla de cuatro columnas.
- * Móvil: C2. El recién registrado va arriba (orden de la API) y se resalta
- * mientras dura su aviso.
+ * Libro de movimientos de un mes. Escritorio: rejilla de cuatro columnas.
+ * Móvil: C2. Cada fila es un enlace a su edición (`?movimiento=<id>`); un
+ * movimiento dividido muestra sus partes como sub-renglones. Tras registrar,
+ * guardar o eliminar, el aviso va arriba de la lista y la fila se resalta.
  */
-export function LibroMovimientos({ mes, movimientos, nombreMes }: Props) {
-  const { abrir, resaltadoId } = useContextoCaptura();
+export function LibroMovimientos({ mes, esActual, movimientos, edicion, acciones }: Props) {
+  const { abrir, resaltadoId: registrado } = useContextoCaptura();
+  const aviso = useAvisoEdicion(acciones);
+  const nombreMes = formatearMes(mes).split(" ")[0].toLowerCase();
+  const enlace = (m: Movimiento) => `/movimientos?mes=${mes}&movimiento=${m.id}`;
+  const resaltada = (m: Movimiento) => m.id === registrado || m.id === aviso.resaltadoId;
 
-  if (movimientos.length === 0) {
-    return (
-      <EstadoVacio
-        rotulo={`Movimientos · ${nombreMes}`}
-        titulo="Aún no registras movimientos este mes."
-        detalle="Registra tu primer gasto."
-        accion={{ etiqueta: "Registrar", alPulsar: abrir }}
-      />
-    );
-  }
+  const datosAviso = datosAvisoEdicion(aviso.aviso);
+  const datosOferta = datosDeOferta(aviso.oferta, (acepta) => void aviso.responderOferta(acepta));
 
   return (
-    <section aria-label={`Movimientos de ${mes}`}>
-      {/* Escritorio */}
-      <div role="table" className="hidden md:block">
-        <div role="row" className={`grid ${COLUMNAS} gap-3 border-b border-raya pb-2 text-rotulo uppercase text-secundario`}>
-          <span role="columnheader">Fecha</span>
-          <span role="columnheader">Descripción</span>
-          <span role="columnheader">Cuenta</span>
-          <span role="columnheader" className="text-right">
-            Importe
-          </span>
-        </div>
-        {movimientos.map((m) => {
-          const resaltada = m.id === resaltadoId;
-          const peso = resaltada ? "font-semibold" : "";
-          const cat = categoria(m);
-          return (
-            <div
-              key={m.id}
-              role="row"
-              className={`grid ${COLUMNAS} items-baseline gap-3 border-b border-linea py-3 ${resaltada ? "bg-hundido" : ""}`}
-            >
-              <span role="cell" className="font-mono text-cifra-xs text-secundario">
-                {formatearFechaSinAnio(m.fecha)}
-              </span>
-              <span role="cell" className="flex min-w-0 flex-col">
-                <span className={`truncate text-cuerpo ${peso}`}>{concepto(m)}</span>
-                <span className="text-etiqueta text-secundario">
-                  {m.tipo === "transferencia" ? "Transferencia" : cat ?? <span className="punteada">Sin clasificar</span>}
-                </span>
-              </span>
-              <span role="cell" className="truncate text-etiqueta text-secundario">
-                {cuenta(m)}
-              </span>
-              <span role="cell" className="text-right">
-                <Importe m={m} peso={peso} />
+    <>
+      <AvisoRegistro aviso={datosAviso} oferta={datosOferta} />
+
+      {movimientos.length === 0 ? (
+        <EstadoVacio
+          rotulo={`Movimientos · ${nombreMes}`}
+          titulo={esActual ? "Aún no registras movimientos este mes." : `No hay movimientos en ${nombreMes}.`}
+          detalle={esActual ? "Registra tu primer gasto." : "Registra uno o cambia de mes."}
+          accion={{ etiqueta: "Registrar", alPulsar: abrir }}
+        />
+      ) : (
+        <section aria-label={`Movimientos de ${mes}`}>
+          {/* Escritorio */}
+          <div role="table" className="hidden md:block">
+            <div role="row" className={`grid ${COLUMNAS} gap-3 border-b border-raya pb-2 text-rotulo uppercase text-secundario`}>
+              <span role="columnheader">Fecha</span>
+              <span role="columnheader">Descripción</span>
+              <span role="columnheader">Cuenta</span>
+              <span role="columnheader" className="text-right">
+                Importe
               </span>
             </div>
-          );
-        })}
-      </div>
+            {movimientos.map((m) => {
+              const destacada = resaltada(m);
+              const peso = destacada ? "font-semibold" : "";
+              const cat = categoria(m);
+              return (
+                <div
+                  key={m.id}
+                  role="row"
+                  className={`relative grid ${COLUMNAS} items-baseline gap-x-3 border-b border-linea py-3 ${
+                    destacada ? "bg-hundido" : "hover:bg-hundido"
+                  }`}
+                >
+                  <span role="cell" className="font-mono text-cifra-xs text-secundario">
+                    {formatearFechaSinAnio(m.fecha)}
+                  </span>
+                  <span role="cell" className="flex min-w-0 flex-col">
+                    {/* El enlace se estira sobre toda la fila: un solo objetivo, nombrado por el concepto. */}
+                    <Link href={enlace(m)} scroll={false} className={`truncate text-cuerpo after:absolute after:inset-0 ${peso}`}>
+                      {conceptoDe(m)}
+                    </Link>
+                    <span className="text-etiqueta text-secundario">
+                      {m.tipo === "transferencia" ? "Transferencia" : cat ?? <span className="punteada">Sin clasificar</span>}
+                    </span>
+                  </span>
+                  <span role="cell" className="truncate text-etiqueta text-secundario">
+                    {cuentaDe(m)}
+                  </span>
+                  <span role="cell" className="text-right">
+                    <Importe m={m} peso={peso} />
+                  </span>
+                  {m.partes.length > 0 && <SubRenglones partes={partesDe(m)} className="col-span-3 col-start-2 pt-1" />}
+                </div>
+              );
+            })}
+          </div>
 
-      {/* Móvil */}
-      <div className="md:hidden">
-        {movimientos.map((m) => (
-          <FilaMovimiento
-            key={m.id}
-            fecha={formatearFechaSinAnio(m.fecha)}
-            concepto={concepto(m)}
-            tipo={m.tipo}
-            monto={{ monto: m.monto, moneda: "COP" }}
-            categoria={categoria(m)}
-            cuenta={m.tipo === "transferencia" ? undefined : cuenta(m)}
-            transferencia={
-              m.tipo === "transferencia" ? { origen: m.cuentaOrigen?.nombre ?? "", destino: m.cuentaDestino?.nombre ?? "" } : undefined
-            }
-            omitirCOP
-            resaltada={m.id === resaltadoId}
-          />
-        ))}
-      </div>
-    </section>
+          {/* Móvil */}
+          <div className="md:hidden">
+            {movimientos.map((m) => (
+              <FilaMovimiento
+                key={m.id}
+                fecha={formatearFechaSinAnio(m.fecha)}
+                concepto={conceptoDe(m)}
+                tipo={m.tipo}
+                monto={{ monto: m.monto, moneda: "COP" }}
+                categoria={categoria(m)}
+                cuenta={m.tipo === "transferencia" ? undefined : cuentaDe(m)}
+                transferencia={
+                  m.tipo === "transferencia" ? { origen: m.cuentaOrigen?.nombre ?? "", destino: m.cuentaDestino?.nombre ?? "" } : undefined
+                }
+                partes={partesDe(m)}
+                omitirCOP
+                resaltada={resaltada(m)}
+                href={enlace(m)}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {edicion && (
+        <EdicionMovimiento
+          key={edicion.movimiento.id}
+          movimiento={edicion.movimiento}
+          datos={edicion.datos}
+          mes={mes}
+          acciones={acciones}
+          alTerminar={aviso.mostrar}
+        />
+      )}
+    </>
   );
 }

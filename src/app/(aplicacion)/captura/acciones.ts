@@ -1,103 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { unstable_rethrow } from "next/navigation";
 import * as captura from "@/services/captura";
 import type { ResultadoCarga, ResultadoSugerencias } from "@/services/captura";
 import * as movimientos from "@/services/movimientos";
-import type {
-  CampoCaptura,
-  MovimientoCuerpo,
-  ResultadoRegistro,
-  ResultadoSimple,
-  TipoMovimiento,
-} from "@/services/movimientos";
+import type { MovimientoCuerpo, ResultadoRegistro, ResultadoSimple, TipoMovimiento } from "@/services/movimientos";
+import * as perfil from "@/services/perfil";
+import { cuerpoValido, ENTRADA_INVALIDA, esId, esTipo, fallo, RUTAS_AFECTADAS } from "./entrada";
 
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const MONTO = /^\d{1,19}$/;
-const FECHA = /^\d{4}-\d{2}-\d{2}$/;
-const TIPOS: readonly TipoMovimiento[] = ["gasto", "ingreso", "transferencia"];
-
-const MENSAJE_SIN_CONEXION = "No pudimos conectar. Intenta de nuevo.";
-const MENSAJE_ENTRADA = "No pudimos procesar los datos. Intenta de nuevo.";
 const MENSAJE_CARGA = "No pudimos cargar el formulario.";
-
-/** Lo que registrar y deshacer cambian: la lista del mes y los saldos. */
-const RUTAS_AFECTADAS = ["/movimientos", "/cuentas"] as const;
-
-type Fallo = { ok: false; codigo: string; mensaje: string; campo?: CampoCaptura };
-
-const ENTRADA_INVALIDA: Fallo = { ok: false, codigo: "ENTRADA_INVALIDA", mensaje: MENSAJE_ENTRADA };
-
-/** Campo de la API → campo del formulario. `cuentaDestinoId` depende del tipo. */
-function campoFormulario(campo: string | undefined, tipo: TipoMovimiento | null): CampoCaptura | undefined {
-  switch (campo) {
-    case "tipo":
-    case "monto":
-    case "fecha":
-    case "descripcion":
-    case "nota":
-      return campo;
-    case "categoriaId":
-      return "categoria";
-    case "cuentaOrigenId":
-      return "cuenta";
-    case "cuentaDestinoId":
-      return tipo === "transferencia" ? "destino" : "cuenta";
-    default:
-      return undefined;
-  }
-}
-
-/**
- * Traduce un error a un fallo: el `mensaje` de la API bajo su campo, o
- * general si no trae campo. Sin conexión o error desconocido, texto local.
- * Las redirecciones de Next (sesión vencida) se relanzan.
- */
-function fallo(error: unknown, tipo: TipoMovimiento | null = null, sinConexion = MENSAJE_SIN_CONEXION): Fallo {
-  unstable_rethrow(error);
-  if (!(error instanceof movimientos.ErrorApi) || error.codigo === "SIN_CONEXION") {
-    return { ok: false, codigo: error instanceof movimientos.ErrorApi ? error.codigo : "ERROR_INTERNO", mensaje: sinConexion };
-  }
-  const campo = campoFormulario(error.campo, tipo);
-  return campo
-    ? { ok: false, codigo: error.codigo, mensaje: error.message, campo }
-    : { ok: false, codigo: error.codigo, mensaje: error.message };
-}
-
-function esTipo(valor: unknown): valor is TipoMovimiento {
-  return typeof valor === "string" && (TIPOS as readonly string[]).includes(valor);
-}
-
-function esId(valor: unknown): valor is string {
-  return typeof valor === "string" && UUID.test(valor);
-}
-
-function esTextoOpcional(valor: unknown): valor is string | null | undefined {
-  return valor === undefined || valor === null || typeof valor === "string";
-}
-
-function esIdOpcional(valor: unknown): valor is string | null | undefined {
-  return valor === undefined || valor === null || esId(valor);
-}
-
-/** Valida la forma del cuerpo (viene del navegador). El contenido lo valida la API. */
-function cuerpoValido(entrada: unknown): MovimientoCuerpo | null {
-  if (!entrada || typeof entrada !== "object") return null;
-  const { tipo, monto, fecha, descripcion, nota, cuentaOrigenId, cuentaDestinoId, categoriaId } = entrada as Record<string, unknown>;
-  if (!esTipo(tipo) || typeof monto !== "string" || !MONTO.test(monto)) return null;
-  if (fecha !== undefined && (typeof fecha !== "string" || !FECHA.test(fecha))) return null;
-  if (!esTextoOpcional(descripcion) || !esTextoOpcional(nota)) return null;
-  if (!esIdOpcional(cuentaOrigenId) || !esIdOpcional(cuentaDestinoId) || !esIdOpcional(categoriaId)) return null;
-
-  // Se copian solo los campos conocidos: dividir (`partes`) llega en SPEC 06.
-  const cuerpo: MovimientoCuerpo = { tipo, monto, descripcion, nota };
-  if (fecha !== undefined) cuerpo.fecha = fecha;
-  if (cuentaOrigenId !== undefined) cuerpo.cuentaOrigenId = cuentaOrigenId;
-  if (cuentaDestinoId !== undefined) cuerpo.cuentaDestinoId = cuentaDestinoId;
-  if (categoriaId !== undefined) cuerpo.categoriaId = categoriaId;
-  return cuerpo;
-}
 
 /** `GET /captura` y `GET /cuentas` al abrir el formulario. */
 export async function cargarCaptura(): Promise<ResultadoCarga> {
@@ -165,6 +76,18 @@ export async function ajustarRegla(id: string, categoriaId: string): Promise<Res
   if (!esId(id) || !esId(categoriaId)) return ENTRADA_INVALIDA;
   try {
     await captura.ajustarRegla(id, categoriaId);
+  } catch (error) {
+    const { codigo, mensaje } = fallo(error);
+    return { ok: false, codigo, mensaje };
+  }
+  return { ok: true };
+}
+
+/** «Usar {cuenta} siempre»: `PATCH /perfil` → `cuentaPredeterminadaId` (N-34). */
+export async function elegirPredeterminada(cuentaId: string): Promise<ResultadoSimple> {
+  if (!esId(cuentaId)) return ENTRADA_INVALIDA;
+  try {
+    await perfil.elegirPredeterminada(cuentaId);
   } catch (error) {
     const { codigo, mensaje } = fallo(error);
     return { ok: false, codigo, mensaje };

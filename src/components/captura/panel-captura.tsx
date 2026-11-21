@@ -5,44 +5,69 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { formatearDinero } from "@/domain/dinero/formato";
 import { importeEnPatrimonio } from "@/domain/movimiento/vista-previa";
 import type { Cuenta } from "@/services/captura";
+import type { TipoMovimiento } from "@/services/movimientos";
+import { BloqueEliminar } from "../bloque-eliminar";
 import { Boton } from "../boton";
 import { CampoMonto } from "../campo-monto";
 import { ChipCategoria } from "../chip-categoria";
 import { EnlaceTexto } from "../enlace-texto";
 import { MensajeError } from "../mensaje-error";
+import type { EstadoEdicion } from "../movimientos/usar-edicion";
 import { PanelLateral, type ControlPanel } from "../panel-lateral";
 import { AvisoRegistro } from "./aviso-registro";
+import { EditorPartes } from "./editor-partes";
 import { FichaCuenta } from "./ficha-cuenta";
 import { SelectorFecha } from "./selector-fecha";
 import { SelectorTipo } from "./selector-tipo";
-import {
-  datosAviso,
-  datosOferta,
-  etiquetaRegistrar,
-  MAX_DESCRIPCION,
-  MAX_NOTA,
-  normalizar,
-  type EstadoCaptura,
-  type RolCuenta,
-} from "./usar-captura";
+import { datosAviso, datosOferta, type EstadoCaptura } from "./usar-captura";
+import { MAX_DESCRIPCION, MAX_NOTA, normalizar, type RolCuenta } from "./usar-formulario";
+
+/** El formulario de movimiento en cualquiera de sus modos: registro (captura) o edición. */
+export type EstadoFormulario = EstadoCaptura | EstadoEdicion;
 
 export const ID_MONTO = "captura-monto";
 const ID_FORMULARIO = "captura-formulario";
 
-/** Pesos sin «COP»: toda la captura está en pesos. */
+const ROTULO_TIPO: Record<TipoMovimiento, string> = { gasto: "Gasto", ingreso: "Ingreso", transferencia: "Transferencia" };
+
+const VERBO: Record<TipoMovimiento, string> = {
+  gasto: "Registrar gasto",
+  ingreso: "Registrar ingreso",
+  transferencia: "Registrar transferencia",
+};
+
+/** «Registrar gasto» / «Registrando…» en la captura; «Guardar cambios» / «Guardando…» en la edición. */
+export function etiquetaEnviar(c: EstadoFormulario): string {
+  if (c.modo === "edicion") return c.enviando ? "Guardando…" : "Guardar cambios";
+  return c.enviando ? "Registrando…" : VERBO[c.valores.tipo];
+}
+
+/** `{concepto}` de los textos: la descripción o, sin ella, el tipo («Gasto»). */
+export function conceptoDe(movimiento: { tipo: TipoMovimiento; descripcion: string | null }): string {
+  return movimiento.descripcion ?? ROTULO_TIPO[movimiento.tipo];
+}
+
+/** Frase del bloque de borrado de un movimiento: «El saldo de Nequi vuelve a como estaba. No se puede deshacer.». */
+export function detalleEliminar(c: EstadoEdicion): string {
+  const { cuentaOrigen, cuentaDestino } = c.movimiento;
+  const cuentas = [cuentaOrigen, cuentaDestino].filter((cu) => cu !== null).map((cu) => cu.nombre);
+  return `El saldo de ${cuentas.join(" y ")} vuelve a como estaba. No se puede deshacer.`;
+}
+
+/** Pesos sin «COP»: todo el formulario está en pesos. */
 function pesos(monto: bigint): string {
   return formatearDinero({ monto, moneda: "COP" }, { omitirCOP: true });
 }
 
 /** Monto del botón con su signo: «−15.000», «+15.000» o «15.000» en transferencia. */
-export function montoConSigno(c: EstadoCaptura): string | undefined {
+export function montoConSigno(c: EstadoFormulario): string | undefined {
   if (c.montoNumero === null) return undefined;
   const efecto = importeEnPatrimonio(c.valores.tipo, c.montoNumero);
   return formatearDinero({ monto: efecto ?? c.montoNumero, moneda: "COP" }, { omitirCOP: true, signoMas: efecto !== null });
 }
 
 /** «Nequi quedará en 5.321»; en un pasivo, «Visa Oro quedará en debe 1.299.300». */
-function textoVistaPrevia(c: EstadoCaptura): { cuenta: string; saldo: string } | null {
+function textoVistaPrevia(c: EstadoFormulario): { cuenta: string; saldo: string } | null {
   const cuenta = c.cuentaElegida;
   if (!cuenta) return null;
   const resultante = c.vistaPrevia(cuenta, "cuenta");
@@ -74,6 +99,39 @@ export function ErrorCarga({ alReintentar }: { alReintentar: () => void }) {
   );
 }
 
+/** Edición de un movimiento con una cuenta archivada (N-36): solo lectura. */
+export function AvisoSoloLectura({ cuenta }: { cuenta: string }) {
+  return (
+    <div role="status" className="flex flex-col items-start gap-1 border-b border-linea pb-4">
+      <p className="text-cuerpo">La cuenta {cuenta} está archivada. Restáurala para modificar este movimiento.</p>
+      <EnlaceTexto href="/cuentas/archivadas">Ver archivadas</EnlaceTexto>
+    </div>
+  );
+}
+
+/** «¿Descartar los cambios?» en lugar del botón, al cerrar la edición con cambios. */
+export function ConfirmarDescarte({ alDescartar, alSeguir }: { alDescartar: () => void; alSeguir: () => void }) {
+  return (
+    <div role="group" aria-label="Descartar los cambios" className="flex flex-col gap-3">
+      <p className="text-cuerpo font-semibold">¿Descartar los cambios?</p>
+      <div className="flex flex-wrap items-center gap-3">
+        <Boton onClick={alDescartar}>Descartar</Boton>
+        <Boton variante="texto" onClick={alSeguir}>
+          Seguir editando
+        </Boton>
+      </div>
+    </div>
+  );
+}
+
+/** «Usar {cuenta} siempre» (solo en la captura): la elegida pasa a ser la predeterminada (N-34). */
+export function usarSiempre(c: EstadoFormulario): { cuenta: Cuenta; alPulsar: () => void; pendiente: boolean } | null {
+  if (c.modo !== "registro" || c.valores.tipo === "transferencia") return null;
+  const elegida = c.cuentaElegida;
+  if (!elegida || elegida.id === c.predeterminada?.id) return null;
+  return { cuenta: elegida, alPulsar: () => void c.elegirPredeterminada(elegida.id), pendiente: c.predeterminadaPendiente };
+}
+
 /** Renglones vacíos mientras llegan categorías y cuentas: sin datos inventados. */
 function Cargando({ etiqueta }: { etiqueta: string }) {
   return (
@@ -84,7 +142,7 @@ function Cargando({ etiqueta }: { etiqueta: string }) {
   );
 }
 
-function Descripcion({ c }: { c: EstadoCaptura }) {
+function Descripcion({ c }: { c: EstadoFormulario }) {
   const { descripcion } = c.valores;
   const error = c.errores.descripcion;
   const primero = c.conceptos[0];
@@ -154,7 +212,7 @@ function Descripcion({ c }: { c: EstadoCaptura }) {
   );
 }
 
-function Categorias({ c }: { c: EstadoCaptura }) {
+function Categorias({ c }: { c: EstadoFormulario }) {
   const { categoria } = c.valores;
   const propuestaActiva = categoria.modo === "propuesta" ? c.propuesta : null;
   return (
@@ -179,13 +237,22 @@ function Categorias({ c }: { c: EstadoCaptura }) {
   );
 }
 
-function GrupoFichas({ c, rol, etiqueta }: { c: EstadoCaptura; rol: RolCuenta; etiqueta: string }) {
+function GrupoFichas({ c, rol, etiqueta }: { c: EstadoFormulario; rol: RolCuenta; etiqueta: string }) {
   const elegida = rol === "cuenta" ? c.valores.cuentaId : c.valores.destinoId;
   const error = rol === "cuenta" ? c.errores.cuenta : c.errores.destino;
   const elegir = (cuenta: Cuenta) => c.cambiar(rol === "cuenta" ? "cuentaId" : "destinoId", cuenta.id);
+  const usar = rol === "cuenta" ? usarSiempre(c) : null;
+  const errorPredeterminada = rol === "cuenta" && c.modo === "registro" ? c.errorPredeterminada : null;
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-etiqueta text-secundario">{etiqueta}</span>
+      <div className="flex min-h-6 items-center justify-between gap-3">
+        <span className="text-etiqueta text-secundario">{etiqueta}</span>
+        {usar && (
+          <Boton variante="texto" onClick={usar.alPulsar} disabled={usar.pendiente} className="h-11 shrink-0">
+            Usar {usar.cuenta.nombre} siempre
+          </Boton>
+        )}
+      </div>
       <div role="group" aria-label={etiqueta} className="grid grid-cols-2 gap-2">
         {c.cuentas.map((cuenta) => (
           <FichaCuenta
@@ -198,53 +265,98 @@ function GrupoFichas({ c, rol, etiqueta }: { c: EstadoCaptura; rol: RolCuenta; e
         ))}
       </div>
       {error && <MensajeError mensaje={error} />}
+      {errorPredeterminada && <MensajeError mensaje={errorPredeterminada} />}
+    </div>
+  );
+}
+
+/** Pie de la edición: guardar (o descartar), y debajo el borrado C26. En solo lectura no hay pie. */
+function PieEdicion({ c, alCerrarYa }: { c: EstadoEdicion; alCerrarYa: () => Promise<void> }) {
+  const concepto = conceptoDe(c.movimiento);
+  return (
+    <div className="flex flex-col gap-2">
+      {c.confirmandoDescarte ? (
+        <ConfirmarDescarte alDescartar={() => void alCerrarYa()} alSeguir={c.seguirEditando} />
+      ) : (
+        <Boton type="submit" form={ID_FORMULARIO} disabled={!c.puedeEnviar} className="w-full justify-center">
+          {etiquetaEnviar(c)}
+        </Boton>
+      )}
+      {c.errorGeneral && <MensajeError mensaje={c.errorGeneral} />}
+      <div className="mt-2 border-t border-linea pt-4">
+        {c.confirmandoBorrado ? (
+          <BloqueEliminar
+            nombre={concepto}
+            detalle={detalleEliminar(c)}
+            alConfirmar={() => void c.eliminar().then((ok) => (ok ? alCerrarYa() : undefined))}
+            alCancelar={c.cancelarBorrado}
+            pendiente={c.eliminando}
+            error={c.errorBorrado}
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={c.pedirBorrado}
+            disabled={c.enviando}
+            className="py-2 text-etiqueta font-normal text-secundario hover:text-texto disabled:cursor-not-allowed"
+          >
+            Eliminar movimiento…
+          </button>
+        )}
+      </div>
     </div>
   );
 }
 
 /**
- * Captura rápida en escritorio (≥ 768 px): panel lateral de 480 px sobre la
- * página actual, sin cambiar la URL. Enter registra desde cualquier campo
- * salvo la nota; Escape cierra y conserva el borrador.
+ * Formulario de movimiento en escritorio (≥ 768 px): panel lateral de 480 px.
+ * Registro (captura): sobre la página actual, sin cambiar la URL; Enter
+ * registra desde cualquier campo salvo la nota; Escape cierra y conserva el
+ * borrador. Edición: abierta por URL desde `/movimientos`; Enter guarda;
+ * cerrar con cambios pregunta.
  */
-export function PanelCaptura({ c }: { c: EstadoCaptura }) {
+export function PanelCaptura({ c }: { c: EstadoFormulario }) {
   const panel = useRef<ControlPanel>(null);
-  const [masOpciones, setMasOpciones] = useState(() => c.valores.nota !== "");
+  const [masOpciones, setMasOpciones] = useState(() => c.valores.nota !== "" || c.valores.partes !== null);
   const { valores } = c;
   const esTransferencia = valores.tipo === "transferencia";
+  const edicion = c.modo === "edicion" ? c : null;
+  const soloLectura = edicion?.soloLectura ?? null;
 
   // Al abrir y tras cada registro, el foco vuelve al monto.
   useEffect(() => {
-    document.getElementById(ID_MONTO)?.focus();
-  }, [c.registros]);
+    if (!soloLectura) document.getElementById(ID_MONTO)?.focus();
+  }, [c.envios, soloLectura]);
 
-  async function cerrar() {
+  /** Retira la hoja y avisa (la captura se oculta; la edición quita `?movimiento=`). */
+  async function cerrarYa() {
     await panel.current?.cerrar();
     c.cerrar();
   }
 
-  function enviar(evento: FormEvent<HTMLFormElement>) {
+  function solicitarCierre() {
+    if (c.solicitarCierre()) void cerrarYa();
+  }
+
+  async function enviar(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
-    void c.registrar();
+    if (await c.enviar()) await cerrarYa();
   }
 
   const listo = c.estadoCarga === "lista" && c.captura !== null;
   const errorCarga = c.estadoCarga === "error" && c.captura === null;
   const vista = textoVistaPrevia(c);
-  const predeterminada = c.predeterminada ? `Cuenta · ${c.predeterminada.nombre} es la predeterminada` : "Cuenta";
+  const rotuloCuenta = c.predeterminada ? `Cuenta · ${c.predeterminada.nombre} es la predeterminada` : "Cuenta";
 
-  const pie =
-    errorCarga || c.sinCuentas ? undefined : (
+  let pie;
+  if (edicion) {
+    pie = soloLectura ? undefined : <PieEdicion c={edicion} alCerrarYa={cerrarYa} />;
+  } else if (!errorCarga && !c.sinCuentas) {
+    pie = (
       <div className="flex flex-col gap-2">
         {c.errorGeneral && <MensajeError mensaje={c.errorGeneral} />}
-        <Boton
-          type="submit"
-          form={ID_FORMULARIO}
-          disabled={!c.puedeRegistrar}
-          monto={montoConSigno(c)}
-          className="w-full justify-center"
-        >
-          {etiquetaRegistrar(c)}
+        <Boton type="submit" form={ID_FORMULARIO} disabled={!c.puedeEnviar} monto={montoConSigno(c)} className="w-full justify-center">
+          {etiquetaEnviar(c)}
         </Boton>
         <p className="text-etiqueta font-normal text-secundario">
           <kbd className="rounded-muestra border border-linea px-1 font-mono text-cifra-xs">↵</kbd> registra y deja el panel listo para otro
@@ -256,18 +368,26 @@ export function PanelCaptura({ c }: { c: EstadoCaptura }) {
         )}
       </div>
     );
+  }
 
   return (
-    <PanelLateral ref={panel} titulo="Registrar" ancho="amplio" alSolicitarCierre={() => void cerrar()} pie={pie}>
-      <form id={ID_FORMULARIO} onSubmit={enviar} noValidate className="flex flex-col gap-6">
-        <AvisoRegistro aviso={datosAviso(c)} oferta={datosOferta(c)} />
+    <PanelLateral
+      ref={panel}
+      titulo={edicion ? "Editar movimiento" : "Registrar"}
+      ancho="amplio"
+      alSolicitarCierre={solicitarCierre}
+      pie={pie}
+    >
+      <form id={ID_FORMULARIO} onSubmit={(e) => void enviar(e)} noValidate className="flex flex-col gap-6">
+        {c.modo === "registro" && <AvisoRegistro aviso={datosAviso(c)} oferta={datosOferta(c)} />}
+        {soloLectura && <AvisoSoloLectura cuenta={soloLectura.nombre} />}
 
         {errorCarga ? (
           <ErrorCarga alReintentar={c.reintentar} />
         ) : c.sinCuentas ? (
           <SinCuentas alIr={c.cerrar} />
         ) : (
-          <>
+          <fieldset disabled={soloLectura !== null} className="m-0 flex min-w-0 flex-col gap-6 border-0 p-0">
             <SelectorTipo valor={valores.tipo} alCambiar={c.cambiarTipo} />
             {c.errores.tipo && <MensajeError mensaje={c.errores.tipo} />}
 
@@ -280,7 +400,8 @@ export function PanelCaptura({ c }: { c: EstadoCaptura }) {
 
             <Descripcion c={c} />
 
-            {!esTransferencia && (listo ? <Categorias c={c} /> : <Cargando etiqueta="Categoría" />)}
+            {/* Con partes, los chips de categoría se ocultan: la categoría va en cada parte. */}
+            {!esTransferencia && valores.partes === null && (listo ? <Categorias c={c} /> : <Cargando etiqueta="Categoría" />)}
 
             {listo ? (
               esTransferencia ? (
@@ -289,7 +410,7 @@ export function PanelCaptura({ c }: { c: EstadoCaptura }) {
                   <GrupoFichas c={c} rol="destino" etiqueta="Hacia" />
                 </>
               ) : (
-                <GrupoFichas c={c} rol="cuenta" etiqueta={predeterminada} />
+                <GrupoFichas c={c} rol="cuenta" etiqueta={rotuloCuenta} />
               )
             ) : (
               <Cargando etiqueta="Cuenta" />
@@ -310,7 +431,7 @@ export function PanelCaptura({ c }: { c: EstadoCaptura }) {
                 className="flex min-h-11 items-center justify-between border-b border-linea text-left text-cuerpo"
               >
                 <span>
-                  Más opciones <span className="text-secundario">· nota</span>
+                  Más opciones <span className="text-secundario">· nota, dividir</span>
                 </span>
                 <span className="flex text-secundario">
                   {masOpciones ? (
@@ -321,23 +442,40 @@ export function PanelCaptura({ c }: { c: EstadoCaptura }) {
                 </span>
               </button>
               {masOpciones && (
-                <label className="flex flex-col gap-1 pt-4">
-                  <span className="text-etiqueta text-secundario">Nota</span>
-                  <textarea
-                    value={valores.nota}
-                    onChange={(e) => c.cambiar("nota", e.target.value)}
-                    maxLength={MAX_NOTA}
-                    rows={3}
-                    aria-invalid={c.errores.nota ? true : undefined}
-                    className={`resize-none rounded-none border-0 border-b bg-transparent p-0 py-2 text-cuerpo text-texto ${
-                      c.errores.nota ? "border-salida" : "border-linea focus:border-raya"
-                    }`}
-                  />
-                  {c.errores.nota && <MensajeError mensaje={c.errores.nota} />}
-                </label>
+                <div className="flex flex-col gap-4 pt-4">
+                  <label className="flex flex-col gap-1">
+                    <span className="text-etiqueta text-secundario">Nota</span>
+                    <textarea
+                      value={valores.nota}
+                      onChange={(e) => c.cambiar("nota", e.target.value)}
+                      maxLength={MAX_NOTA}
+                      rows={3}
+                      aria-invalid={c.errores.nota ? true : undefined}
+                      className={`resize-none rounded-none border-0 border-b bg-transparent p-0 py-2 text-cuerpo text-texto ${
+                        c.errores.nota ? "border-salida" : "border-linea focus:border-raya"
+                      }`}
+                    />
+                    {c.errores.nota && <MensajeError mensaje={c.errores.nota} />}
+                  </label>
+                  {!esTransferencia && listo && (
+                    <EditorPartes
+                      idBase="panel"
+                      total={c.montoNumero}
+                      partes={valores.partes}
+                      categorias={c.categorias}
+                      alActivar={c.activarPartes}
+                      alDesactivar={c.desactivarPartes}
+                      alCambiar={c.cambiarParte}
+                      alAgregar={c.agregarParte}
+                      alQuitar={c.quitarParte}
+                      alCompletar={c.completarResto}
+                      error={c.errores.partes ?? c.errorDePartes}
+                    />
+                  )}
+                </div>
               )}
             </div>
-          </>
+          </fieldset>
         )}
       </form>
     </PanelLateral>

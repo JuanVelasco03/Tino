@@ -7,7 +7,7 @@ import { Boton } from "../boton";
 import { EnlaceTexto } from "../enlace-texto";
 import { IconoCuenta, ROTULO_TIPO_CUENTA } from "../iconos";
 import { MensajeError } from "../mensaje-error";
-import { BloqueEliminar } from "./bloque-eliminar";
+import { BloqueEliminar, DETALLE_ELIMINAR_CUENTA } from "../bloque-eliminar";
 
 type Props = {
   cuentas: Cuenta[];
@@ -181,6 +181,7 @@ function FilaArchivada({ cuenta, restaurar, eliminar }: PropsFila) {
         <div className="col-start-2 pt-2 pb-2 md:col-end-4">
           <BloqueEliminar
             nombre={cuenta.nombre}
+            detalle={DETALLE_ELIMINAR_CUENTA}
             alConfirmar={confirmarBorrado}
             alCancelar={volver}
             pendiente={pendiente}

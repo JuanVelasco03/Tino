@@ -14,8 +14,13 @@ export type DatosAviso = {
   descripcion: string | null;
   /** «Nequi»; en transferencia, «Nequi → Visa Oro». */
   cuenta: string;
-  alDeshacer: () => void;
-  deshaciendo: boolean;
+  /** «Registrado» (captura), «Guardado» o «Eliminado» (edición). */
+  verbo?: string;
+  /** Tras el texto: « · ahora en Octubre 2026» si una edición lo cambió de mes. */
+  sufijo?: string;
+  /** Sin él no hay «Deshacer» (la edición y el borrado no se deshacen). */
+  alDeshacer?: () => void;
+  deshaciendo?: boolean;
   error?: string | null;
 };
 
@@ -73,14 +78,17 @@ export function AvisoRegistro({ formato = "panel", aviso, oferta }: Props) {
                 <Importe tipo={aviso.tipo} monto={aviso.monto} />
               </>
             ) : (
-              <span className="min-w-0 flex-1 text-cuerpo">
-                Registrado: {aviso.descripcion ?? ROTULO_TIPO[aviso.tipo]} <Importe tipo={aviso.tipo} monto={aviso.monto} /> en{" "}
-                {aviso.cuenta}
+              <span className={`min-w-0 flex-1 text-cuerpo ${aviso.alDeshacer ? "" : "py-2 pr-3"}`}>
+                {aviso.verbo ?? "Registrado"}: {aviso.descripcion ?? ROTULO_TIPO[aviso.tipo]}{" "}
+                <Importe tipo={aviso.tipo} monto={aviso.monto} /> en {aviso.cuenta}
+                {aviso.sufijo}
               </span>
             )}
-            <Boton variante="texto" onClick={aviso.alDeshacer} disabled={aviso.deshaciendo} className="h-11 shrink-0 px-3">
-              {aviso.deshaciendo ? "Deshaciendo…" : "Deshacer"}
-            </Boton>
+            {aviso.alDeshacer && (
+              <Boton variante="texto" onClick={aviso.alDeshacer} disabled={aviso.deshaciendo} className="h-11 shrink-0 px-3">
+                {aviso.deshaciendo ? "Deshaciendo…" : "Deshacer"}
+              </Boton>
+            )}
           </div>
           {aviso.error && <MensajeError mensaje={aviso.error} className="pr-3 pb-2" />}
         </div>

@@ -4,7 +4,15 @@ import type { AccionesCaptura } from "@/components/captura/usar-captura";
 import { BarraPestanas } from "@/components/menu/barra-pestanas";
 import { MenuLateral } from "@/components/menu/menu-lateral";
 import { salir } from "../(acceso)/acciones";
-import { ajustarRegla, cargarCaptura, crearRegla, deshacerRegistro, registrarMovimiento, sugerir } from "./captura/acciones";
+import {
+  ajustarRegla,
+  cargarCaptura,
+  crearRegla,
+  deshacerRegistro,
+  elegirPredeterminada,
+  registrarMovimiento,
+  sugerir,
+} from "./captura/acciones";
 
 const ACCIONES_CAPTURA: AccionesCaptura = {
   cargar: cargarCaptura,
@@ -13,6 +21,7 @@ const ACCIONES_CAPTURA: AccionesCaptura = {
   deshacer: deshacerRegistro,
   crearRegla,
   ajustarRegla,
+  elegirPredeterminada,
 };
 
 /**

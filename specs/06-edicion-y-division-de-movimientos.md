@@ -1,6 +1,6 @@
 # SPEC 06 — Edición, borrado y división de movimientos
 
-> **Estado:**  Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 04, SPEC 05, Tino-API SPEC 04
 > **Fecha:** 2026-11-21
 > **Objetivo:** Que el usuario corrija, elimine y divida sus movimientos, recorra otros meses y elija su cuenta predeterminada, sin salir del libro de movimientos.

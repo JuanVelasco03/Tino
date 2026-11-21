@@ -5,6 +5,9 @@
  * el dominio no importa `repositories/`.
  */
 import { aDigitos } from "../dinero/entrada";
+import { errorPartes, type ValorParte } from "./partes";
+
+export type { ValorParte };
 
 export type TipoMovimiento = "gasto" | "ingreso" | "transferencia";
 
@@ -36,11 +39,13 @@ export type ValoresCaptura = {
   /** `"YYYY-MM-DD"`; por defecto `captura.fechaHoy`. `""` mientras no llega: la API pone hoy. */
   fecha: string;
   nota: string;
+  /** `null` = sin dividir. Nunca en transferencia (RN-05). */
+  partes: ValorParte[] | null;
 };
 
-export type CampoCaptura = "tipo" | "monto" | "descripcion" | "categoria" | "cuenta" | "destino" | "fecha" | "nota";
+export type CampoCaptura = "tipo" | "monto" | "descripcion" | "categoria" | "cuenta" | "destino" | "fecha" | "nota" | "partes";
 
-/** `MovimientoCuerpo` del contrato, sin `partes` (dividir llega en SPEC 06). */
+/** `MovimientoCuerpo` del contrato. */
 export type CuerpoMovimiento = {
   tipo: TipoMovimiento;
   /** `^\d{1,19}$`, > 0. */
@@ -51,6 +56,7 @@ export type CuerpoMovimiento = {
   cuentaOrigenId?: string | null;
   cuentaDestinoId?: string | null;
   categoriaId?: string | null;
+  partes?: { categoriaId: string; monto: string }[] | null;
 };
 
 /**
@@ -80,10 +86,23 @@ function textoONulo(texto: string): string | null {
   return recortado === "" ? null : recortado;
 }
 
+/** Partes del cuerpo, o `null` si no son válidas (`errorPartes`): cada una con categoría y entero > 0. */
+function partesDelCuerpo(total: string, partes: readonly ValorParte[]): { categoriaId: string; monto: string }[] | null {
+  if (errorPartes(BigInt(total), partes) !== null) return null;
+  const cuerpo: { categoriaId: string; monto: string }[] = [];
+  for (const parte of partes) {
+    const monto = montoValido(parte.monto);
+    if (parte.categoriaId === null || monto === null) return null;
+    cuerpo.push({ categoriaId: parte.categoriaId, monto });
+  }
+  return cuerpo;
+}
+
 /**
- * Cuerpo de `POST /movimientos` desde el formulario, o `null` si el monto no
- * es válido. Gasto: `cuentaOrigenId`. Ingreso: `cuentaDestinoId`.
- * Transferencia: ambos y nunca `categoriaId` (RN-03, RN-05).
+ * Cuerpo de `POST /movimientos` (o `PUT`) desde el formulario, o `null` si el
+ * monto o las partes no son válidos. Gasto: `cuentaOrigenId`. Ingreso:
+ * `cuentaDestinoId`. Transferencia: ambos, nunca `categoriaId` ni `partes`
+ * (RN-03, RN-05). Con partes, nunca `categoriaId` (`PARTES_CON_CATEGORIA`).
  */
 export function cuerpoDesdeValores(valores: ValoresCaptura, propuesta: Propuesta | null): CuerpoMovimiento | null {
   const monto = montoValido(valores.monto);
@@ -97,19 +116,21 @@ export function cuerpoDesdeValores(valores: ValoresCaptura, propuesta: Propuesta
   };
   if (valores.fecha !== "") cuerpo.fecha = valores.fecha;
 
-  switch (valores.tipo) {
-    case "gasto":
-      cuerpo.cuentaOrigenId = valores.cuentaId;
-      cuerpo.categoriaId = categoriaEfectiva(valores, propuesta);
-      break;
-    case "ingreso":
-      cuerpo.cuentaDestinoId = valores.cuentaId;
-      cuerpo.categoriaId = categoriaEfectiva(valores, propuesta);
-      break;
-    case "transferencia":
-      cuerpo.cuentaOrigenId = valores.cuentaId;
-      cuerpo.cuentaDestinoId = valores.destinoId;
-      break;
+  if (valores.tipo === "transferencia") {
+    cuerpo.cuentaOrigenId = valores.cuentaId;
+    cuerpo.cuentaDestinoId = valores.destinoId;
+    return cuerpo;
+  }
+
+  if (valores.tipo === "gasto") cuerpo.cuentaOrigenId = valores.cuentaId;
+  else cuerpo.cuentaDestinoId = valores.cuentaId;
+
+  if (valores.partes !== null) {
+    const partes = partesDelCuerpo(monto, valores.partes);
+    if (partes === null) return null;
+    cuerpo.partes = partes;
+  } else {
+    cuerpo.categoriaId = categoriaEfectiva(valores, propuesta);
   }
   return cuerpo;
 }

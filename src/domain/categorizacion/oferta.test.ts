@@ -17,9 +17,37 @@ function entrada(cambios: Partial<EntradaOferta>): EntradaOferta {
     categoria: { modo: "elegida", id: HOGAR.id },
     propuesta: null,
     categorias: CATEGORIAS,
+    dividido: false,
     ...cambios,
   };
 }
+
+describe("ofertaDeRegla · edición", () => {
+  it("corregir Comida (propuesta por «almuerzo») por Ocio ofrece cambiar la regla", () => {
+    const oferta = ofertaDeRegla(
+      entrada({ descripcion: "Almuerzo", propuesta: PROPUESTA, categoria: { modo: "elegida", id: OCIO.id }, categoriaAnterior: COMIDA.id }),
+    );
+    expect(oferta).toEqual({ tipo: "ajustar", reglaId: "r-almuerzo", palabraClave: "almuerzo", categoria: OCIO });
+  });
+
+  it("la categoría no cambió (solo el monto) → null", () => {
+    expect(
+      ofertaDeRegla(entrada({ descripcion: "Almuerzo", propuesta: PROPUESTA, categoria: { modo: "elegida", id: OCIO.id }, categoriaAnterior: OCIO.id })),
+    ).toBeNull();
+    expect(ofertaDeRegla(entrada({ categoriaAnterior: HOGAR.id }))).toBeNull();
+  });
+
+  it("sin categoría antes y elegida ahora → ofrece", () => {
+    expect(ofertaDeRegla(entrada({ categoriaAnterior: null }))).toEqual({ tipo: "crear", palabraClave: "Peluquería", categoria: HOGAR });
+  });
+});
+
+describe("ofertaDeRegla · partes", () => {
+  it("dividido → null", () => {
+    expect(ofertaDeRegla(entrada({ dividido: true }))).toBeNull();
+    expect(ofertaDeRegla(entrada({ dividido: true, propuesta: PROPUESTA, categoria: { modo: "elegida", id: OCIO.id } }))).toBeNull();
+  });
+});
 
 describe("ofertaDeRegla · crear", () => {
   it("sin propuesta y categoría elegida a mano: ofrece crear con la descripción", () => {

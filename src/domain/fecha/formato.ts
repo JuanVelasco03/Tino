@@ -84,3 +84,45 @@ export function formatearMes(mes: string): string {
   if (!coincidencia || !nombre) throw new Error(`Mes mal formado: "${mes}". Se espera "YYYY-MM".`);
   return `${nombre} ${coincidencia[1]}`;
 }
+
+const MES = /^(\d{4})-(0[1-9]|1[0-2])$/;
+
+/** `"2026-11"` es un mes válido; `"2026-13"`, `"hola"` o `"2026-11-19"`, no. */
+export function esMes(texto: string): boolean {
+  return MES.test(texto);
+}
+
+function partirMes(mes: string): { anio: number; mes: number } {
+  const coincidencia = MES.exec(mes);
+  if (!coincidencia) throw new Error(`Mes mal formado: "${mes}". Se espera "YYYY-MM".`);
+  return { anio: Number.parseInt(coincidencia[1], 10), mes: Number.parseInt(coincidencia[2], 10) };
+}
+
+function aMes(anio: number, mes: number): string {
+  return `${String(anio).padStart(4, "0")}-${String(mes).padStart(2, "0")}`;
+}
+
+/** `"2026-01"`, `-1` → `"2025-12"`. Aritmética de calendario, sin zona horaria. */
+export function sumarMeses(mes: string, n: number): string {
+  const partes = partirMes(mes);
+  const total = partes.anio * 12 + (partes.mes - 1) + n;
+  return aMes(Math.floor(total / 12), (((total % 12) + 12) % 12) + 1);
+}
+
+/** `"2026-11-19"` → `"2026-11"`. */
+export function mesDeFecha(fecha: string): string {
+  partir(fecha); // valida la forma
+  return fecha.slice(0, 7);
+}
+
+/**
+ * Mes actual en la zona del perfil (IANA): a medianoche UTC del 1 de
+ * diciembre, en Bogotá todavía es noviembre. Presentación (REGLAS §6).
+ */
+export function mesEnZona(zona: string, ahora: Date): string {
+  const partes = new Intl.DateTimeFormat("en-CA", { timeZone: zona, year: "numeric", month: "2-digit" }).formatToParts(ahora);
+  const anio = partes.find((p) => p.type === "year")?.value;
+  const mes = partes.find((p) => p.type === "month")?.value;
+  if (!anio || !mes) throw new Error(`No se pudo calcular el mes en la zona "${zona}".`);
+  return `${anio}-${mes}`;
+}

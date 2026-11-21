@@ -384,10 +384,19 @@ Filas de 44 px separadas por divisiones, con un radio nativo oculto y dibujado c
 Rótulo en MAYÚSCULAS a la izquierda y cifra-s a la derecha, alineados por línea base sobre una raya, con 8 px de relleno inferior. Entre grupos se separa con 24 px de espacio, nunca con otra línea.
 
 ### Fila de movimiento (C2)
-Sin icono. Grid `52px | flexible | auto` con división inferior y 12 px de relleno vertical. Fecha en cifra-xs secundaria, concepto en cuerpo, y debajo categoría · cuenta en `etiqueta` secundaria (sin clasificar: «Sin clasificar» con línea punteada; con partes: «Dividido»). Monto en cifra-s con signo y color según patrimonio, tomado del tipo; en USD, la equivalencia debajo. El recién registrado (`resaltada`) toma fondo `hundido` y peso 600 en concepto y monto mientras dura su aviso.
+Sin icono. Grid `52px | flexible | auto` con división inferior y 12 px de relleno vertical. Fecha en cifra-xs secundaria, concepto en cuerpo, y debajo categoría · cuenta en `etiqueta` secundaria (sin clasificar: «Sin clasificar» con línea punteada; con partes: «Dividido»). Monto en cifra-s con signo y color según patrimonio, tomado del tipo; en USD, la equivalencia debajo. El recién registrado o guardado (`resaltada`) toma fondo `hundido` y peso 600 en concepto y monto mientras dura su aviso.
+- **Partes (sub-renglones):** un movimiento dividido lleva bajo la fila un renglón por parte, con la misma sangría que el concepto: categoría en `etiqueta` secundaria y monto en cifra-xs secundaria, sin signo (el signo es del total), alineado con el importe.
+- **Como enlace (`href`):** toda la fila abre su edición. El enlace es el concepto, estirado sobre la fila con un pseudo-elemento (un solo objetivo, nombrado por el concepto); al pasar el cursor, fondo `hundido`.
 
 ### Libro de movimientos (`/movimientos`)
 En escritorio, rejilla de cuatro columnas `52px | flexible | hasta 176px | 128px` (Fecha, Descripción con la categoría debajo, Cuenta, Importe a la derecha) con rótulos sobre una raya y divisiones entre filas. En móvil, filas C2. Transferencia: «origen → destino» en la cuenta y sin signo.
+- **Cabecera:** el título y debajo la navegación de meses.
+- **Filas:** cada una es un enlace a `?mes=…&movimiento=<id>` (sin mover el scroll); las partes van como sub-renglones que ocupan de la Descripción al Importe.
+- **Aviso:** tras guardar o eliminar, el `AvisoRegistro` va arriba de la lista («Guardado: …» / «Eliminado: …», sin «Deshacer») con la oferta de regla si aplica.
+- **Vacío:** en el mes actual, «Aún no registras movimientos este mes.»; en otro, «No hay movimientos en {mes}.» · «Registra uno o cambia de mes.».
+
+### Navegación de meses (`NavegacionMes`)
+`‹` y `›` como objetivos de 44 px con chevrones de 18 px en `secundario` (pasan a `texto` al pasar el cursor), y entre ellos el mes («Noviembre 2026») en cuerpo 600. A la derecha, «Este mes» (`EnlaceTexto`) solo fuera del mes actual. Cada mes es una URL (`?mes=YYYY-MM`), sin límite hacia adelante. Las flechas se nombran con el destino: «Mes anterior: Octubre 2026».
 
 ### Estado vacío (C7)
 «La página en blanco»: el encabezado de sección con un «0» tenue, tres renglones vacíos de 44 px y debajo el título (cuerpo 600), el detalle y la acción con un `+` (un `EnlaceTexto`; si la acción no navega, como abrir la captura, un botón con el mismo aspecto). Si el destino aún no existe, la acción va en `terciario` y deshabilitada («Próximamente»), con la misma caja de 44 px para que no salte.
@@ -408,15 +417,29 @@ Para elegir la cuenta en la captura de escritorio, dos por fila. Grid `20px | fl
 
 ### Aviso de registro (`AvisoRegistro`)
 Tras registrar: marca de 16 px en verde base, «Registrado: Almuerzo −15.000 en Nequi» en cuerpo (monto en cifra-s con signo) y «Deshacer» como botón de texto, durante 5 s. Debajo, tras una división, la oferta de regla en `etiqueta` secundaria con «Crear regla» / «Cambiar regla» · «No», que sigue hasta que el usuario responde o registra otro. Borde `linea`, radio de campo, fondo `fondo` en el panel y `superficie` en la hoja móvil (formato compacto: «Almuerzo · Nequi   −15.000   Deshacer»). Sin sombra.
+- **Tras editar:** el mismo aviso con otro verbo («Guardado: …», «Eliminado: …») y sin «Deshacer»; si la edición cambió el mes, termina en « · ahora en Octubre 2026».
+
+### Formulario de movimiento, modo edición
+El formulario de la captura (panel de 480 px en escritorio, hoja a pantalla completa con teclado propio en móvil) abierto por URL desde el libro, con todos sus campos precargados, tipo incluido.
+- **Cambia respecto al registro:** título «Editar movimiento»; sin «Hoy −X», sin conceptos frecuentes, sin «Usar siempre» y sin vista previa del saldo. Botón «Guardar cambios» / «Guardando…» (sin cifra); Enter guarda.
+- **Pie:** el botón y, tras una división, «Eliminar movimiento…» como vínculo discreto, que se reemplaza por la confirmación de borrado. Al cerrar con cambios (Escape, «Cerrar», el velo), el botón se reemplaza por «¿Descartar los cambios?» · «Descartar» (primario) · «Seguir editando» (texto).
+- **Solo lectura:** con una cuenta archivada, los campos se ven deshabilitados (un `fieldset` deshabilitado), sin botón de guardar ni de eliminar, y arriba «La cuenta {nombre} está archivada. Restáurala para modificar este movimiento.» con «Ver archivadas».
+- **«Más opciones · nota, dividir»:** en ambos modos, la nota y el editor de partes van plegados bajo esta fila; se despliega sola si ya hay nota o partes.
+- **«Usar {cuenta} siempre» (solo registro):** si la cuenta elegida no es la predeterminada, botón de texto a la derecha del rótulo «Cuenta · Nequi es la predeterminada». En móvil va al pie de la hoja de cuentas, y la predeterminada lleva «Predeterminada» en su subtítulo.
+
+### Editor de partes (`EditorPartes`)
+Dividir un movimiento entre categorías. Sin dividir es solo «Dividir entre categorías» (botón de texto); dividido, el rótulo con «No dividir» a la derecha y una fila por parte: grid `flexible | 112px | 44px` con un `<select>` nativo de categoría (sin caja, `appearance-none`, línea de `CampoSubrayado` y chevron de 18 px), el monto en cifra-s mono a la derecha sobre la misma línea y «Quitar parte» (✕ de 18 px en 44 px) solo desde la tercera. Debajo, «+ Agregar parte» y la línea del restante: «Falta asignar X» en `etiqueta` secundaria, «Sobran X» en `salida-texto` o «Las partes suman el total.», con «El resto» a la derecha cuando completar la última deja un monto mayor que cero. El error (local o de la API) va al final con `MensajeError`.
+- Cada `<select>` ofrece las categorías del tipo que no usa otra parte. Con partes, los chips de categoría se ocultan.
+- En escritorio vive bajo «Más opciones»; en móvil, en la hoja de Categoría, y los montos usan el teclado del sistema (`inputMode="numeric"`): el teclado propio es del total.
 
 ### Teclado numérico (`TecladoNumerico`)
 Solo en la captura móvil, en vez del teclado del sistema. Tres columnas de teclas de 56 px (1–9, 000, 0, borrar) en cifra-m 400, fondo `fondo`, separadas por divisiones de 1 px y radio 0; pulsada, `hundido`. Ignora los ceros a la izquierda y no pasa de 19 dígitos (`aplicarTecla`, en `src/domain/dinero/entrada.ts`).
 
-### Confirmación de borrado (`bloque-eliminar`)
-La confirmación ocurre en la misma página, sin diálogo emergente: reemplaza al vínculo que la abrió, en el panel o en la fila.
-- **Contenido:** «Eliminar {nombre}» en `rotulo` y la frase de irreversibilidad en cuerpo. Debajo, el botón secundario «Eliminar {nombre}» con el texto en `salida-texto` y «Cancelar» como botón de texto.
+### Confirmación de borrado (`BloqueEliminar`)
+La confirmación ocurre en la misma página, sin diálogo emergente: reemplaza al vínculo que la abrió, en el panel, en la fila o en la edición de un movimiento. Vive en `src/components/bloque-eliminar.tsx`.
+- **Contenido:** «Eliminar {nombre}» en `rotulo` y la frase de irreversibilidad (`detalle`) en cuerpo. Cada función trae la suya: cuentas, «Se borra para siempre, con su historial de cambios. No se puede deshacer.»; un movimiento, «El saldo de Nequi vuelve a como estaba. No se puede deshacer.». Debajo, el botón secundario «Eliminar {nombre}» con el texto en `salida-texto` y «Cancelar» como botón de texto.
 - **Por qué terracota:** borrar es irreversible y debe distinguirse de las demás acciones. El acento queda en el texto, nunca de fondo.
-- **Vínculo que la abre:** discreto, en `etiqueta` o cuerpo `secundario` y terminado en «…» («Eliminar cuenta…»).
+- **Vínculo que la abre:** discreto, en `etiqueta` o cuerpo `secundario` y terminado en «…» («Eliminar cuenta…», «Eliminar movimiento…»).
 
 ### Fila en edición (C19)
 Una fila que se abre en su lugar para resolver algo sin salir de la lista. Se usa al restaurar una cuenta archivada cuyo nombre ya está en uso. La fila pasa a `superficie` entre dos rayas y muestra, bajo el nombre, la explicación en `etiqueta` secundaria, un campo subrayado y la acción primaria con «Cancelar» en texto. Al cerrarse vuelve a ser una fila normal.

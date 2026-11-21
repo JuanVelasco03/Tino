@@ -1,5 +1,9 @@
+import Link from "next/link";
 import { formatearDinero, type Dinero } from "@/domain/dinero/formato";
 import { importeEnPatrimonio } from "@/domain/movimiento/vista-previa";
+
+/** Parte de un movimiento dividido, ya con el nombre de su categoría. */
+export type ParteFila = { categoria: string; monto: bigint };
 
 type Props = {
   /** Ya formateada, p. ej. "04 nov". */
@@ -13,13 +17,36 @@ type Props = {
   cuenta?: string;
   /** Transferencia: extremos. */
   transferencia?: { origen: string; destino: string };
+  /** Dividido: un sub-renglón por parte (categoría y monto), bajo la fila. */
+  partes?: ParteFila[];
   /** Dólares: equivalente en COP, que se muestra debajo en secundario. */
   equivalenteCOP?: bigint;
   /** Toda la columna está en pesos: se omite «COP». */
   omitirCOP?: boolean;
-  /** El recién registrado, mientras dura su aviso: fondo hundido y peso 600. */
+  /** El recién registrado o guardado, mientras dura su aviso: fondo hundido y peso 600. */
   resaltada?: boolean;
+  /** La fila entera es un enlace a su edición (`?movimiento=<id>`), sin mover el scroll. */
+  href?: string;
 };
+
+/**
+ * Sub-renglones de un movimiento dividido: categoría en `etiqueta` secundaria
+ * y monto en cifra-xs, alineado con el importe. Sin signo: el signo es del total.
+ */
+export function SubRenglones({ partes, omitirCOP = true, className = "" }: { partes: ParteFila[]; omitirCOP?: boolean; className?: string }) {
+  return (
+    <ul aria-label="Partes" className={`flex flex-col ${className}`}>
+      {partes.map((parte) => (
+        <li key={parte.categoria} className="flex items-baseline justify-between gap-3 pl-3">
+          <span className="truncate text-etiqueta text-secundario">{parte.categoria}</span>
+          <span className="font-mono text-cifra-xs tabular-nums text-secundario">
+            {formatearDinero({ monto: parte.monto, moneda: "COP" }, { omitirCOP })}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 /**
  * C2 · Fila de movimiento, lista general. Sin icono.
@@ -35,9 +62,11 @@ export function FilaMovimiento({
   categoria,
   cuenta,
   transferencia,
+  partes = [],
   equivalenteCOP,
   omitirCOP = false,
   resaltada = false,
+  href,
 }: Props) {
   const efecto = importeEnPatrimonio(tipo, monto.monto);
   const cifra =
@@ -50,13 +79,20 @@ export function FilaMovimiento({
 
   return (
     <div
-      className={`grid grid-cols-[52px_minmax(0,1fr)_auto] items-baseline gap-3 border-b border-linea py-3 ${
-        resaltada ? "bg-hundido" : ""
+      className={`relative grid grid-cols-[52px_minmax(0,1fr)_auto] items-baseline gap-x-3 border-b border-linea py-3 ${
+        resaltada ? "bg-hundido" : href ? "hover:bg-hundido" : ""
       }`}
     >
       <span className="font-mono text-cifra-xs text-secundario">{fecha}</span>
       <div className="min-w-0">
-        <div className={`text-cuerpo ${peso}`}>{concepto}</div>
+        {href ? (
+          // El enlace se estira sobre toda la fila (`after:inset-0`): un solo objetivo, nombrado por el concepto.
+          <Link href={href} scroll={false} className={`block text-cuerpo after:absolute after:inset-0 ${peso}`}>
+            {concepto}
+          </Link>
+        ) : (
+          <div className={`text-cuerpo ${peso}`}>{concepto}</div>
+        )}
         <div className="text-etiqueta text-secundario">
           {tipo === "transferencia" && transferencia ? (
             <>
@@ -82,6 +118,7 @@ export function FilaMovimiento({
           </div>
         )}
       </div>
+      {partes.length > 0 && <SubRenglones partes={partes} omitirCOP={omitirCOP} className="col-span-2 col-start-2 pt-1" />}
     </div>
   );
 }

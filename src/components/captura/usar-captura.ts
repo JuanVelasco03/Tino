@@ -3,18 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { ofertaDeRegla, type Oferta } from "@/domain/categorizacion/oferta";
 import type { Sentido } from "@/domain/cuenta/naturaleza";
-import {
-  cuerpoDesdeValores,
-  montoValido,
-  type Categoria,
-  type DecisionCategoria,
-  type Propuesta,
-} from "@/domain/movimiento/cuerpo";
+import { cuerpoDesdeValores, montoValido, type Categoria } from "@/domain/movimiento/cuerpo";
 import { saldoResultante } from "@/domain/movimiento/vista-previa";
-import type { DatosAviso, DatosOferta } from "./aviso-registro";
-import type { Cuenta, DatosCaptura, ResultadoCarga, ResultadoSugerencias, Sugerencias } from "@/services/captura";
+import type { Cuenta, DatosCaptura, ResultadoCarga, ResultadoSugerencias } from "@/services/captura";
 import type {
-  CampoCaptura,
   Movimiento,
   MovimientoCuerpo,
   ResultadoRegistro,
@@ -22,6 +14,10 @@ import type {
   TipoMovimiento,
   ValoresCaptura,
 } from "@/services/movimientos";
+import type { DatosAviso, DatosOferta } from "./aviso-registro";
+import { useFormulario, type RolCuenta } from "./usar-formulario";
+
+export { MAX_DESCRIPCION, MAX_NOTA, normalizar, type RolCuenta } from "./usar-formulario";
 
 /** Server actions; llegan por prop desde el layout (los componentes no importan `app/`). */
 export type AccionesCaptura = {
@@ -31,28 +27,16 @@ export type AccionesCaptura = {
   deshacer: (id: string) => Promise<ResultadoSimple>;
   crearRegla: (palabraClave: string, categoriaId: string) => Promise<ResultadoSimple>;
   ajustarRegla: (id: string, categoriaId: string) => Promise<ResultadoSimple>;
+  elegirPredeterminada: (cuentaId: string) => Promise<ResultadoSimple>;
 };
 
-/** Rol de una cuenta en el movimiento: de dónde sale o a dónde entra el dinero. */
-export type RolCuenta = "cuenta" | "destino";
-
-type Errores = Partial<Record<CampoCaptura, string>>;
-
 type EstadoCarga = "inactiva" | "cargando" | "error" | "lista";
-
-/** Respuesta de `/sugerencias` con lo que se pidió, para saber si sigue vigente. */
-type SugerenciasPara = { tipo: TipoMovimiento; texto: string; datos: Sugerencias };
 
 export type Aviso = { movimiento: Movimiento; deshaciendo: boolean; error: string | null };
 export type EstadoOferta = { oferta: Oferta; pendiente: boolean; error: string | null };
 
-/** Espera tras la última tecla antes de pedir sugerencias. */
-const ESPERA_SUGERENCIAS_MS = 150;
 /** Plazo para deshacer un registro (y del resaltado en la lista). */
-const PLAZO_AVISO_MS = 5000;
-/** Largo máximo de `texto` en `GET /sugerencias` y de la descripción. */
-export const MAX_DESCRIPCION = 80;
-export const MAX_NOTA = 500;
+export const PLAZO_AVISO_MS = 5000;
 
 const VALORES_INICIALES: ValoresCaptura = {
   tipo: "gasto",
@@ -63,12 +47,8 @@ const VALORES_INICIALES: ValoresCaptura = {
   destinoId: null,
   fecha: "",
   nota: "",
+  partes: null,
 };
-
-/** Sin mayúsculas ni tildes, como compara la API («cafe» = «Café»). */
-export function normalizar(texto: string): string {
-  return texto.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
-}
 
 function sentidoDe(tipo: TipoMovimiento, rol: RolCuenta): Sentido {
   if (rol === "destino") return "entrada";
@@ -76,34 +56,35 @@ function sentidoDe(tipo: TipoMovimiento, rol: RolCuenta): Sentido {
 }
 
 /**
- * La lógica de la captura rápida, una sola para sus dos presentaciones (panel
- * en escritorio, hoja en móvil). Vive en el proveedor del layout: cerrar
- * conserva el borrador; registrar lo limpia.
+ * La captura rápida (modo registro), una sola lógica para sus dos
+ * presentaciones (panel en escritorio, hoja en móvil). Vive en el proveedor
+ * del layout: cerrar conserva el borrador; registrar lo limpia.
  */
 export function useCaptura(acciones: AccionesCaptura) {
   const [abierto, setAbierto] = useState(false);
   const [estadoCarga, setEstadoCarga] = useState<EstadoCarga>("inactiva");
   const [datos, setDatos] = useState<DatosCaptura | null>(null);
-  const [valores, setValores] = useState<ValoresCaptura>(VALORES_INICIALES);
-  const [errores, setErrores] = useState<Errores>({});
-  const [errorGeneral, setErrorGeneral] = useState<string | null>(null);
-  const [sugerencias, setSugerencias] = useState<SugerenciasPara | null>(null);
-  const [registrando, setRegistrando] = useState(false);
+  const [enviando, setEnviando] = useState(false);
   const [aviso, setAviso] = useState<Aviso | null>(null);
   const [oferta, setOferta] = useState<EstadoOferta | null>(null);
+  const [predeterminada, setPredeterminada] = useState<{ pendiente: boolean; error: string | null }>({ pendiente: false, error: null });
   /** Sube con cada registro: la presentación devuelve el foco al monto. */
-  const [registros, setRegistros] = useState(0);
+  const [envios, setEnvios] = useState(0);
+
+  const f = useFormulario({
+    sugerir: acciones.sugerir,
+    iniciales: VALORES_INICIALES,
+    categoriasPorTipo: datos?.captura.categorias ?? null,
+  });
+  const { valores, setValores } = f;
 
   const secuenciaCarga = useRef(0);
-  const secuenciaSugerencias = useRef(0);
-  const esperaSugerencias = useRef<ReturnType<typeof setTimeout> | null>(null);
   const plazoAviso = useRef<ReturnType<typeof setTimeout> | null>(null);
   /** Bloqueo síncrono: dos Enter seguidos no registran dos veces. */
   const enCurso = useRef(false);
 
   useEffect(
     () => () => {
-      if (esperaSugerencias.current) clearTimeout(esperaSugerencias.current);
       if (plazoAviso.current) clearTimeout(plazoAviso.current);
     },
     [],
@@ -149,98 +130,6 @@ export function useCaptura(acciones: AccionesCaptura) {
     setAbierto(false);
   }
 
-  /* ── Sugerencias ───────────────────────────────────────────────────── */
-
-  function cancelarEspera() {
-    if (esperaSugerencias.current) clearTimeout(esperaSugerencias.current);
-    esperaSugerencias.current = null;
-  }
-
-  /** Pide sugerencias; solo se aplica la última respuesta (número de secuencia). */
-  async function pedirSugerencias(tipo: TipoMovimiento, texto: string): Promise<Sugerencias | null> {
-    const secuencia = ++secuenciaSugerencias.current;
-    if (texto.trim() === "" || texto.length > MAX_DESCRIPCION) {
-      setSugerencias(null);
-      return null;
-    }
-    const resultado = await acciones.sugerir(tipo, texto);
-    if (secuencia !== secuenciaSugerencias.current || !resultado.ok) return null;
-    setSugerencias({ tipo, texto, datos: resultado.sugerencias });
-    return resultado.sugerencias;
-  }
-
-  function programarSugerencias(tipo: TipoMovimiento, texto: string) {
-    cancelarEspera();
-    if (texto.trim() === "") {
-      secuenciaSugerencias.current++;
-      setSugerencias(null);
-      return;
-    }
-    esperaSugerencias.current = setTimeout(() => void pedirSugerencias(tipo, texto), ESPERA_SUGERENCIAS_MS);
-  }
-
-  /* ── Edición ───────────────────────────────────────────────────────── */
-
-  function limpiarError(campo: CampoCaptura) {
-    setErrores((actual) => (actual[campo] ? { ...actual, [campo]: undefined } : actual));
-    setErrorGeneral(null);
-  }
-
-  function cambiar<C extends "monto" | "cuentaId" | "destinoId" | "fecha" | "nota">(campo: C, valor: ValoresCaptura[C]) {
-    setValores((actual) => ({ ...actual, [campo]: valor }));
-    limpiarError(campo === "cuentaId" ? "cuenta" : campo === "destinoId" ? "destino" : campo);
-  }
-
-  function cambiarTipo(tipo: TipoMovimiento) {
-    if (tipo === valores.tipo) return;
-    // La categoría es del tipo: al cambiarlo, vuelve a valer la propuesta.
-    setValores((actual) => ({ ...actual, tipo, categoria: { modo: "propuesta" } }));
-    setErrores({});
-    setErrorGeneral(null);
-    cancelarEspera();
-    void pedirSugerencias(tipo, valores.descripcion);
-  }
-
-  function cambiarDescripcion(descripcion: string) {
-    setValores((actual) => ({
-      ...actual,
-      descripcion,
-      // Quitar la propuesta era sobre otro texto: con uno nuevo vuelve a proponer.
-      categoria: actual.categoria.modo === "quitada" ? { modo: "propuesta" } : actual.categoria,
-    }));
-    limpiarError("descripcion");
-    programarSugerencias(valores.tipo, descripcion);
-  }
-
-  /** Acepta un concepto (Tab, clic o chip): completa la descripción y propone su categoría. */
-  function aceptarConcepto(descripcion: string) {
-    cambiarDescripcion(descripcion);
-    cancelarEspera();
-    void pedirSugerencias(valores.tipo, descripcion);
-  }
-
-  /** Respuesta de sugerencias para el tipo actual; la última, aunque el texto siga cambiando. */
-  const vigentes = sugerencias && sugerencias.tipo === valores.tipo && valores.descripcion.trim() !== "" ? sugerencias.datos : null;
-  const propuesta: Propuesta | null = valores.tipo === "transferencia" ? null : (vigentes?.propuesta ?? null);
-  const conceptos = vigentes?.conceptos ?? [];
-
-  /** Texto fantasma: lo que falta del primer concepto si empieza por lo escrito. */
-  const primero = conceptos[0];
-  const fantasma =
-    primero && normalizar(primero.descripcion).startsWith(normalizar(valores.descripcion))
-      ? primero.descripcion.slice(valores.descripcion.length)
-      : "";
-
-  /** Toca un chip de categoría: elige, cambia o quita (la propuesta o la elegida). */
-  function tocarCategoria(id: string) {
-    const actual = valores.categoria;
-    const esPropuesta = actual.modo === "propuesta" && propuesta?.categoria.id === id;
-    const esElegida = actual.modo === "elegida" && actual.id === id;
-    const siguiente: DecisionCategoria = esPropuesta || esElegida ? { modo: "quitada" } : { modo: "elegida", id };
-    setValores((v) => ({ ...v, categoria: siguiente }));
-    limpiarError("categoria");
-  }
-
   /* ── Registro ──────────────────────────────────────────────────────── */
 
   function mostrarAviso(movimiento: Movimiento) {
@@ -253,38 +142,28 @@ export function useCaptura(acciones: AccionesCaptura) {
     }, PLAZO_AVISO_MS);
   }
 
-  const montoDigitos = montoValido(valores.monto);
   const sinCuentas = datos !== null && datos.cuentas.length === 0;
-  const puedeRegistrar = montoDigitos !== null && datos !== null && !sinCuentas && !registrando;
+  const puedeEnviar =
+    montoValido(valores.monto) !== null && f.errorDePartes === null && datos !== null && !sinCuentas && !enviando;
 
-  async function registrar() {
-    if (enCurso.current || !puedeRegistrar || !datos) return;
+  /** Registra. Devuelve `false`: la captura queda abierta, lista para otro. */
+  async function enviar(): Promise<boolean> {
+    if (enCurso.current || !puedeEnviar || !datos) return false;
     enCurso.current = true;
-    setRegistrando(true);
-    setErrores({});
-    setErrorGeneral(null);
+    setEnviando(true);
+    f.limpiarErrores();
 
     const enviados = valores;
-    const conTexto = enviados.descripcion.trim() !== "" && enviados.tipo !== "transferencia";
-    let propuestaUsada = conTexto ? propuesta : null;
-    // La categoría propuesta debe ser la de la descripción final, no la de una tecla anterior.
-    const alDia = sugerencias?.tipo === enviados.tipo && sugerencias.texto === enviados.descripcion;
-    if (conTexto && enviados.categoria.modo === "propuesta" && !alDia) {
-      cancelarEspera();
-      propuestaUsada = (await pedirSugerencias(enviados.tipo, enviados.descripcion))?.propuesta ?? null;
-    }
-
+    const propuestaUsada = await f.propuestaPara(enviados, false);
     const cuerpo = cuerpoDesdeValores(enviados, propuestaUsada);
     const resultado = cuerpo ? await acciones.registrar(cuerpo) : null;
     enCurso.current = false;
-    setRegistrando(false);
-    if (!resultado) return;
+    setEnviando(false);
+    if (!resultado) return false;
 
     if (!resultado.ok) {
-      // Se conserva todo lo escrito.
-      if (resultado.campo) setErrores({ [resultado.campo]: resultado.mensaje });
-      else setErrorGeneral(resultado.mensaje);
-      return;
+      f.mostrarFallo(resultado);
+      return false;
     }
 
     const categorias: readonly Categoria[] = enviados.tipo === "transferencia" ? [] : datos.captura.categorias[enviados.tipo];
@@ -294,16 +173,17 @@ export function useCaptura(acciones: AccionesCaptura) {
       categoria: enviados.categoria,
       propuesta: propuestaUsada,
       categorias,
+      dividido: enviados.partes !== null,
     });
     setOferta(nueva ? { oferta: nueva, pendiente: false, error: null } : null);
     mostrarAviso(resultado.movimiento);
 
     // Listo para otro: tipo, cuentas y fecha se mantienen.
-    setValores((actual) => ({ ...actual, monto: "", descripcion: "", categoria: { modo: "propuesta" }, nota: "" }));
-    secuenciaSugerencias.current++;
-    setSugerencias(null);
-    setRegistros((n) => n + 1);
+    setValores((actual) => ({ ...actual, monto: "", descripcion: "", categoria: { modo: "propuesta" }, nota: "", partes: null }));
+    f.olvidarSugerencias();
+    setEnvios((n) => n + 1);
     void cargar(); // saldos, gastos de hoy y frecuentes, en segundo plano
+    return false;
   }
 
   async function deshacer() {
@@ -343,68 +223,71 @@ export function useCaptura(acciones: AccionesCaptura) {
     else setOferta((actual) => (actual?.oferta === o ? { ...actual, pendiente: false, error: resultado.mensaje } : actual));
   }
 
+  /** «Usar {cuenta} siempre»: `PATCH /perfil`. Éxito → recarga la captura (el rótulo cambia). */
+  async function elegirPredeterminada(cuentaId: string) {
+    if (predeterminada.pendiente) return;
+    setPredeterminada({ pendiente: true, error: null });
+    const resultado = await acciones.elegirPredeterminada(cuentaId);
+    if (!resultado.ok) {
+      setPredeterminada({ pendiente: false, error: resultado.mensaje });
+      return;
+    }
+    await cargar();
+    setPredeterminada({ pendiente: false, error: null });
+  }
+
   /* ── Derivados para presentar ──────────────────────────────────────── */
 
   const cuentas: Cuenta[] = datos?.cuentas ?? [];
   const captura = datos?.captura ?? null;
-  const montoNumero = montoDigitos === null ? null : BigInt(montoDigitos);
 
   /** Saldo estimado de la cuenta elegida en ese rol tras el movimiento (solo presentación, RN-02). */
   function vistaPrevia(cuenta: Cuenta, rol: RolCuenta): bigint | null {
-    if (montoNumero === null) return null;
+    if (f.montoNumero === null) return null;
     const elegida = rol === "cuenta" ? valores.cuentaId : valores.destinoId;
     if (cuenta.id !== elegida) return null;
     if (rol === "destino" && valores.tipo !== "transferencia") return null;
-    return saldoResultante(cuenta, sentidoDe(valores.tipo, rol), montoNumero);
+    return saldoResultante(cuenta, sentidoDe(valores.tipo, rol), f.montoNumero);
   }
 
-  const categorias: readonly Categoria[] = captura && valores.tipo !== "transferencia" ? captura.categorias[valores.tipo] : [];
-  const cuentaElegida = cuentas.find((c) => c.id === valores.cuentaId) ?? null;
-  const predeterminada = cuentas.find((c) => c.id === captura?.cuentaPredeterminadaId) ?? null;
-
   return {
+    ...f,
+    modo: "registro" as const,
     abierto,
     abrir,
     cerrar,
+    /** En la captura, cerrar nunca pregunta: el borrador se conserva. */
+    solicitarCierre: () => true,
     reintentar: () => void cargar(),
     estadoCarga,
     captura,
     cuentas,
     sinCuentas,
-    categorias,
-    cuentaElegida,
-    predeterminada,
-    valores,
-    errores,
-    errorGeneral,
-    cambiar,
-    cambiarTipo,
-    cambiarDescripcion,
-    aceptarConcepto,
-    tocarCategoria,
-    propuesta,
-    conceptos,
-    fantasma,
-    montoNumero,
+    cuentaElegida: cuentas.find((c) => c.id === valores.cuentaId) ?? null,
+    predeterminada: cuentas.find((c) => c.id === captura?.cuentaPredeterminadaId) ?? null,
+    nombreCuenta: (id: string | null) => cuentas.find((c) => c.id === id)?.nombre ?? null,
     vistaPrevia,
-    puedeRegistrar,
-    registrando,
-    registrar,
-    registros,
+    puedeEnviar,
+    enviando,
+    enviar,
+    envios,
     aviso,
     deshacer,
     resaltadoId: aviso?.movimiento.id ?? null,
     oferta,
     responderOferta,
+    elegirPredeterminada,
+    predeterminadaPendiente: predeterminada.pendiente,
+    errorPredeterminada: predeterminada.error,
   };
 }
 
 export type EstadoCaptura = ReturnType<typeof useCaptura>;
 
-/* ── Aviso y oferta, iguales en panel y hoja ───────────────────────────── */
+/* ── Aviso y oferta, iguales en panel, hoja y libro ────────────────────── */
 
 /** Cuenta del movimiento como se lee en el aviso: «Nequi» o «Nequi → Visa Oro». */
-function cuentaDe(movimiento: Movimiento): string {
+export function cuentaDe(movimiento: Pick<Movimiento, "tipo" | "cuentaOrigen" | "cuentaDestino">): string {
   const origen = movimiento.cuentaOrigen?.nombre ?? "";
   const destino = movimiento.cuentaDestino?.nombre ?? "";
   if (movimiento.tipo === "transferencia") return `${origen} → ${destino}`;
@@ -425,29 +308,26 @@ export function datosAviso(c: EstadoCaptura): DatosAviso | null {
   };
 }
 
-export function datosOferta(c: EstadoCaptura): DatosOferta | null {
-  if (!c.oferta) return null;
-  const { oferta, pendiente, error } = c.oferta;
+/** Pregunta y acción de la oferta de regla (RN-11). */
+export function datosDeOferta(
+  estado: EstadoOferta | null,
+  responder: (acepta: boolean) => void,
+): DatosOferta | null {
+  if (!estado) return null;
+  const { oferta, pendiente, error } = estado;
   const crear = oferta.tipo === "crear";
   return {
     pregunta: crear
       ? `¿Siempre «${oferta.palabraClave}» → ${oferta.categoria.nombre}?`
       : `¿Cambiar la regla «${oferta.palabraClave}» a ${oferta.categoria.nombre}?`,
     accion: crear ? "Crear regla" : "Cambiar regla",
-    alAceptar: () => void c.responderOferta(true),
-    alRechazar: () => void c.responderOferta(false),
+    alAceptar: () => responder(true),
+    alRechazar: () => responder(false),
     pendiente,
     error,
   };
 }
 
-const VERBO: Record<TipoMovimiento, string> = {
-  gasto: "Registrar gasto",
-  ingreso: "Registrar ingreso",
-  transferencia: "Registrar transferencia",
-};
-
-/** Texto del botón: «Registrar gasto», o «Registrando…» mientras espera. */
-export function etiquetaRegistrar(c: EstadoCaptura): string {
-  return c.registrando ? "Registrando…" : VERBO[c.valores.tipo];
+export function datosOferta(c: EstadoCaptura): DatosOferta | null {
+  return datosDeOferta(c.oferta, (acepta) => void c.responderOferta(acepta));
 }

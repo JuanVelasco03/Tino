@@ -16,6 +16,10 @@ export type EntradaOferta = {
   propuesta: Propuesta | null;
   /** Categorías del tipo, para resolver la elegida por su id. */
   categorias: readonly Categoria[];
+  /** Edición: la categoría que tenía el movimiento. Si no cambió, no hay oferta. */
+  categoriaAnterior?: string | null;
+  /** Con partes no hay una categoría que convertir en regla. */
+  dividido: boolean;
 };
 
 export type Oferta =
@@ -26,11 +30,13 @@ export type Oferta =
  * - crear: sin propuesta, categoría elegida a mano y descripción no vacía de
  *   hasta 60 caracteres (será la palabra clave).
  * - ajustar: con propuesta y una categoría elegida distinta de la propuesta.
- * - `null` en cualquier otro caso y siempre en transferencia.
+ * - `null` en cualquier otro caso, siempre en transferencia y con partes; en
+ *   la edición, también si la categoría es la que ya tenía (no se tocó).
  */
 export function ofertaDeRegla(entrada: EntradaOferta): Oferta | null {
-  const { tipo, descripcion, categoria, propuesta, categorias } = entrada;
-  if (tipo === "transferencia" || categoria.modo !== "elegida") return null;
+  const { tipo, descripcion, categoria, propuesta, categorias, categoriaAnterior, dividido } = entrada;
+  if (tipo === "transferencia" || dividido || categoria.modo !== "elegida") return null;
+  if (categoriaAnterior !== undefined && categoria.id === categoriaAnterior) return null;
 
   const elegida = categorias.find((c) => c.id === categoria.id && c.tipo === tipo);
   if (!elegida) return null;

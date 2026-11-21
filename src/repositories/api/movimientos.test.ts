@@ -14,6 +14,7 @@ import {
   crearMovimiento,
   eliminarMovimiento,
   listarMovimientos,
+  reemplazarMovimiento,
   type ListaMovimientosDto,
   type MovimientoDto,
 } from "./movimientos";
@@ -55,23 +56,27 @@ beforeEach(() => {
 });
 
 describe("aMovimiento", () => {
-  it("convierte el monto a bigint y marca el dividido", () => {
-    expect(aMovimiento(DIVIDIDO)).toEqual({
+  it("convierte montos y partes a bigint y conserva la nota", () => {
+    expect(aMovimiento({ ...DIVIDIDO, nota: "con Ana" })).toEqual({
       id: DIVIDIDO.id,
       tipo: "gasto",
       monto: 30000n,
       fecha: "2026-11-19",
       descripcion: "Almuerzo y mercado",
+      nota: "con Ana",
       cuentaOrigen: { id: "8f0e0000-0000-4000-8000-000000000002", nombre: "Nequi" },
       cuentaDestino: null,
       categoria: null,
-      dividido: true,
+      partes: [
+        { categoria: { id: "bb9f", nombre: "Comida" }, monto: 20000n },
+        { categoria: { id: "bb4e", nombre: "Mercado" }, monto: 10000n },
+      ],
     });
   });
 
-  it("sin partes no está dividido; conserva ambos extremos de la transferencia", () => {
+  it("sin partes: lista vacía; conserva ambos extremos de la transferencia", () => {
     const movimiento = aMovimiento(TRANSFERENCIA);
-    expect(movimiento.dividido).toBe(false);
+    expect(movimiento.partes).toEqual([]);
     expect(movimiento.cuentaOrigen?.nombre).toBe("Nequi");
     expect(movimiento.cuentaDestino?.nombre).toBe("Visa Oro");
   });
@@ -113,6 +118,25 @@ describe("llamadas", () => {
     const movimiento = await crearMovimiento(cuerpo);
     expect(enviar).toHaveBeenCalledWith("POST", "/movimientos", cuerpo);
     expect(movimiento.monto).toBe(1200000n);
+  });
+
+  it("reemplazarMovimiento hace PUT con el cuerpo completo y convierte la respuesta", async () => {
+    vi.mocked(enviar).mockResolvedValue(DIVIDIDO);
+    const cuerpo = {
+      tipo: "gasto" as const,
+      monto: "30000",
+      fecha: "2026-11-19",
+      descripcion: "Almuerzo y mercado",
+      nota: "con Ana",
+      cuentaOrigenId: "a",
+      partes: [
+        { categoriaId: "bb9f", monto: "20000" },
+        { categoriaId: "bb4e", monto: "10000" },
+      ],
+    };
+    const movimiento = await reemplazarMovimiento("3c2a/x", cuerpo);
+    expect(enviar).toHaveBeenCalledWith("PUT", "/movimientos/3c2a%2Fx", cuerpo);
+    expect(movimiento.partes.map((p) => p.monto)).toEqual([20000n, 10000n]);
   });
 
   it("eliminarMovimiento codifica el id", async () => {

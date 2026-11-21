@@ -1,9 +1,11 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { BloqueEliminar } from "@/components/bloque-eliminar";
 import { Boton } from "@/components/boton";
 import { CampoMonto } from "@/components/campo-monto";
 import { AvisoRegistro } from "@/components/captura/aviso-registro";
+import { EditorPartes } from "@/components/captura/editor-partes";
 import { FichaCuenta } from "@/components/captura/ficha-cuenta";
 import { SelectorTipo } from "@/components/captura/selector-tipo";
 import { TecladoNumerico } from "@/components/captura/teclado-numerico";
@@ -12,7 +14,9 @@ import { EstadoVacio } from "@/components/estado-vacio";
 import { IconoCuenta } from "@/components/iconos";
 import { OpcionUnica } from "@/components/opcion-unica";
 import { PanelLateral, type ControlPanel } from "@/components/panel-lateral";
+import { desdeMonto, formatearEntradaPesos } from "@/domain/dinero/entrada";
 import type { TipoMovimiento } from "@/domain/movimiento/cuerpo";
+import { errorPartes, restante, type ValorParte } from "@/domain/movimiento/partes";
 import { saldoResultante } from "@/domain/movimiento/vista-previa";
 
 type Tipo = "banco" | "efectivo" | "tarjeta_credito";
@@ -197,6 +201,76 @@ export function MuestraEstadoVacioBoton() {
       titulo="Aún no registras movimientos este mes."
       detalle={veces === 0 ? "Registra tu primer gasto." : `Abriría la captura (${veces}).`}
       accion={{ etiqueta: "Registrar", alPulsar: () => setVeces((v) => v + 1) }}
+    />
+  );
+}
+
+const CATEGORIAS_PARTES = [
+  { id: "comida", nombre: "Comida" },
+  { id: "mercado", nombre: "Mercado" },
+  { id: "hogar", nombre: "Hogar" },
+  { id: "ocio", nombre: "Ocio" },
+];
+
+/** Editor de partes sobre un total de 30.000: falta, sobra, cuadra y «El resto». `sufijo` separa los ids. */
+export function MuestraEditorPartes({ sufijo }: { sufijo: string }) {
+  const total = 30_000n;
+  const [partes, setPartes] = useState<ValorParte[] | null>([
+    { categoriaId: "comida", monto: "20.000" },
+    { categoriaId: null, monto: "" },
+  ]);
+  const error = partes ? errorPartes(total, partes) : null;
+
+  function cambiar(indice: number, cambios: Partial<ValorParte>) {
+    const formateados = cambios.monto === undefined ? cambios : { ...cambios, monto: formatearEntradaPesos(cambios.monto) };
+    setPartes((p) => p?.map((parte, i) => (i === indice ? { ...parte, ...formateados } : parte)) ?? null);
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      <p className="text-etiqueta font-normal text-secundario">
+        Total <span className="font-mono tabular-nums">30.000</span>
+      </p>
+      <EditorPartes
+        idBase={`estilos-${sufijo}`}
+        total={total}
+        partes={partes}
+        categorias={CATEGORIAS_PARTES}
+        alActivar={() => setPartes([{ categoriaId: "comida", monto: "" }, { categoriaId: null, monto: "" }])}
+        alDesactivar={() => setPartes(null)}
+        alCambiar={cambiar}
+        alAgregar={() => setPartes((p) => (p ? [...p, { categoriaId: null, monto: "" }] : p))}
+        alQuitar={(indice) => setPartes((p) => (p && p.length > 2 ? p.filter((_, i) => i !== indice) : p))}
+        alCompletar={() =>
+          setPartes((p) => {
+            if (!p) return p;
+            const resto = restante(total, p.slice(0, -1));
+            return resto > 0n ? p.map((parte, i) => (i === p.length - 1 ? { ...parte, monto: desdeMonto(resto) } : parte)) : p;
+          })
+        }
+        error={error}
+      />
+    </div>
+  );
+}
+
+/** C26 con el texto de un movimiento: el bloque reemplaza al vínculo que lo abre. */
+export function MuestraBloqueEliminar() {
+  const [abierto, setAbierto] = useState(false);
+  if (!abierto) {
+    return (
+      <button type="button" onClick={() => setAbierto(true)} className="py-2 text-etiqueta font-normal text-secundario hover:text-texto">
+        Eliminar movimiento…
+      </button>
+    );
+  }
+  return (
+    <BloqueEliminar
+      nombre="Almuerzo"
+      detalle="El saldo de Nequi vuelve a como estaba. No se puede deshacer."
+      alConfirmar={() => setAbierto(false)}
+      alCancelar={() => setAbierto(false)}
+      pendiente={false}
     />
   );
 }

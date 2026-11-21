@@ -18,7 +18,10 @@ const BASE: ValoresCaptura = {
   destinoId: null,
   fecha: "2026-11-19",
   nota: "",
+  partes: null,
 };
+
+const MERCADO = "bb9f0000-0000-4000-8000-000000000005";
 
 describe("cuerpoDesdeValores · forma por tipo", () => {
   it("gasto: cuenta de origen y categoría propuesta", () => {
@@ -93,6 +96,62 @@ describe("cuerpoDesdeValores · monto", () => {
 
   it("quita los puntos de miles y no pasa por number", () => {
     expect(cuerpoDesdeValores({ ...BASE, monto: "9.007.199.254.740.993" }, null)?.monto).toBe("9007199254740993");
+  });
+});
+
+describe("cuerpoDesdeValores · partes", () => {
+  const DIVIDIDO: ValoresCaptura = {
+    ...BASE,
+    monto: "30.000",
+    nota: "con Ana",
+    categoria: { modo: "elegida", id: OCIO },
+    partes: [
+      { categoriaId: COMIDA.id, monto: "20.000" },
+      { categoriaId: MERCADO, monto: "10.000" },
+    ],
+  };
+
+  it("con partes envía `partes` y nunca `categoriaId`, aunque haya una elegida o propuesta", () => {
+    const cuerpo = cuerpoDesdeValores(DIVIDIDO, PROPUESTA);
+    expect(cuerpo).toEqual({
+      tipo: "gasto",
+      monto: "30000",
+      fecha: "2026-11-19",
+      descripcion: "Almuerzo",
+      nota: "con Ana",
+      cuentaOrigenId: NEQUI,
+      partes: [
+        { categoriaId: COMIDA.id, monto: "20000" },
+        { categoriaId: MERCADO, monto: "10000" },
+      ],
+    });
+    expect(cuerpo).not.toHaveProperty("categoriaId");
+  });
+
+  it("ingreso dividido: la cuenta es el destino", () => {
+    const cuerpo = cuerpoDesdeValores({ ...DIVIDIDO, tipo: "ingreso" }, null);
+    expect(cuerpo?.cuentaDestinoId).toBe(NEQUI);
+    expect(cuerpo?.partes).toHaveLength(2);
+  });
+
+  it("transferencia: nunca partes", () => {
+    const cuerpo = cuerpoDesdeValores({ ...DIVIDIDO, tipo: "transferencia", destinoId: VISA }, null);
+    expect(cuerpo).not.toHaveProperty("partes");
+    expect(cuerpo).not.toHaveProperty("categoriaId");
+  });
+
+  it.each<[string, ValoresCaptura["partes"]]>([
+    ["no suman", [{ categoriaId: COMIDA.id, monto: "20.000" }, { categoriaId: MERCADO, monto: "5.000" }]],
+    ["una sola", [{ categoriaId: COMIDA.id, monto: "30.000" }]],
+    ["sin categoría", [{ categoriaId: COMIDA.id, monto: "20.000" }, { categoriaId: null, monto: "10.000" }]],
+    ["repetidas", [{ categoriaId: COMIDA.id, monto: "20.000" }, { categoriaId: COMIDA.id, monto: "10.000" }]],
+    ["monto vacío", [{ categoriaId: COMIDA.id, monto: "30.000" }, { categoriaId: MERCADO, monto: "" }]],
+  ])("partes inválidas (%s) → null", (_caso, partes) => {
+    expect(cuerpoDesdeValores({ ...DIVIDIDO, partes }, null)).toBeNull();
+  });
+
+  it("sin dividir: no envía `partes`", () => {
+    expect(cuerpoDesdeValores(BASE, null)).not.toHaveProperty("partes");
   });
 });
 

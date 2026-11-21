@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { formatearDiaSemana, formatearFecha, formatearFechaSinAnio, formatearMes, sumarDias } from "./formato";
+import {
+  esMes,
+  formatearDiaSemana,
+  formatearFecha,
+  formatearFechaSinAnio,
+  formatearMes,
+  mesDeFecha,
+  mesEnZona,
+  sumarDias,
+  sumarMeses,
+} from "./formato";
 
 describe("sumarDias", () => {
   it.each<[string, number, string]>([
@@ -89,4 +99,57 @@ describe("formatearFechaSinAnio", () => {
   it("lanza error con entrada mal formada", () => {
     expect(() => formatearFechaSinAnio("nov 18")).toThrow();
   });
+});
+
+describe("sumarMeses", () => {
+  it.each<[string, number, string]>([
+    ["2026-11", -1, "2026-10"],
+    ["2026-11", 1, "2026-12"],
+    ["2026-01", -1, "2025-12"], // cambio de año hacia atrás
+    ["2026-12", 1, "2027-01"], // cambio de año hacia adelante
+    ["2026-11", 0, "2026-11"],
+    ["2026-11", -23, "2024-12"],
+    ["2026-11", 14, "2028-01"],
+  ])("%s %+d → %s", (mes, n, esperado) => {
+    expect(sumarMeses(mes, n)).toBe(esperado);
+  });
+
+  it.each(["2026-13", "2026-00", "hola", ""])("lanza error con mes inválido: %j", (mes) => {
+    expect(() => sumarMeses(mes, 1)).toThrow();
+  });
+});
+
+describe("mesDeFecha", () => {
+  it("toma año y mes", () => {
+    expect(mesDeFecha("2026-11-19")).toBe("2026-11");
+    expect(mesDeFecha("2027-01-01")).toBe("2027-01");
+  });
+
+  it("lanza error con fecha mal formada", () => {
+    expect(() => mesDeFecha("2026-11")).toThrow();
+  });
+});
+
+describe("mesEnZona", () => {
+  it("a medianoche UTC del día 1, en Bogotá sigue el mes anterior", () => {
+    expect(mesEnZona("America/Bogota", new Date("2026-12-01T00:00:00Z"))).toBe("2026-11");
+    expect(mesEnZona("UTC", new Date("2026-12-01T00:00:00Z"))).toBe("2026-12");
+  });
+
+  it("a medianoche UTC del 1 de enero, en Bogotá sigue diciembre del año anterior", () => {
+    expect(mesEnZona("America/Bogota", new Date("2027-01-01T00:00:00Z"))).toBe("2026-12");
+  });
+
+  it("a las 5:00 UTC del día 1 ya es el mes nuevo en Bogotá", () => {
+    expect(mesEnZona("America/Bogota", new Date("2026-12-01T05:00:00Z"))).toBe("2026-12");
+  });
+});
+
+describe("esMes", () => {
+  it.each([["2026-11", true], ["2026-01", true], ["2026-13", false], ["2026-00", false], ["hola", false], ["2026-11-19", false], ["", false]] as const)(
+    "%j → %s",
+    (texto, esperado) => {
+      expect(esMes(texto)).toBe(esperado);
+    },
+  );
 });
